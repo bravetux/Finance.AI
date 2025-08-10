@@ -307,6 +307,33 @@ const RealEstate: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>📉 Rental Yield &lt; 6%</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm text-muted-foreground">
+            <p><strong>Low yield territory</strong> — the rental income isn’t compensating you enough for the property’s market value.</p>
+            <p>This usually happens in metro/prime city areas where prices are high but rents haven’t kept pace.</p>
+            <p>Treat the property more as a <strong>capital appreciation play</strong> rather than a pure income generator. You’re banking on long-term price growth.</p>
+            <p>But if capital appreciation is also sluggish, your money is working too slowly — better to consider selling and reallocating to higher-yield or faster-growth assets.</p>
+            <p>Alternative investments (REITs, bonds, dividend stocks) could beat your current yield with less headache.</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>✅ Rental Yield ≥ 6%</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm text-muted-foreground">
+            <p><strong>Healthy income zone</strong> — you’re getting decent cash flow relative to property value.</p>
+            <p>Can be a sign of undervalued property or high rental demand (often in tier-2/tier-3 cities or commercial spaces).</p>
+            <p>You can hold and reinvest the rental income, potentially compounding returns.</p>
+            <p>Still, compare with local REIT yields (often 6–8%) — if you’re earning more, you’ve got a solid asset.</p>
+            <p>Factor in maintenance, vacancy, and tax — real net yield after expenses might be 1–2% lower.</p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
