@@ -334,6 +334,17 @@ const RealEstate: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>💡 Golden Rule</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-lg font-medium text-muted-foreground">
+            For long-term investors, a rental yield below 6% needs strong capital growth to justify holding. A yield above 6% can justify holding even without significant price appreciation, as the cash flow itself is robust.
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 };

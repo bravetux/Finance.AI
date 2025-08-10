@@ -56,6 +56,7 @@ const navItems = [
     children: [
       { name: "Net Worth Calculator", path: "/net-worth", icon: Calculator },
       { name: "Real Estate", path: "/real-estate", icon: Home },
+      { name: "Rental Yield Appreciation", path: "/rental-yield-appreciation", icon: TrendingUp },
       { name: "Domestic Equity", path: "/domestic-equity", icon: BarChart2 },
       { name: "US Equity", path: "/us-equity", icon: Landmark },
       { name: "Debt", path: "/debt", icon: FileText },
