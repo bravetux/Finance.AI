@@ -26,20 +26,33 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "./theme-toggle";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const navItems = [
-  { name: "Dashboard", path: "/", icon: LayoutDashboard },
-  { name: "FIRE Calculator", path: "/fire-calculator", icon: Flame },
-  { name: "Expense Tracker", path: "/expense-tracker", icon: SheetIcon },
-  { name: "Cashflow", path: "/cashflow", icon: ArrowDownUp },
-  { name: "Net Worth", path: "/net-worth", icon: Calculator },
-  { name: "Goals", path: "/goals", icon: Target },
-  { name: "Future Value", path: "/future-value", icon: TrendingUp },
-  { name: "Retirement", path: "/retirement", icon: Landmark },
-  { name: "Portfolio", path: "/portfolio", icon: Briefcase },
-  { name: "Projected Cashflow", path: "/projected-cashflow", icon: LineChart },
-  { name: "Reports", path: "/reports", icon: FileText },
-  { name: "AI Prompt", path: "/ai-prompt", icon: Bot },
+  { name: "Dashboard", path: "/", icon: LayoutDashboard, type: 'link' },
+  { 
+    name: "Financial Planning", 
+    icon: Calculator,
+    type: 'section',
+    children: [
+      { name: "Expense Tracker", path: "/expense-tracker", icon: SheetIcon },
+      { name: "Cashflow", path: "/cashflow", icon: ArrowDownUp },
+    ]
+  },
+  { name: "FIRE Calculator", path: "/fire-calculator", icon: Flame, type: 'link' },
+  { name: "Net Worth", path: "/net-worth", icon: Calculator, type: 'link' },
+  { name: "Goals", path: "/goals", icon: Target, type: 'link' },
+  { name: "Future Value", path: "/future-value", icon: TrendingUp, type: 'link' },
+  { name: "Retirement", path: "/retirement", icon: Landmark, type: 'link' },
+  { name: "Portfolio", path: "/portfolio", icon: Briefcase, type: 'link' },
+  { name: "Projected Cashflow", path: "/projected-cashflow", icon: LineChart, type: 'link' },
+  { name: "Reports", path: "/reports", icon: FileText, type: 'link' },
+  { name: "AI Prompt", path: "/ai-prompt", icon: Bot, type: 'link' },
 ];
 
 const DashboardLayout: React.FC = () => {
@@ -52,21 +65,52 @@ const DashboardLayout: React.FC = () => {
         Finance Dashboard
       </h2>
       <div className="flex-grow flex flex-col">
-        <nav className="flex flex-col gap-2">
-          {navItems.map((item) => (
-            <Button
-              key={item.name}
-              variant="ghost"
-              className="justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-              asChild
-              onClick={() => isMobile && setIsSheetOpen(false)}
-            >
-              <Link to={item.path}>
-                <item.icon className="mr-2 h-4 w-4" />
-                {item.name}
-              </Link>
-            </Button>
-          ))}
+        <nav className="flex flex-col gap-1">
+          {navItems.map((item) =>
+            item.type === 'section' && item.children ? (
+              <Accordion key={item.name} type="single" collapsible className="w-full">
+                <AccordionItem value={item.name} className="border-none">
+                  <AccordionTrigger className="justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:no-underline rounded-md px-3 py-2 w-full">
+                    <div className="flex items-center">
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {item.name}
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="pt-1 pb-0">
+                    <div className="flex flex-col gap-1 pl-4">
+                      {item.children.map((child) => (
+                        <Button
+                          key={child.name}
+                          variant="ghost"
+                          className="justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                          asChild
+                          onClick={() => isMobile && setIsSheetOpen(false)}
+                        >
+                          <Link to={child.path}>
+                            <child.icon className="mr-2 h-4 w-4" />
+                            {child.name}
+                          </Link>
+                        </Button>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            ) : (
+              <Button
+                key={item.name}
+                variant="ghost"
+                className="justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                asChild
+                onClick={() => isMobile && setIsSheetOpen(false)}
+              >
+                <Link to={item.path!}>
+                  <item.icon className="mr-2 h-4 w-4" />
+                  {item.name}
+                </Link>
+              </Button>
+            )
+          )}
         </nav>
         <div className="mt-6 text-sm text-sidebar-foreground/80 px-2">
           <p className="font-semibold">Designed and Developed by B.Vignesh Kumar</p>
