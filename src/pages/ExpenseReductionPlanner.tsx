@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { saveAs } from "file-saver";
 import { showSuccess, showError } from "@/utils/toast";
+import GenericPieChart from "@/components/GenericPieChart";
 
 type Action = "Same" | "Reduce" | "Increase";
 
@@ -99,6 +100,15 @@ const ExpenseReductionPlanner: React.FC = () => {
     );
   }, [expenses]);
 
+  const chartData = useMemo(() => {
+    return expenses
+      .filter(expense => expense.monthlyCost > 0)
+      .map(expense => ({
+        name: expense.category,
+        value: expense.monthlyCost,
+      }));
+  }, [expenses]);
+
   const formatCurrency = (value: number) => {
     return `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
   };
@@ -163,6 +173,18 @@ const ExpenseReductionPlanner: React.FC = () => {
           </Button>
         </div>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Expense Breakdown</CardTitle>
+          <CardDescription>
+            A visual representation of your monthly expenses by category.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <GenericPieChart data={chartData} />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
