@@ -189,88 +189,90 @@ const RealEstate: React.FC = () => {
         </div>
       </div>
 
-      {/* Property Value Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Property Value</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Particulars</TableHead>
-                <TableHead className="text-right">Value (INR)</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {propertyValues.map(p => (
-                <TableRow key={p.id}>
-                  <TableCell className="font-medium">{p.name}</TableCell>
-                  <TableCell className="text-right">
-                    <Input
-                      type="number"
-                      value={p.value}
-                      onChange={e => handlePropertyValueChange(p.id, e.target.value)}
-                      className="text-right"
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TableCell className="font-bold">Total</TableCell>
-                <TableCell className="text-right font-bold">{formatCurrency(totalPropertyValue)}</TableCell>
-              </TableRow>
-            </TableFooter>
-          </Table>
-        </CardContent>
-      </Card>
-
-      {/* Rental Yield Calculator Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Rental Yield Calculator</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Property Value Table */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Property Value</CardTitle>
+          </CardHeader>
+          <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Particulars</TableHead>
-                  <TableHead>Value (INR)</TableHead>
-                  <TableHead>Rent</TableHead>
-                  <TableHead className="text-right">Annual Rent</TableHead>
-                  <TableHead className="text-right">Yield %</TableHead>
+                  <TableHead className="text-right">Value (INR)</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {rentalCalculations.map(p => (
+                {propertyValues.map(p => (
                   <TableRow key={p.id}>
                     <TableCell className="font-medium">{p.name}</TableCell>
-                    <TableCell>
+                    <TableCell className="text-right">
                       <Input
                         type="number"
                         value={p.value}
-                        onChange={e => handleRentalPropertyChange(p.id, 'value', e.target.value)}
+                        onChange={e => handlePropertyValueChange(p.id, e.target.value)}
+                        className="text-right"
                       />
                     </TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={p.rent}
-                        onChange={e => handleRentalPropertyChange(p.id, 'rent', e.target.value)}
-                      />
-                    </TableCell>
-                    <TableCell className="text-right">{formatCurrency(p.annualRent)}</TableCell>
-                    <TableCell className="text-right">{p.yieldPercent.toFixed(2)}%</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TableCell className="font-bold">Total</TableCell>
+                  <TableCell className="text-right font-bold">{formatCurrency(totalPropertyValue)}</TableCell>
+                </TableRow>
+              </TableFooter>
             </Table>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+
+        {/* Rental Yield Calculator Table */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Rental Yield Calculator</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Particulars</TableHead>
+                    <TableHead>Value (INR)</TableHead>
+                    <TableHead>Rent</TableHead>
+                    <TableHead className="text-right">Annual Rent</TableHead>
+                    <TableHead className="text-right">Yield %</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {rentalCalculations.map(p => (
+                    <TableRow key={p.id}>
+                      <TableCell className="font-medium">{p.name}</TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          value={p.value}
+                          onChange={e => handleRentalPropertyChange(p.id, 'value', e.target.value)}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          value={p.rent}
+                          onChange={e => handleRentalPropertyChange(p.id, 'rent', e.target.value)}
+                        />
+                      </TableCell>
+                      <TableCell className="text-right">{formatCurrency(p.annualRent)}</TableCell>
+                      <TableCell className="text-right">{p.yieldPercent.toFixed(2)}%</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
