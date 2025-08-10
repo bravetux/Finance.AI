@@ -21,7 +21,8 @@ import {
   FileText,
   Briefcase,
   Flame,
-  Sheet as SheetIcon
+  Sheet as SheetIcon,
+  FileInput,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -57,7 +58,15 @@ const navItems = [
       { name: "Future Value", path: "/future-value", icon: TrendingUp },
     ]
   },
-  { name: "Portfolio", path: "/portfolio", icon: Briefcase, type: 'link' },
+  { 
+    name: "Portfolio Management", 
+    icon: Briefcase,
+    type: 'section',
+    children: [
+      { name: "Portfolio Analysis", path: "/portfolio", icon: Briefcase },
+      { name: "CDSL Portfolio Import", path: "/cdsl-portfolio-import", icon: FileInput },
+    ]
+  },
   { name: "Reports", path: "/reports", icon: FileText, type: 'link' },
   { name: "AI Prompt", path: "/ai-prompt", icon: Bot, type: 'link' },
 ];
