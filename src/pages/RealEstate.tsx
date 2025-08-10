@@ -199,35 +199,26 @@ const RealEstate: React.FC = () => {
             <CardTitle>Property Value</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Particulars</TableHead>
-                  <TableHead className="text-right">Value (INR)</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {propertyValues.map(p => (
-                  <TableRow key={p.id}>
-                    <TableCell className="font-medium">{p.name}</TableCell>
-                    <TableCell className="text-right">
-                      <Input
-                        type="number"
-                        value={p.value}
-                        onChange={e => handlePropertyValueChange(p.id, e.target.value)}
-                        className="w-36 text-right"
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-              <TableFooter>
-                <TableRow>
-                  <TableCell className="font-bold">Total</TableCell>
-                  <TableCell className="text-right font-bold">{formatCurrency(totalPropertyValue)}</TableCell>
-                </TableRow>
-              </TableFooter>
-            </Table>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+              {propertyValues.map(p => (
+                <div key={p.id}>
+                  <Label htmlFor={p.id}>{p.name}</Label>
+                  <Input
+                    id={p.id}
+                    type="number"
+                    value={p.value}
+                    onChange={e => handlePropertyValueChange(p.id, e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 border-t pt-4">
+              <div className="flex justify-between font-bold text-lg">
+                <span>Total</span>
+                <span>{formatCurrency(totalPropertyValue)}</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
