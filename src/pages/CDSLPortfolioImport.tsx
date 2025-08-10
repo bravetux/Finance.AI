@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Upload, Download, FileInput, KeyRound, Loader2 } from "lucide-react";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { saveAs } from "file-saver";
-import pdf from "pdf-parse";
+import * as pdfjs from "pdfjs-dist";
 
 interface Holding {
   isin: string;
@@ -22,6 +22,14 @@ const CDSLPortfolioImport: React.FC = () => {
   const [password, setPassword] = useState("");
   const [holdings, setHoldings] = useState<Holding[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    // Set the workerSrc for pdf.js to ensure it works with Vite
+    pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+      'pdfjs-dist/build/pdf.worker.min.js',
+      import.meta.url,
+    ).toString();
+  }, []);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -62,8 +70,21 @@ const CDSLPortfolioImport: React.FC = () => {
         dismissToast(toastId);
         parsingToastId = showLoading("Parsing portfolio data...");
 
-        const data = await pdf(arrayBuffer, { password });
-        const text = data.text;
+        const loadingTask = pdfjs.getDocument({
+          data: arrayBuffer,
+          password: password,
+        });
+
+        const pdfDoc = await loadingTask.promise;
+        let fullText = "";
+
+        for (let i = 1; i <= pdfDoc.numPages; i++) {
+          const page = await pdfDoc.getPage(i);
+          const textContent = await page.getTextContent();
+          // The type for item is complex, so we cast to any to access .str
+          const pageText = textContent.items.map(item => (item as any).str).join(" ");
+          fullText += pageText + "\n";
+        }
 
         const parsedHoldings: Holding[] = [];
         
@@ -71,7 +92,7 @@ const CDSLPortfolioImport: React.FC = () => {
         const holdingRegex = /^(IN[A-Z0-9]{10})\s+(.*?)\s+([\d,]+\.\d{3})$/gm;
         
         let match;
-        while ((match = holdingRegex.exec(text)) !== null) {
+        while ((match = holdingRegex.exec(fullText)) !== null) {
             const isin = match[1].trim();
             const name = match[2].trim().replace(/\s{2,}/g, ' ');
             const quantity = parseFloat(match[3].replace(/,/g, ''));
@@ -93,7 +114,7 @@ const CDSLPortfolioImport: React.FC = () => {
         if (parsingToastId) dismissToast(parsingToastId);
         else dismissToast(toastId);
         
-        if (error.message.includes("password")) {
+        if (error.message.includes("Invalid password")) {
             showError("Incorrect password or password-protected file.");
         } else {
             showError(`Failed to parse PDF: ${error.message}`);
