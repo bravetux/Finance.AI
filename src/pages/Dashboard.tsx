@@ -24,7 +24,6 @@ const Dashboard: React.FC = () => {
       const savedData = localStorage.getItem('finance-data');
       return savedData ? JSON.parse(savedData) : {
         postTaxSalaryIncome: 1200000,
-        postCapitalGainIncome: 0,
         businessIncome: 500000,
         rentalProperty1: 180000,
         rentalProperty2: 120000,
@@ -46,7 +45,6 @@ const Dashboard: React.FC = () => {
     } catch {
       return {
         postTaxSalaryIncome: 1200000,
-        postCapitalGainIncome: 0,
         businessIncome: 500000,
         rentalProperty1: 180000,
         rentalProperty2: 120000,
@@ -144,7 +142,7 @@ const Dashboard: React.FC = () => {
   const handleReset = () => {
     // Define zeroed-out data structures
     const zeroedFinanceData = {
-      postTaxSalaryIncome: 0, postCapitalGainIncome: 0, businessIncome: 0,
+      postTaxSalaryIncome: 0, businessIncome: 0,
       rentalProperty1: 0, rentalProperty2: 0, rentalProperty3: 0,
       fdInterest: 0, bondIncome: 0, dividendIncome: 0,
       monthlyHouseholdExpense: 0, monthlyPpf: 0, monthlyUlip: 0,
@@ -197,7 +195,6 @@ const Dashboard: React.FC = () => {
   const totalRentalIncome = (cashflowData.rentalProperty1 || 0) + (cashflowData.rentalProperty2 || 0) + (cashflowData.rentalProperty3 || 0);
   const totalAnnualIncome =
     (cashflowData.postTaxSalaryIncome || 0) +
-    (cashflowData.postCapitalGainIncome || 0) +
     (cashflowData.businessIncome || 0) +
     totalRentalIncome +
     (cashflowData.fdInterest || 0) +

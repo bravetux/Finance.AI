@@ -27,7 +27,7 @@ const getInitialFinanceData = () => {
       const rentalIncome = (data.rentalProperty1 || 0) + (data.rentalProperty2 || 0) + (data.rentalProperty3 || 0);
       
       // All other income sources that are not salary or rental
-      const otherIncome = (data.postCapitalGainIncome || 0) + (data.businessIncome || 0) + (data.fdInterest || 0) + (data.bondIncome || 0) + (data.dividendIncome || 0);
+      const otherIncome = (data.businessIncome || 0) + (data.fdInterest || 0) + (data.bondIncome || 0) + (data.dividendIncome || 0);
 
       // Expenses that are subject to the 'expenseIncrement' slider
       const variableAnnualExpenses = ((data.monthlyHouseholdExpense || 0) + (data.monthlyEntertainment || 0) + (data.monthlyTravel || 0) + (data.monthlyOthers || 0) + (data.monthlyDonation || 0)) * 12;

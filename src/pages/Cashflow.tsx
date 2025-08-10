@@ -11,7 +11,6 @@ import { showError } from "@/utils/toast";
 interface FinanceData {
   // Income
   postTaxSalaryIncome: number;
-  postCapitalGainIncome: number;
   businessIncome: number;
   rentalProperty1: number;
   rentalProperty2: number;
@@ -50,7 +49,6 @@ const Cashflow: React.FC = () => {
     // Default values if nothing in localStorage
     return {
       postTaxSalaryIncome: 1200000,
-      postCapitalGainIncome: 0,
       businessIncome: 500000,
       rentalProperty1: 180000,
       rentalProperty2: 120000,
@@ -111,7 +109,6 @@ const Cashflow: React.FC = () => {
   const totalRentalIncome = financeData.rentalProperty1 + financeData.rentalProperty2 + financeData.rentalProperty3;
   const totalAnnualIncome =
     financeData.postTaxSalaryIncome +
-    financeData.postCapitalGainIncome +
     financeData.businessIncome +
     totalRentalIncome +
     financeData.fdInterest +
@@ -224,17 +221,6 @@ const Cashflow: React.FC = () => {
                     className="mt-1"
                   />
                 </div>
-                {/* All other income input fields updated similarly */}
-                <div>
-                  <Label htmlFor="postCapitalGainIncome">Post Capital Gain Income:</Label>
-                  <Input
-                    id="postCapitalGainIncome"
-                    type="number"
-                    value={financeData.postCapitalGainIncome}
-                    onChange={(e) => setFinanceData({...financeData, postCapitalGainIncome: Number(e.target.value)})}
-                    className="mt-1"
-                  />
-                </div>
                 <div>
                   <Label htmlFor="businessIncome">Business Income:</Label>
                   <Input
@@ -311,10 +297,6 @@ const Cashflow: React.FC = () => {
                 <div className="flex justify-between">
                   <span>Post-Tax Salary Income:</span>
                   <span className="font-medium">₹{financeData.postTaxSalaryIncome.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Post Capital Gain Income:</span>
-                  <span className="font-medium">₹{financeData.postCapitalGainIncome.toLocaleString("en-IN")}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Business Income:</span>
