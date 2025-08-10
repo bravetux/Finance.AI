@@ -29,15 +29,15 @@ import { ThemeToggle } from "./theme-toggle";
 
 const navItems = [
   { name: "Dashboard", path: "/", icon: LayoutDashboard },
-  { name: "Cashflow", path: "/cashflow", icon: ArrowDownUp },
-  { name: "Expense Tracker", path: "/expense-tracker", icon: SheetIcon },
-  { name: "Projected Cashflow", path: "/projected-cashflow", icon: LineChart },
-  { name: "Net Worth", path: "/net-worth", icon: Calculator },
-  { name: "Future Value", path: "/future-value", icon: TrendingUp },
-  { name: "Goals", path: "/goals", icon: Target },
-  { name: "Retirement", path: "/retirement", icon: Landmark },
   { name: "FIRE Calculator", path: "/fire-calculator", icon: Flame },
+  { name: "Expense Tracker", path: "/expense-tracker", icon: SheetIcon },
+  { name: "Cashflow", path: "/cashflow", icon: ArrowDownUp },
+  { name: "Net Worth", path: "/net-worth", icon: Calculator },
+  { name: "Goals", path: "/goals", icon: Target },
+  { name: "Future Value", path: "/future-value", icon: TrendingUp },
+  { name: "Retirement", path: "/retirement", icon: Landmark },
   { name: "Portfolio", path: "/portfolio", icon: Briefcase },
+  { name: "Projected Cashflow", path: "/projected-cashflow", icon: LineChart },
   { name: "Reports", path: "/reports", icon: FileText },
   { name: "AI Prompt", path: "/ai-prompt", icon: Bot },
 ];
