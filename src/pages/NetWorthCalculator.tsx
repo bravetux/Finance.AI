@@ -209,6 +209,40 @@ const NetWorthCalculator: React.FC = () => {
         </div>
       </div>
 
+      <Card>
+        <CardHeader>
+          <CardTitle>Summary</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-x-8 gap-y-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span>Total Illiquid Assets:</span>
+              <span className="font-medium">₹{totalIlliquidAssets.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Total Liquid Assets:</span>
+              <span className="font-medium">₹{totalLiquidAssets.toLocaleString("en-IN")}</span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span>Total Assets:</span>
+              <span className="font-medium">₹{totalAssets.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Total Liabilities:</span>
+              <span className="font-medium">₹{totalLiabilities.toLocaleString("en-IN")}</span>
+            </div>
+          </div>
+          <div className="md:col-span-2 flex justify-between items-center border-t pt-4 mt-4">
+            <span className="text-lg font-bold">Net Worth:</span>
+            <span className={`text-2xl font-bold ${netWorth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              ₹{netWorth.toLocaleString("en-IN")}
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className={`grid gap-4 ${totalLiabilities > 0 ? "md:grid-cols-2" : "md:grid-cols-1"}`}>
         <Card>
           <CardHeader>
@@ -562,37 +596,6 @@ const NetWorthCalculator: React.FC = () => {
                 </div>
               </>
             )}
-          </CardContent>
-        </Card>
-
-        {/* Summary */}
-        <Card className="md:col-span-2 lg:col-span-1">
-          <CardHeader>
-            <CardTitle>Summary</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex justify-between">
-              <span>Total Illiquid Assets:</span>
-              <span className="font-medium">₹{totalIlliquidAssets.toLocaleString("en-IN")}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Total Liquid Assets:</span>
-              <span className="font-medium">₹{totalLiquidAssets.toLocaleString("en-IN")}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Total Assets:</span>
-              <span className="font-medium">₹{totalAssets.toLocaleString("en-IN")}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Total Liabilities:</span>
-              <span className="font-medium">₹{totalLiabilities.toLocaleString("en-IN")}</span>
-            </div>
-            <div className="flex justify-between border-t pt-2">
-              <span className="font-bold">Net Worth:</span>
-              <span className={`font-bold ${netWorth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                ₹{netWorth.toLocaleString("en-IN")}
-              </span>
-            </div>
           </CardContent>
         </Card>
       </div>
