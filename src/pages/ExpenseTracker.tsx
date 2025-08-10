@@ -176,32 +176,32 @@ const ExpenseTracker: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="min-w-[250px]">Category</TableHead>
-                  <TableHead>Cost</TableHead>
-                  <TableHead>Action</TableHead>
-                  <TableHead>±1%</TableHead>
-                  <TableHead>±5%</TableHead>
-                  <TableHead>±10%</TableHead>
+                  <TableHead className="min-w-[250px] p-2">Category</TableHead>
+                  <TableHead className="p-2 text-right">Cost</TableHead>
+                  <TableHead className="p-2">Action</TableHead>
+                  <TableHead className="p-2 text-right">±1%</TableHead>
+                  <TableHead className="p-2 text-right">±5%</TableHead>
+                  <TableHead className="p-2 text-right">±10%</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {expenses.map((expense) => (
                   <TableRow key={expense.id}>
-                    <TableCell className="font-medium">{expense.category}</TableCell>
-                    <TableCell>
+                    <TableCell className="font-medium p-2">{expense.category}</TableCell>
+                    <TableCell className="p-0">
                       <Input
                         type="number"
                         value={expense.monthlyCost}
                         onChange={(e) => handleCostChange(expense.id, e.target.value)}
-                        className="w-28"
+                        className="w-28 border-0 rounded-none focus-visible:ring-1 focus-visible:ring-offset-0 p-2 h-auto bg-transparent text-right"
                       />
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="p-0">
                       <Select
                         value={expense.action}
                         onValueChange={(value: Action) => handleActionChange(expense.id, value)}
                       >
-                        <SelectTrigger className="w-[120px]">
+                        <SelectTrigger className="w-[120px] border-0 rounded-none focus:ring-1 focus:ring-offset-0 p-2 h-auto bg-transparent">
                           <SelectValue placeholder="Select action" />
                         </SelectTrigger>
                         <SelectContent>
@@ -211,20 +211,20 @@ const ExpenseTracker: React.FC = () => {
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell>{formatCurrency(calculateChange(expense.monthlyCost, expense.action, 1))}</TableCell>
-                    <TableCell>{formatCurrency(calculateChange(expense.monthlyCost, expense.action, 5))}</TableCell>
-                    <TableCell>{formatCurrency(calculateChange(expense.monthlyCost, expense.action, 10))}</TableCell>
+                    <TableCell className="p-2 text-right">{formatCurrency(calculateChange(expense.monthlyCost, expense.action, 1))}</TableCell>
+                    <TableCell className="p-2 text-right">{formatCurrency(calculateChange(expense.monthlyCost, expense.action, 5))}</TableCell>
+                    <TableCell className="p-2 text-right">{formatCurrency(calculateChange(expense.monthlyCost, expense.action, 10))}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
               <TableFooter>
                 <TableRow className="bg-muted/50 font-bold">
-                  <TableCell>Total Expenses</TableCell>
-                  <TableCell>{formatCurrency(totals.monthlyCost)}</TableCell>
-                  <TableCell></TableCell>
-                  <TableCell>{formatCurrency(totals.change1)}</TableCell>
-                  <TableCell>{formatCurrency(totals.change5)}</TableCell>
-                  <TableCell>{formatCurrency(totals.change10)}</TableCell>
+                  <TableCell className="p-2">Total Expenses</TableCell>
+                  <TableCell className="p-2 text-right">{formatCurrency(totals.monthlyCost)}</TableCell>
+                  <TableCell className="p-2"></TableCell>
+                  <TableCell className="p-2 text-right">{formatCurrency(totals.change1)}</TableCell>
+                  <TableCell className="p-2 text-right">{formatCurrency(totals.change5)}</TableCell>
+                  <TableCell className="p-2 text-right">{formatCurrency(totals.change10)}</TableCell>
                 </TableRow>
               </TableFooter>
             </Table>
