@@ -41,7 +41,7 @@ const initialExpenses: ExpenseItem[] = [
   { id: '18', category: 'Broker + Shifting + Home deposit interest', monthlyCost: 0, action: 'Same' },
 ];
 
-const ExpenseReducer: React.FC = () => {
+const ExpenseReductionPlanner: React.FC = () => {
   const [expenses, setExpenses] = useState<ExpenseItem[]>(() => {
     try {
       const savedData = localStorage.getItem('expenseTrackerData');
@@ -143,7 +143,7 @@ const ExpenseReducer: React.FC = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <SheetIcon className="h-8 w-8" />
-          Expense Reducer
+          Expense Reduction Planner
         </h1>
         <div className="flex gap-2">
           <Button variant="outline" onClick={exportData}>
@@ -166,7 +166,7 @@ const ExpenseReducer: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Monthly Expense Reducer</CardTitle>
+          <CardTitle>Monthly Expense Reduction Planner</CardTitle>
           <CardDescription>
             Reduce your monthly expenses and see how small changes can impact your budget.
           </CardDescription>
@@ -238,4 +238,4 @@ const ExpenseReducer: React.FC = () => {
   );
 };
 
-export default ExpenseReducer;
+export default ExpenseReductionPlanner;
