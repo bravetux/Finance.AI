@@ -28,6 +28,7 @@ import {
   BarChart2,
   Gem,
   PieChart,
+  Repeat,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -64,6 +65,7 @@ const navItems = [
         children: [
           { name: "Domestic Equity", path: "/domestic-equity", icon: BarChart2, type: 'link' },
           { name: "Mutual Fund Allocation", path: "/mutual-fund-allocation", icon: PieChart, type: 'link' },
+          { name: "Mutual Fund SIP", path: "/mutual-fund-sip", icon: Repeat, type: 'link' },
           { name: "US Equity", path: "/us-equity", icon: Landmark, type: 'link' },
         ]
       },

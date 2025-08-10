@@ -25,6 +25,7 @@ import USEquity from "./pages/USEquity";
 import Debt from "./pages/Debt";
 import Gold from "./pages/Gold";
 import MutualFundAllocation from "./pages/MutualFundAllocation";
+import MutualFundSIP from "./pages/MutualFundSIP";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
               <Route path="real-estate" element={<RealEstate />} />
               <Route path="domestic-equity" element={<DomesticEquity />} />
               <Route path="mutual-fund-allocation" element={<MutualFundAllocation />} />
+              <Route path="mutual-fund-sip" element={<MutualFundSIP />} />
               <Route path="us-equity" element={<USEquity />} />
               <Route path="debt" element={<Debt />} />
               <Route path="gold" element={<Gold />} />
