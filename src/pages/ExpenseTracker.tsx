@@ -1,11 +1,15 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sheet as SheetIcon } from "lucide-react";
+import { Sheet as SheetIcon, Upload, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { saveAs } from "file-saver";
+import { showSuccess, showError } from "@/utils/toast";
 
 type Action = "Same" | "Reduce" | "Increase";
 
@@ -38,7 +42,25 @@ const initialExpenses: ExpenseItem[] = [
 ];
 
 const ExpenseTracker: React.FC = () => {
-  const [expenses, setExpenses] = useState<ExpenseItem[]>(initialExpenses);
+  const [expenses, setExpenses] = useState<ExpenseItem[]>(() => {
+    try {
+      const savedData = localStorage.getItem('expenseTrackerData');
+      if (savedData) {
+        return JSON.parse(savedData);
+      }
+    } catch (error) {
+      console.error("Failed to load expense data from localStorage:", error);
+    }
+    return initialExpenses;
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('expenseTrackerData', JSON.stringify(expenses));
+    } catch (error) {
+      console.error("Failed to save expense data to localStorage:", error);
+    }
+  }, [expenses]);
 
   const handleCostChange = (id: string, value: string) => {
     const newExpenses = expenses.map(expense =>
@@ -81,6 +103,41 @@ const ExpenseTracker: React.FC = () => {
     return `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
   };
 
+  const exportData = () => {
+    try {
+      const dataStr = JSON.stringify(expenses, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      saveAs(blob, "expense-tracker-data.json");
+      showSuccess("Expense data exported successfully!");
+    } catch (error) {
+      showError("Failed to export data.");
+      console.error("Export error:", error);
+    }
+  };
+
+  const importData = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        const importedData = JSON.parse(content);
+        if (Array.isArray(importedData) && importedData.every(item => 'id' in item && 'category' in item && 'monthlyCost' in item && 'action' in item)) {
+          setExpenses(importedData);
+          showSuccess("Expense data imported successfully!");
+        } else {
+          throw new Error("Invalid file format.");
+        }
+      } catch (error) {
+        showError("Error parsing file. Please check the file format.");
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -88,6 +145,23 @@ const ExpenseTracker: React.FC = () => {
           <SheetIcon className="h-8 w-8" />
           Expense Tracker
         </h1>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={exportData}>
+            <Upload className="mr-2 h-4 w-4" /> Export
+          </Button>
+          <Button variant="outline" asChild>
+            <Label htmlFor="import-file" className="cursor-pointer">
+              <Download className="mr-2 h-4 w-4" /> Import
+              <Input 
+                id="import-file" 
+                type="file" 
+                accept=".json" 
+                className="hidden" 
+                onChange={importData}
+              />
+            </Label>
+          </Button>
+        </div>
       </div>
 
       <Card>
