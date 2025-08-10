@@ -44,11 +44,18 @@ const navItems = [
       { name: "Cashflow", path: "/cashflow", icon: ArrowDownUp },
     ]
   },
-  { name: "FIRE Calculator", path: "/fire-calculator", icon: Flame, type: 'link' },
   { name: "Net Worth", path: "/net-worth", icon: Calculator, type: 'link' },
   { name: "Goals", path: "/goals", icon: Target, type: 'link' },
+  { 
+    name: "Retirement Planning", 
+    icon: Landmark,
+    type: 'section',
+    children: [
+      { name: "FIRE Calculator", path: "/fire-calculator", icon: Flame },
+      { name: "Retirement", path: "/retirement", icon: Landmark },
+    ]
+  },
   { name: "Future Value", path: "/future-value", icon: TrendingUp, type: 'link' },
-  { name: "Retirement", path: "/retirement", icon: Landmark, type: 'link' },
   { name: "Portfolio", path: "/portfolio", icon: Briefcase, type: 'link' },
   { name: "Projected Cashflow", path: "/projected-cashflow", icon: LineChart, type: 'link' },
   { name: "Reports", path: "/reports", icon: FileText, type: 'link' },
