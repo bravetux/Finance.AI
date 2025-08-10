@@ -17,7 +17,7 @@ import AIPrompt from "./pages/AIPrompt";
 import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
 import FireCalculator from "./pages/FireCalculator";
-import ExpenseTracker from "./pages/ExpenseTracker";
+import ExpenseReducer from "./pages/ExpenseReducer";
 
 const queryClient = new QueryClient();
 
@@ -32,7 +32,7 @@ const App = () => (
             <Route path="/" element={<DashboardLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="cashflow" element={<Cashflow />} />
-              <Route path="expense-tracker" element={<ExpenseTracker />} />
+              <Route path="expense-reducer" element={<ExpenseReducer />} />
               <Route path="projected-cashflow" element={<ProjectedCashflow />} />
               <Route path="net-worth" element={<NetWorthCalculator />} />
               <Route path="future-value" element={<FutureValueCalculator />} />
