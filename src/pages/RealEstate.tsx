@@ -83,12 +83,15 @@ const RealEstate: React.FC = () => {
 
   // Handlers for input changes
   const handlePropertyValueChange = (id: string, value: string) => {
+    if (value.length > 9) return;
     setPropertyValues(prev =>
       prev.map(p => (p.id === id ? { ...p, value: Number(value) || 0 } : p))
     );
   };
 
   const handleRentalPropertyChange = (id: string, field: 'value' | 'rent', value: string) => {
+    if (field === 'value' && value.length > 9) return;
+    if (field === 'rent' && value.length > 7) return;
     setRentalProperties(prev =>
       prev.map(p => (p.id === id ? { ...p, [field]: Number(value) || 0 } : p))
     );
@@ -212,7 +215,7 @@ const RealEstate: React.FC = () => {
                         type="number"
                         value={p.value}
                         onChange={e => handlePropertyValueChange(p.id, e.target.value)}
-                        className="text-right"
+                        className="w-36 text-right"
                       />
                     </TableCell>
                   </TableRow>
@@ -254,6 +257,7 @@ const RealEstate: React.FC = () => {
                           type="number"
                           value={p.value}
                           onChange={e => handleRentalPropertyChange(p.id, 'value', e.target.value)}
+                          className="w-36"
                         />
                       </TableCell>
                       <TableCell>
@@ -261,6 +265,7 @@ const RealEstate: React.FC = () => {
                           type="number"
                           value={p.rent}
                           onChange={e => handleRentalPropertyChange(p.id, 'rent', e.target.value)}
+                          className="w-28"
                         />
                       </TableCell>
                       <TableCell className="text-right">{formatCurrency(p.annualRent)}</TableCell>
