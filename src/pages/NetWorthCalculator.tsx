@@ -244,27 +244,6 @@ const NetWorthCalculator: React.FC = () => {
         </CardContent>
       </Card>
 
-      <div className={`grid gap-4 ${totalLiabilities > 0 ? "md:grid-cols-2" : "md:grid-cols-1"}`}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Asset Allocation</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <GenericPieChart data={assetData} />
-          </CardContent>
-        </Card>
-        {totalLiabilities > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Liability Breakdown</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <GenericPieChart data={liabilityData} />
-            </CardContent>
-          </Card>
-        )}
-      </div>
-
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {/* Illiquid Assets */}
         <Card>
@@ -599,6 +578,27 @@ const NetWorthCalculator: React.FC = () => {
             )}
           </CardContent>
         </Card>
+      </div>
+
+      <div className={`grid gap-4 ${totalLiabilities > 0 ? "md:grid-cols-2" : "md:grid-cols-1"}`}>
+        <Card>
+          <CardHeader>
+            <CardTitle>Asset Allocation</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <GenericPieChart data={assetData} />
+          </CardContent>
+        </Card>
+        {totalLiabilities > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Liability Breakdown</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <GenericPieChart data={liabilityData} />
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
