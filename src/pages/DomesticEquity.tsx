@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, Table
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { BarChart2, Upload, Download, Trash2 } from "lucide-react";
+import { BarChart2, Upload, Download, Trash2, Edit, Save } from "lucide-react";
 import { saveAs } from "file-saver";
 import { showSuccess, showError } from "@/utils/toast";
 import {
@@ -40,6 +40,7 @@ const initialData: EquityData[] = [
 ];
 
 const DomesticEquity: React.FC = () => {
+  const [isEditing, setIsEditing] = useState(false);
   const [equityData, setEquityData] = useState<EquityData[]>(() => {
     try {
       const saved = localStorage.getItem('domesticEquityData');
@@ -140,6 +141,13 @@ const DomesticEquity: React.FC = () => {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          <Button variant="outline" onClick={() => setIsEditing(!isEditing)}>
+            {isEditing ? (
+              <><Save className="mr-2 h-4 w-4" /> Save</>
+            ) : (
+              <><Edit className="mr-2 h-4 w-4" /> Edit</>
+            )}
+          </Button>
           <Button variant="outline" onClick={exportData}>
             <Upload className="mr-2 h-4 w-4" /> Export
           </Button>
@@ -166,7 +174,7 @@ const DomesticEquity: React.FC = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Company size</TableHead>
-                    <TableHead>Current value (INR)</TableHead>
+                    <TableHead className="text-right">Current value (INR)</TableHead>
                     <TableHead className="text-right">Contribution %</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -174,13 +182,17 @@ const DomesticEquity: React.FC = () => {
                   {calculations.dataWithContribution.map(item => (
                     <TableRow key={item.id}>
                       <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell className="p-1">
-                        <Input
-                          type="number"
-                          value={item.value}
-                          onChange={e => handleValueChange(item.id, e.target.value)}
-                          className="w-full bg-transparent border-0 focus-visible:ring-1 focus-visible:ring-offset-0 h-auto"
-                        />
+                      <TableCell className="p-1 text-right">
+                        {isEditing ? (
+                          <Input
+                            type="number"
+                            value={item.value}
+                            onChange={e => handleValueChange(item.id, e.target.value)}
+                            className="w-full text-right bg-transparent border-0 focus-visible:ring-1 focus-visible:ring-offset-0 h-auto"
+                          />
+                        ) : (
+                          <span className="px-3">{formatCurrency(item.value)}</span>
+                        )}
                       </TableCell>
                       <TableCell className="text-right">{item.contribution.toFixed(0)}%</TableCell>
                     </TableRow>
@@ -189,7 +201,7 @@ const DomesticEquity: React.FC = () => {
                 <TableFooter>
                   <TableRow>
                     <TableCell className="font-bold">Total</TableCell>
-                    <TableCell className="font-bold">{formatCurrency(calculations.totalValue)}</TableCell>
+                    <TableCell className="font-bold text-right">{formatCurrency(calculations.totalValue)}</TableCell>
                     <TableCell className="text-right font-bold">100%</TableCell>
                   </TableRow>
                 </TableFooter>
