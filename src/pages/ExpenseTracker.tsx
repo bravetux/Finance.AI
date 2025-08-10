@@ -176,12 +176,12 @@ const ExpenseTracker: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[300px] min-w-[250px]">Category</TableHead>
-                  <TableHead>Monthly Cost</TableHead>
-                  <TableHead>Reduce/Increase</TableHead>
-                  <TableHead>1% Change</TableHead>
-                  <TableHead>5% Change</TableHead>
-                  <TableHead>10% Change</TableHead>
+                  <TableHead className="min-w-[250px]">Category</TableHead>
+                  <TableHead>Cost</TableHead>
+                  <TableHead>Action</TableHead>
+                  <TableHead>±1%</TableHead>
+                  <TableHead>±5%</TableHead>
+                  <TableHead>±10%</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
