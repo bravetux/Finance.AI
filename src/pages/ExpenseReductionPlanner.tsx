@@ -182,7 +182,7 @@ const ExpenseReductionPlanner: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <GenericPieChart data={chartData} />
+          <GenericPieChart data={chartData} showLegend={false} />
         </CardContent>
       </Card>
 

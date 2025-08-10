@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 interface PieChartEntry {
@@ -29,7 +29,7 @@ const generateColors = (numColors: number) => {
 };
 
 const GenericPieChart: React.FC<GenericPieChartProps> = ({ data, showLegend = true }) => {
-  const chartData = useMemo(() => data.filter(entry => entry.value > 0), [data]);
+  const chartData = data.filter(entry => entry.value > 0);
   
   if (chartData.length === 0) {
     return (
@@ -39,23 +39,7 @@ const GenericPieChart: React.FC<GenericPieChartProps> = ({ data, showLegend = tr
     );
   }
 
-  const COLORS = useMemo(() => generateColors(chartData.length), [chartData.length]);
-
-  const legendPayload = useMemo(() => {
-    const dataForLegend = chartData.length > 10 
-      ? [...chartData].sort((a, b) => b.value - a.value).slice(0, 10)
-      : chartData;
-
-    return dataForLegend.map(item => {
-      const originalIndex = chartData.findIndex(originalItem => originalItem.name === item.name);
-      return {
-        value: item.name,
-        type: 'circle',
-        id: item.name,
-        color: COLORS[originalIndex % COLORS.length],
-      };
-    });
-  }, [chartData, COLORS]);
+  const COLORS = generateColors(chartData.length);
 
   return (
     <ResponsiveContainer width="100%" height={300}>
@@ -76,7 +60,7 @@ const GenericPieChart: React.FC<GenericPieChartProps> = ({ data, showLegend = tr
           ))}
         </Pie>
         <Tooltip formatter={(value: number, name: string) => [`₹${value.toLocaleString('en-IN')}`, name]} />
-        {showLegend && <Legend payload={legendPayload} />}
+        {showLegend && <Legend />}
       </PieChart>
     </ResponsiveContainer>
   );
