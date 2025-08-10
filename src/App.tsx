@@ -20,7 +20,6 @@ import FireCalculator from "./pages/FireCalculator";
 import ExpenseReductionPlanner from "./pages/ExpenseReductionPlanner";
 import CDSLPortfolioImport from "./pages/CDSLPortfolioImport";
 import RealEstate from "./pages/RealEstate";
-import RentalYieldAppreciation from "./pages/RentalYieldAppreciation";
 import DomesticEquity from "./pages/DomesticEquity";
 import USEquity from "./pages/USEquity";
 import Debt from "./pages/Debt";
@@ -43,7 +42,6 @@ const App = () => (
               <Route path="projected-cashflow" element={<ProjectedCashflow />} />
               <Route path="net-worth" element={<NetWorthCalculator />} />
               <Route path="real-estate" element={<RealEstate />} />
-              <Route path="rental-yield-appreciation" element={<RentalYieldAppreciation />} />
               <Route path="domestic-equity" element={<DomesticEquity />} />
               <Route path="us-equity" element={<USEquity />} />
               <Route path="debt" element={<Debt />} />
