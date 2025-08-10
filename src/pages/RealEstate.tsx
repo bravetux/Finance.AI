@@ -189,9 +189,9 @@ const RealEstate: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Property Value Table */}
-        <Card>
+        <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle>Property Value</CardTitle>
           </CardHeader>
@@ -229,7 +229,7 @@ const RealEstate: React.FC = () => {
         </Card>
 
         {/* Rental Yield Calculator Table */}
-        <Card>
+        <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Rental Yield Calculator</CardTitle>
           </CardHeader>
