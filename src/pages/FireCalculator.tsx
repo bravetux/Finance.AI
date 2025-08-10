@@ -5,7 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Flame } from "lucide-react";
+import { Flame, Upload, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { saveAs } from "file-saver";
+import { showSuccess, showError } from "@/utils/toast";
 
 const FireCalculator: React.FC = () => {
   const [inputs, setInputs] = useState({
@@ -49,6 +52,48 @@ const FireCalculator: React.FC = () => {
     return `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
   };
 
+  const exportData = () => {
+    try {
+      const dataStr = JSON.stringify(inputs, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      saveAs(blob, "fire-calculator-data.json");
+      showSuccess("FIRE Calculator data exported successfully!");
+    } catch (error) {
+      showError("Failed to export data.");
+      console.error("Export error:", error);
+    }
+  };
+
+  const importData = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        const importedData = JSON.parse(content);
+        
+        const requiredKeys: (keyof typeof inputs)[] = ['monthlyExpenses', 'currentAge', 'retirementAge', 'inflation', 'coastFireAge', 'expectedReturn'];
+        const hasAllKeys = requiredKeys.every(key => key in importedData && typeof importedData[key] === 'number');
+
+        if (hasAllKeys) {
+          setInputs(importedData);
+          showSuccess("FIRE Calculator data imported successfully!");
+        } else {
+          throw new Error("Invalid or incomplete file format.");
+        }
+      } catch (error: any) {
+        showError(`Error parsing file: ${error.message}`);
+      }
+    };
+    reader.onerror = () => {
+        showError("Failed to read the file.");
+    }
+    reader.readAsText(file);
+    event.target.value = '';
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -56,6 +101,23 @@ const FireCalculator: React.FC = () => {
           <Flame className="h-8 w-8" />
           FIRE Calculator
         </h1>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={exportData}>
+            <Upload className="mr-2 h-4 w-4" /> Export
+          </Button>
+          <Button variant="outline" asChild>
+            <Label htmlFor="import-file" className="cursor-pointer">
+              <Download className="mr-2 h-4 w-4" /> Import
+              <Input 
+                id="import-file" 
+                type="file" 
+                accept=".json" 
+                className="hidden" 
+                onChange={importData}
+              />
+            </Label>
+          </Button>
+        </div>
       </div>
 
       <Card>
