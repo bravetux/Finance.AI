@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, Table
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { BarChart2, Upload, Download, Trash2, Edit, Save } from "lucide-react";
+import { PieChart, Upload, Download, Trash2, Edit, Save } from "lucide-react";
 import { saveAs } from "file-saver";
 import { showSuccess, showError } from "@/utils/toast";
 import {
@@ -27,76 +27,65 @@ import {
 } from "@/components/ui/resizable";
 import GenericPieChart from "@/components/GenericPieChart";
 
-// Equity Data
-interface EquityData {
+interface MutualFundData {
   id: string;
-  name: 'Largecap' | 'Midcap' | 'Smallcap';
+  name: 'Largecap' | 'Midcap' | 'Smallcap' | 'Flexi/Multi cap';
   value: number;
 }
 
-const initialEquityData: EquityData[] = [
-  { id: 'large', name: 'Largecap', value: 11475843 },
-  { id: 'mid', name: 'Midcap', value: 4120442 },
-  { id: 'small', name: 'Smallcap', value: 3602340 },
+const initialMutualFundData: MutualFundData[] = [
+  { id: 'mf-large', name: 'Largecap', value: 270230 },
+  { id: 'mf-mid', name: 'Midcap', value: 2300 },
+  { id: 'mf-small', name: 'Smallcap', value: 6140 },
+  { id: 'mf-flexi', name: 'Flexi/Multi cap', value: 12377 },
 ];
 
-const DomesticEquity: React.FC = () => {
-  // State for editing
-  const [isEquityEditing, setIsEquityEditing] = useState(false);
-
-  // State for equity data
-  const [equityData, setEquityData] = useState<EquityData[]>(() => {
+const MutualFundAllocation: React.FC = () => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [mutualFundData, setMutualFundData] = useState<MutualFundData[]>(() => {
     try {
-      const saved = localStorage.getItem('domesticEquityData');
-      return saved ? JSON.parse(saved) : initialEquityData;
+      const saved = localStorage.getItem('mutualFundAllocationData');
+      return saved ? JSON.parse(saved) : initialMutualFundData;
     } catch {
-      return initialEquityData;
+      return initialMutualFundData;
     }
   });
 
-  // Persist data to localStorage
   useEffect(() => {
-    localStorage.setItem('domesticEquityData', JSON.stringify(equityData));
-  }, [equityData]);
+    localStorage.setItem('mutualFundAllocationData', JSON.stringify(mutualFundData));
+  }, [mutualFundData]);
 
-  // Handlers for input changes
-  const handleEquityValueChange = (id: string, value: string) => {
+  const handleValueChange = (id: string, value: string) => {
     if (value.length > 10) return;
-    setEquityData(prev =>
+    setMutualFundData(prev =>
       prev.map(item => (item.id === id ? { ...item, value: Number(value) || 0 } : item))
     );
   };
 
-  // Calculations for equity
-  const equityCalculations = useMemo(() => {
-    const totalValue = equityData.reduce((sum, item) => sum + item.value, 0);
-    const dataWithContribution = equityData.map(item => ({
+  const calculations = useMemo(() => {
+    const totalValue = mutualFundData.reduce((sum, item) => sum + item.value, 0);
+    const dataWithContribution = mutualFundData.map(item => ({
       ...item,
       contribution: totalValue > 0 ? (item.value / totalValue) * 100 : 0,
     }));
     return { totalValue, dataWithContribution };
-  }, [equityData]);
+  }, [mutualFundData]);
 
-  // Chart data
-  const equityChartData = useMemo(() => {
-    return equityCalculations.dataWithContribution
+  const chartData = useMemo(() => {
+    return calculations.dataWithContribution
       .filter(item => item.value > 0)
       .map(item => ({
         name: item.name,
         value: item.value,
       }));
-  }, [equityCalculations.dataWithContribution]);
+  }, [calculations.dataWithContribution]);
 
   const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 
-  // Data management
   const exportData = () => {
-    const dataToExport = {
-      equityData,
-    };
-    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
-    saveAs(blob, 'domestic-equity-data.json');
-    showSuccess('Domestic Equity data exported successfully!');
+    const blob = new Blob([JSON.stringify(mutualFundData, null, 2)], { type: 'application/json' });
+    saveAs(blob, 'mutual-fund-allocation-data.json');
+    showSuccess('Mutual Fund Allocation data exported successfully!');
   };
 
   const importData = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,9 +96,9 @@ const DomesticEquity: React.FC = () => {
       try {
         const content = e.target?.result as string;
         const data = JSON.parse(content);
-        if (data.equityData) {
-          setEquityData(data.equityData);
-          showSuccess('Domestic Equity data imported successfully!');
+        if (Array.isArray(data) && data.every(item => 'id' in item && 'name' in item && 'value' in item)) {
+          setMutualFundData(data);
+          showSuccess('Data imported successfully!');
         } else {
           showError('Invalid file format.');
         }
@@ -122,17 +111,16 @@ const DomesticEquity: React.FC = () => {
   };
 
   const handleClearData = () => {
-    setEquityData(initialEquityData);
-    showSuccess('Domestic Equity data has been reset.');
+    setMutualFundData(initialMutualFundData);
+    showSuccess('Data has been reset.');
   };
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold flex items-center gap-2">
-          <BarChart2 className="h-8 w-8" />
-          Domestic Equity
+          <PieChart className="h-8 w-8" />
+          Mutual Fund Allocation
         </h1>
         <div className="flex gap-2">
           <AlertDialog>
@@ -166,7 +154,6 @@ const DomesticEquity: React.FC = () => {
         </div>
       </div>
 
-      {/* Equity Allocation Section */}
       <ResizablePanelGroup
         direction="horizontal"
         className="min-h-[300px] w-full rounded-lg border"
@@ -174,9 +161,9 @@ const DomesticEquity: React.FC = () => {
         <ResizablePanel defaultSize={60}>
           <Card className="h-full border-0 shadow-none rounded-none">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Market Cap Allocation</CardTitle>
-              <Button variant="outline" size="sm" onClick={() => setIsEquityEditing(!isEquityEditing)}>
-                {isEquityEditing ? (
+              <CardTitle>Mutual Fund Components</CardTitle>
+              <Button variant="outline" size="sm" onClick={() => setIsEditing(!isEditing)}>
+                {isEditing ? (
                   <><Save className="mr-2 h-4 w-4" /> Save</>
                 ) : (
                   <><Edit className="mr-2 h-4 w-4" /> Edit</>
@@ -187,21 +174,21 @@ const DomesticEquity: React.FC = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Company size</TableHead>
+                    <TableHead>Mutual fund components</TableHead>
                     <TableHead className="text-right">Current value (INR)</TableHead>
                     <TableHead className="text-right">Contribution %</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {equityCalculations.dataWithContribution.map(item => (
+                  {calculations.dataWithContribution.map(item => (
                     <TableRow key={item.id}>
                       <TableCell className="font-medium">{item.name}</TableCell>
                       <TableCell className="p-1 text-right">
-                        {isEquityEditing ? (
+                        {isEditing ? (
                           <Input
                             type="number"
                             value={item.value}
-                            onChange={e => handleEquityValueChange(item.id, e.target.value)}
+                            onChange={e => handleValueChange(item.id, e.target.value)}
                             className="w-full text-right bg-transparent border-0 focus-visible:ring-1 focus-visible:ring-offset-0 h-auto"
                           />
                         ) : (
@@ -215,7 +202,7 @@ const DomesticEquity: React.FC = () => {
                 <TableFooter>
                   <TableRow>
                     <TableCell className="font-bold">Total</TableCell>
-                    <TableCell className="font-bold text-right">{formatCurrency(equityCalculations.totalValue)}</TableCell>
+                    <TableCell className="font-bold text-right">{formatCurrency(calculations.totalValue)}</TableCell>
                     <TableCell className="text-right font-bold">100%</TableCell>
                   </TableRow>
                 </TableFooter>
@@ -227,10 +214,10 @@ const DomesticEquity: React.FC = () => {
         <ResizablePanel defaultSize={40}>
           <Card className="h-full border-0 shadow-none rounded-none">
             <CardHeader>
-              <CardTitle>Allocation Chart</CardTitle>
+              <CardTitle>Mutual Fund Allocation Chart</CardTitle>
             </CardHeader>
             <CardContent>
-              <GenericPieChart data={equityChartData} />
+              <GenericPieChart data={chartData} />
             </CardContent>
           </Card>
         </ResizablePanel>
@@ -239,4 +226,4 @@ const DomesticEquity: React.FC = () => {
   );
 };
 
-export default DomesticEquity;
+export default MutualFundAllocation;

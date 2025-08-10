@@ -27,6 +27,7 @@ import {
   Home,
   BarChart2,
   Gem,
+  PieChart,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -45,8 +46,8 @@ const navItems = [
     icon: Calculator,
     type: 'section',
     children: [
-      { name: "Expense Reduction Planner", path: "/expense-reduction-planner", icon: SheetIcon },
-      { name: "Cashflow", path: "/cashflow", icon: ArrowDownUp },
+      { name: "Expense Reduction Planner", path: "/expense-reduction-planner", icon: SheetIcon, type: 'link' },
+      { name: "Cashflow", path: "/cashflow", icon: ArrowDownUp, type: 'link' },
     ]
   },
   { 
@@ -54,12 +55,20 @@ const navItems = [
     icon: Wallet,
     type: 'section',
     children: [
-      { name: "Net Worth Calculator", path: "/net-worth", icon: Calculator },
-      { name: "Real Estate", path: "/real-estate", icon: Home },
-      { name: "Domestic Equity", path: "/domestic-equity", icon: BarChart2 },
-      { name: "US Equity", path: "/us-equity", icon: Landmark },
-      { name: "Debt", path: "/debt", icon: FileText },
-      { name: "Gold", path: "/gold", icon: Gem },
+      { name: "Net Worth Calculator", path: "/net-worth", icon: Calculator, type: 'link' },
+      { name: "Real Estate", path: "/real-estate", icon: Home, type: 'link' },
+      { 
+        name: "Equity", 
+        icon: BarChart2,
+        type: 'section',
+        children: [
+          { name: "Domestic Equity", path: "/domestic-equity", icon: BarChart2, type: 'link' },
+          { name: "Mutual Fund Allocation", path: "/mutual-fund-allocation", icon: PieChart, type: 'link' },
+          { name: "US Equity", path: "/us-equity", icon: Landmark, type: 'link' },
+        ]
+      },
+      { name: "Debt", path: "/debt", icon: FileText, type: 'link' },
+      { name: "Gold", path: "/gold", icon: Gem, type: 'link' },
     ]
   },
   { name: "Goals", path: "/goals", icon: Target, type: 'link' },
@@ -68,10 +77,10 @@ const navItems = [
     icon: Landmark,
     type: 'section',
     children: [
-      { name: "FIRE Calculator", path: "/fire-calculator", icon: Flame },
-      { name: "Retirement", path: "/retirement", icon: Landmark },
-      { name: "Projected Cashflow", path: "/projected-cashflow", icon: LineChart },
-      { name: "Future Value", path: "/future-value", icon: TrendingUp },
+      { name: "FIRE Calculator", path: "/fire-calculator", icon: Flame, type: 'link' },
+      { name: "Retirement", path: "/retirement", icon: Landmark, type: 'link' },
+      { name: "Projected Cashflow", path: "/projected-cashflow", icon: LineChart, type: 'link' },
+      { name: "Future Value", path: "/future-value", icon: TrendingUp, type: 'link' },
     ]
   },
   { 
@@ -79,8 +88,8 @@ const navItems = [
     icon: Briefcase,
     type: 'section',
     children: [
-      { name: "Portfolio Analysis", path: "/portfolio", icon: Briefcase },
-      { name: "CDSL Portfolio Import", path: "/cdsl-portfolio-import", icon: FileInput },
+      { name: "Portfolio Analysis", path: "/portfolio", icon: Briefcase, type: 'link' },
+      { name: "CDSL Portfolio Import", path: "/cdsl-portfolio-import", icon: FileInput, type: 'link' },
     ]
   },
   { name: "Reports", path: "/reports", icon: FileText, type: 'link' },
@@ -110,20 +119,51 @@ const DashboardLayout: React.FC = () => {
                   </AccordionTrigger>
                   <AccordionContent className="pt-1 pb-0">
                     <div className="flex flex-col gap-1 pl-4">
-                      {item.children.map((child) => (
-                        <Button
-                          key={child.name}
-                          variant="ghost"
-                          className="justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                          asChild
-                          onClick={() => isMobile && setIsSheetOpen(false)}
-                        >
-                          <Link to={child.path}>
-                            <child.icon className="mr-2 h-4 w-4" />
-                            {child.name}
-                          </Link>
-                        </Button>
-                      ))}
+                      {item.children.map((child) =>
+                        child.type === 'section' && child.children ? (
+                          <Accordion key={child.name} type="single" collapsible className="w-full">
+                            <AccordionItem value={child.name} className="border-none">
+                              <AccordionTrigger className="justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:no-underline rounded-md px-3 py-2 w-full">
+                                <div className="flex items-center">
+                                  <child.icon className="mr-2 h-4 w-4" />
+                                  {child.name}
+                                </div>
+                              </AccordionTrigger>
+                              <AccordionContent className="pt-1 pb-0">
+                                <div className="flex flex-col gap-1 pl-4">
+                                  {child.children.map((grandchild) => (
+                                    <Button
+                                      key={grandchild.name}
+                                      variant="ghost"
+                                      className="justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                                      asChild
+                                      onClick={() => isMobile && setIsSheetOpen(false)}
+                                    >
+                                      <Link to={grandchild.path!}>
+                                        <grandchild.icon className="mr-2 h-4 w-4" />
+                                        {grandchild.name}
+                                      </Link>
+                                    </Button>
+                                  ))}
+                                </div>
+                              </AccordionContent>
+                            </AccordionItem>
+                          </Accordion>
+                        ) : (
+                          <Button
+                            key={child.name}
+                            variant="ghost"
+                            className="justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                            asChild
+                            onClick={() => isMobile && setIsSheetOpen(false)}
+                          >
+                            <Link to={child.path!}>
+                              <child.icon className="mr-2 h-4 w-4" />
+                              {child.name}
+                            </Link>
+                          </Button>
+                        )
+                      )}
                     </div>
                   </AccordionContent>
                 </AccordionItem>
