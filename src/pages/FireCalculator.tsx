@@ -1,0 +1,180 @@
+"use client";
+
+import React, { useState, useMemo } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Flame } from "lucide-react";
+
+const FireCalculator: React.FC = () => {
+  const [inputs, setInputs] = useState({
+    monthlyExpenses: 50000,
+    currentAge: 30,
+    retirementAge: 60,
+    inflation: 6,
+    coastFireAge: 40,
+    expectedReturn: 12,
+  });
+
+  const handleInputChange = (field: keyof typeof inputs, value: string) => {
+    setInputs(prev => ({ ...prev, [field]: Number(value) || 0 }));
+  };
+
+  const calculations = useMemo(() => {
+    const { monthlyExpenses, currentAge, retirementAge, inflation, coastFireAge, expectedReturn } = inputs;
+
+    const yearsToRetirement = Math.max(0, retirementAge - currentAge);
+    const yearlyExpensesToday = monthlyExpenses * 12;
+    const yearlyExpensesAtRetirement = yearlyExpensesToday * Math.pow(1 + inflation / 100, yearsToRetirement);
+
+    const leanFireTarget = yearlyExpensesAtRetirement * 15;
+    const fireTarget = yearlyExpensesAtRetirement * 25;
+    const fatFireTarget = yearlyExpensesAtRetirement * 50;
+
+    const yearsFromCoastToRetirement = Math.max(0, retirementAge - coastFireAge);
+    const coastFireTarget = fireTarget / Math.pow(1 + expectedReturn / 100, yearsFromCoastToRetirement);
+
+    return {
+      yearlyExpensesToday,
+      yearlyExpensesAtRetirement,
+      leanFireTarget,
+      fireTarget,
+      fatFireTarget,
+      coastFireTarget,
+    };
+  }, [inputs]);
+
+  const formatCurrency = (value: number) => {
+    return `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold flex items-center gap-2">
+          <Flame className="h-8 w-8" />
+          FIRE Calculator
+        </h1>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Financial Independence, Retire Early (FIRE) Calculator</CardTitle>
+          <CardDescription>
+            Estimate the corpus you need to achieve financial independence based on your lifestyle.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Input Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <Label htmlFor="monthlyExpenses">Desired Monthly Expenses (Today's Value)</Label>
+              <Input
+                id="monthlyExpenses"
+                type="number"
+                value={inputs.monthlyExpenses}
+                onChange={(e) => handleInputChange('monthlyExpenses', e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="inflation">Expected Annual Inflation (%)</Label>
+              <Input
+                id="inflation"
+                type="number"
+                value={inputs.inflation}
+                onChange={(e) => handleInputChange('inflation', e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="currentAge">Current Age</Label>
+              <Input
+                id="currentAge"
+                type="number"
+                value={inputs.currentAge}
+                onChange={(e) => handleInputChange('currentAge', e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="retirementAge">Desired Retirement Age</Label>
+              <Input
+                id="retirementAge"
+                type="number"
+                value={inputs.retirementAge}
+                onChange={(e) => handleInputChange('retirementAge', e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="coastFireAge">Desired Coast FIRE Age</Label>
+              <Input
+                id="coastFireAge"
+                type="number"
+                value={inputs.coastFireAge}
+                onChange={(e) => handleInputChange('coastFireAge', e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="expectedReturn">Expected Rate of Return (%)</Label>
+              <Input
+                id="expectedReturn"
+                type="number"
+                value={inputs.expectedReturn}
+                onChange={(e) => handleInputChange('expectedReturn', e.target.value)}
+              />
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Yearly Expenses Section */}
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold">Yearly Expenses</h3>
+            <div className="flex justify-between">
+              <p>Yearly Expenses (Today's Value):</p>
+              <p className="font-medium">{formatCurrency(calculations.yearlyExpensesToday)}</p>
+            </div>
+            <div className="flex justify-between">
+              <p>Yearly Expenses (at Retirement Age):</p>
+              <p className="font-medium">{formatCurrency(calculations.yearlyExpensesAtRetirement)}</p>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* FIRE Targets Section */}
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold">FIRE Targets</h3>
+            <div className="flex justify-between">
+              <p>Lean FIRE Target (15x Yearly Expenses):</p>
+              <p className="font-medium text-orange-500">{formatCurrency(calculations.leanFireTarget)}</p>
+            </div>
+            <div className="flex justify-between">
+              <p>FIRE Target (25x Yearly Expenses):</p>
+              <p className="font-medium text-green-500">{formatCurrency(calculations.fireTarget)}</p>
+            </div>
+            <div className="flex justify-between">
+              <p>FAT FIRE Target (50x Yearly Expenses):</p>
+              <p className="font-medium text-purple-500">{formatCurrency(calculations.fatFireTarget)}</p>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Coast FIRE Section */}
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold">Coast FIRE</h3>
+            <div className="flex justify-between">
+              <p>Coast FIRE Target (Amount needed by age {inputs.coastFireAge}):</p>
+              <p className="font-medium text-blue-500">{formatCurrency(calculations.coastFireTarget)}</p>
+            </div>
+            <p className="text-sm text-muted-foreground pt-2">
+              This is the amount you need to have invested by your Coast FIRE age. If you don't add another penny, it should grow to your FIRE Target by your desired retirement age.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default FireCalculator;

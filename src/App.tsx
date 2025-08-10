@@ -16,6 +16,7 @@ import ProjectedCashflow from "./pages/ProjectedCashflow";
 import AIPrompt from "./pages/AIPrompt";
 import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
+import FireCalculator from "./pages/FireCalculator";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
               <Route path="future-value" element={<FutureValueCalculator />} />
               <Route path="goals" element={<Goals />} />
               <Route path="retirement" element={<RetirementDashboard />} />
+              <Route path="fire-calculator" element={<FireCalculator />} />
               <Route path="portfolio" element={<Portfolio />} />
               <Route path="projected-cashflow" element={<ProjectedCashflow />} />
               <Route path="ai-prompt" element={<AIPrompt />} />

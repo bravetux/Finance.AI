@@ -19,7 +19,8 @@ import {
   LineChart,
   Bot,
   FileText,
-  Briefcase
+  Briefcase,
+  Flame
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -33,6 +34,7 @@ const navItems = [
   { name: "Future Value", path: "/future-value", icon: TrendingUp },
   { name: "Goals", path: "/goals", icon: Target },
   { name: "Retirement", path: "/retirement", icon: Landmark },
+  { name: "FIRE Calculator", path: "/fire-calculator", icon: Flame },
   { name: "Portfolio", path: "/portfolio", icon: Briefcase },
   { name: "Reports", path: "/reports", icon: FileText },
   { name: "AI Prompt", path: "/ai-prompt", icon: Bot },
