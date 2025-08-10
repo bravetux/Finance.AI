@@ -10,6 +10,7 @@ interface PieChartEntry {
 
 interface GenericPieChartProps {
   data: PieChartEntry[];
+  showLegend?: boolean;
 }
 
 // Function to generate a list of distinct colors
@@ -27,7 +28,7 @@ const generateColors = (numColors: number) => {
   return colors;
 };
 
-const GenericPieChart: React.FC<GenericPieChartProps> = ({ data }) => {
+const GenericPieChart: React.FC<GenericPieChartProps> = ({ data, showLegend = true }) => {
   const chartData = data.filter(entry => entry.value > 0);
   
   if (chartData.length === 0) {
@@ -59,7 +60,7 @@ const GenericPieChart: React.FC<GenericPieChartProps> = ({ data }) => {
           ))}
         </Pie>
         <Tooltip formatter={(value: number, name: string) => [`₹${value.toLocaleString('en-IN')}`, name]} />
-        <Legend />
+        {showLegend && <Legend />}
       </PieChart>
     </ResponsiveContainer>
   );
