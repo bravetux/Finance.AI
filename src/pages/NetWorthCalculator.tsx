@@ -5,9 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Download, Upload, Edit, Save } from "lucide-react";
-import { showError } from "@/utils/toast";
+import { Download, Upload, Edit, Save, Trash2 } from "lucide-react";
+import { showError, showSuccess } from "@/utils/toast";
 import GenericPieChart from "@/components/GenericPieChart";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface NetWorthData {
   // Assets - Illiquid
@@ -39,61 +50,24 @@ interface NetWorthData {
   otherLiabilities: number;
 }
 
+const defaultNetWorthData: NetWorthData = {
+  homeValue: 0, otherRealEstate: 0, jewellery: 0, sovereignGoldBonds: 0,
+  ulipsSurrenderValue: 0, epfPpfVpf: 0, fixedDeposits: 0, debtFunds: 0,
+  domesticStocks: 0, domesticMutualFunds: 0, internationalFunds: 0,
+  smallCases: 0, savingsBalance: 0, goldEtf: 0, cryptocurrency: 0,
+  reits: 0, homeLoan: 0, educationLoan: 0, carLoan: 0, personalLoan: 0,
+  creditCardDues: 0, otherLiabilities: 0
+};
+
 const NetWorthCalculator: React.FC = () => {
   const [isEditing, setIsEditing] = React.useState(false);
   const [data, setData] = React.useState<NetWorthData>(() => {
     try {
       const savedData = localStorage.getItem('netWorthData');
-      return savedData ? JSON.parse(savedData) : {
-        homeValue: 0,
-        otherRealEstate: 0,
-        jewellery: 0,
-        sovereignGoldBonds: 0,
-        ulipsSurrenderValue: 0,
-        epfPpfVpf: 0,
-        fixedDeposits: 0,
-        debtFunds: 0,
-        domesticStocks: 0,
-        domesticMutualFunds: 0,
-        internationalFunds: 0,
-        smallCases: 0,
-        savingsBalance: 0,
-        goldEtf: 0,
-        cryptocurrency: 0,
-        reits: 0,
-        homeLoan: 0,
-        educationLoan: 0,
-        carLoan: 0,
-        personalLoan: 0,
-        creditCardDues: 0,
-        otherLiabilities: 0
-      };
+      return savedData ? JSON.parse(savedData) : defaultNetWorthData;
     } catch (e) {
       console.error("Failed to load net worth data from localStorage:", e);
-      return {
-        homeValue: 0,
-        otherRealEstate: 0,
-        jewellery: 0,
-        sovereignGoldBonds: 0,
-        ulipsSurrenderValue: 0,
-        epfPpfVpf: 0,
-        fixedDeposits: 0,
-        debtFunds: 0,
-        domesticStocks: 0,
-        domesticMutualFunds: 0,
-        internationalFunds: 0,
-        smallCases: 0,
-        savingsBalance: 0,
-        goldEtf: 0,
-        cryptocurrency: 0,
-        reits: 0,
-        homeLoan: 0,
-        educationLoan: 0,
-        carLoan: 0,
-        personalLoan: 0,
-        creditCardDues: 0,
-        otherLiabilities: 0
-      };
+      return defaultNetWorthData;
     }
   });
 
@@ -133,6 +107,12 @@ const NetWorthCalculator: React.FC = () => {
       }
     };
     reader.readAsText(file);
+  };
+
+  const handleClearData = () => {
+    localStorage.setItem('netWorthData', JSON.stringify(defaultNetWorthData));
+    showSuccess("Net Worth data has been cleared.");
+    setTimeout(() => window.location.reload(), 1000);
   };
 
   // Calculate totals
@@ -180,6 +160,27 @@ const NetWorthCalculator: React.FC = () => {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Net Worth Calculator</h1>
         <div className="flex gap-2">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive">
+                <Trash2 className="mr-2 h-4 w-4" /> Clear Data
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will reset all fields on this page to zero. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleClearData}>
+                  Yes, clear data
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <Button variant="outline" onClick={() => setIsEditing(!isEditing)}>
             {isEditing ? (
               <>

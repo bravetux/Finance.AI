@@ -5,12 +5,23 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sheet as SheetIcon, Upload, Download } from "lucide-react";
+import { Sheet as SheetIcon, Upload, Download, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { saveAs } from "file-saver";
 import { showSuccess, showError } from "@/utils/toast";
 import GenericPieChart from "@/components/GenericPieChart";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 type Action = "Same" | "Reduce" | "Increase";
 
@@ -148,6 +159,12 @@ const ExpenseReductionPlanner: React.FC = () => {
     event.target.value = '';
   };
 
+  const handleClearData = () => {
+    localStorage.removeItem('expenseTrackerData');
+    showSuccess("Expense data has been cleared.");
+    setTimeout(() => window.location.reload(), 1000);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -156,6 +173,27 @@ const ExpenseReductionPlanner: React.FC = () => {
           Expense Reduction Planner
         </h1>
         <div className="flex gap-2">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive">
+                <Trash2 className="mr-2 h-4 w-4" /> Clear Data
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will reset all expense data on this page to its default state. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleClearData}>
+                  Yes, clear data
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <Button variant="outline" onClick={exportData}>
             <Upload className="mr-2 h-4 w-4" /> Export
           </Button>

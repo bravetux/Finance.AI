@@ -5,20 +5,33 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Flame, Upload, Download } from "lucide-react";
+import { Flame, Upload, Download, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { saveAs } from "file-saver";
 import { showSuccess, showError } from "@/utils/toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
+const initialInputs = {
+  monthlyExpenses: 50000,
+  currentAge: 30,
+  retirementAge: 60,
+  inflation: 6,
+  coastFireAge: 40,
+  expectedReturn: 12,
+};
 
 const FireCalculator: React.FC = () => {
-  const [inputs, setInputs] = useState({
-    monthlyExpenses: 50000,
-    currentAge: 30,
-    retirementAge: 60,
-    inflation: 6,
-    coastFireAge: 40,
-    expectedReturn: 12,
-  });
+  const [inputs, setInputs] = useState(initialInputs);
 
   const handleInputChange = (field: keyof typeof inputs, value: string) => {
     setInputs(prev => ({ ...prev, [field]: Number(value) || 0 }));
@@ -94,6 +107,11 @@ const FireCalculator: React.FC = () => {
     event.target.value = '';
   };
 
+  const handleClearFields = () => {
+    setInputs(initialInputs);
+    showSuccess("FIRE Calculator fields have been reset.");
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -102,6 +120,27 @@ const FireCalculator: React.FC = () => {
           FIRE Calculator
         </h1>
         <div className="flex gap-2">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive">
+                <Trash2 className="mr-2 h-4 w-4" /> Clear Fields
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will reset all fields on this page to their default values.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleClearFields}>
+                  Yes, clear fields
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <Button variant="outline" onClick={exportData}>
             <Upload className="mr-2 h-4 w-4" /> Export
           </Button>

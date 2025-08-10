@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Upload, Briefcase, IndianRupee, TrendingUp, Bot, Sparkles } from "lucide-react";
+import { Upload, Briefcase, IndianRupee, TrendingUp, Bot, Sparkles, Trash2 } from "lucide-react";
 import { showError, showSuccess } from "@/utils/toast";
 import Papa from "papaparse";
 import {
@@ -18,6 +18,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent as AlertContent,
+  AlertDialogDescription as AlertDescription,
+  AlertDialogFooter as AlertFooter,
+  AlertDialogHeader as AlertHeader,
+  AlertDialogTitle as AlertTitle,
+  AlertDialogTrigger as AlertTrigger,
+} from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -224,6 +235,12 @@ Your response should be ONLY the JSON array of objects. Do not include any other
     }
   };
 
+  const handleClearData = () => {
+    localStorage.removeItem('portfolioData');
+    showSuccess("Portfolio data has been cleared.");
+    setTimeout(() => window.location.reload(), 1000);
+  };
+
   const portfolioSummary = useMemo(() => {
     if (holdings.length === 0) return { totalInvestment: 0, currentValue: 0, overallPnl: 0 };
     let totalInvestment = 0, currentValue = 0;
@@ -245,6 +262,11 @@ Your response should be ONLY the JSON array of objects. Do not include any other
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold flex items-center gap-2"><Briefcase className="h-8 w-8" />Portfolio Analysis</h1>
         <div className="flex gap-2">
+          <AlertTrigger asChild>
+            <Button variant="destructive" disabled={holdings.length === 0}>
+              <Trash2 className="mr-2 h-4 w-4" /> Clear Data
+            </Button>
+          </AlertTrigger>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" disabled={holdings.length === 0}>
@@ -294,6 +316,20 @@ Your response should be ONLY the JSON array of objects. Do not include any other
           <Button variant="outline" asChild>
             <Label htmlFor="import-file" className="cursor-pointer"><Upload className="mr-2 h-4 w-4" /> Import CSV<Input id="import-file" type="file" accept=".csv" className="hidden" onChange={handleFileImport} /></Label>
           </Button>
+          <AlertContent>
+            <AlertHeader>
+              <AlertTitle>Are you sure?</AlertTitle>
+              <AlertDescription>
+                This will clear all imported portfolio data from this page. This action cannot be undone.
+              </AlertDescription>
+            </AlertHeader>
+            <AlertFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleClearData}>
+                Yes, clear data
+              </AlertDialogAction>
+            </AlertFooter>
+          </AlertContent>
         </div>
       </div>
 

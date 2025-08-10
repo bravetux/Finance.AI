@@ -12,10 +12,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Flame, Sailboat, Gem, Upload, Download } from "lucide-react";
+import { Flame, Sailboat, Gem, Upload, Download, Trash2 } from "lucide-react";
 import AllocationPieChart from "@/components/AllocationPieChart";
 import { Button } from "@/components/ui/button";
 import { showSuccess, showError } from "@/utils/toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface RetirementState {
   currentAge: number;
@@ -151,6 +162,12 @@ const RetirementDashboard: React.FC = () => {
     reader.readAsText(file);
   };
 
+  const handleClearData = () => {
+    localStorage.removeItem('retirementData');
+    showSuccess("Retirement data has been cleared.");
+    setTimeout(() => window.location.reload(), 1000);
+  };
+
   const handleStateChange = (field: keyof RetirementState, value: any) => {
     setRetirementData((prev) => ({ ...prev, [field]: value }));
   };
@@ -218,6 +235,27 @@ const RetirementDashboard: React.FC = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Retirement Dashboard</h1>
         <div className="flex gap-2">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive">
+                <Trash2 className="mr-2 h-4 w-4" /> Clear Data
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will reset all retirement data on this page to its default state. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleClearData}>
+                  Yes, clear data
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <Button variant="outline" onClick={exportData}>
             <Upload className="mr-2 h-4 w-4" /> Export
           </Button>

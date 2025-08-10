@@ -2,11 +2,22 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { IndianRupee, TrendingUp, Wallet, Download, Upload } from "lucide-react";
+import { IndianRupee, TrendingUp, Wallet, Download, Upload, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { showError } from "@/utils/toast";
+import { showError, showSuccess } from "@/utils/toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface FinanceData {
   // Income
@@ -31,6 +42,16 @@ interface FinanceData {
   monthlyTravel: number;
   monthlyOthers: number;
 }
+
+const defaultFinanceData: FinanceData = {
+  postTaxSalaryIncome: 0, businessIncome: 0,
+  rentalProperty1: 0, rentalProperty2: 0, rentalProperty3: 0,
+  fdInterest: 0, bondIncome: 0, dividendIncome: 0,
+  monthlyHouseholdExpense: 0, monthlyPpf: 0, monthlyUlip: 0,
+  monthlyInsurance: 0, monthlyRds: 0, monthlyLoanEMIs: 0,
+  monthlyDonation: 0, monthlyEntertainment: 0, monthlyTravel: 0,
+  monthlyOthers: 0
+};
 
 const Cashflow: React.FC = () => {
   const [isEditingIncome, setIsEditingIncome] = React.useState(false);
@@ -105,6 +126,12 @@ const Cashflow: React.FC = () => {
     reader.readAsText(file);
   };
 
+  const handleClearData = () => {
+    localStorage.setItem('finance-data', JSON.stringify(defaultFinanceData));
+    showSuccess("Cashflow data has been cleared.");
+    setTimeout(() => window.location.reload(), 1000);
+  };
+
   // Calculate totals
   const totalRentalIncome = financeData.rentalProperty1 + financeData.rentalProperty2 + financeData.rentalProperty3;
   const totalAnnualIncome =
@@ -143,6 +170,27 @@ const Cashflow: React.FC = () => {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Cashflow</h1>
         <div className="flex gap-2">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive">
+                <Trash2 className="mr-2 h-4 w-4" /> Clear Data
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will reset all fields on this page to zero. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleClearData}>
+                  Yes, clear data
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <Button variant="outline" onClick={exportData}>
             <Upload className="mr-2 h-4 w-4" /> Export Data
           </Button>

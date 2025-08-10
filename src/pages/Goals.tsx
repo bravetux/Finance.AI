@@ -5,8 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Download, Upload } from "lucide-react";
-import { showError } from "@/utils/toast";
+import { Download, Upload, Trash2 } from "lucide-react";
+import { showError, showSuccess } from "@/utils/toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Goal {
   id: string;
@@ -157,6 +168,12 @@ const Goals: React.FC = () => {
     reader.readAsText(file);
   };
 
+  const handleClearData = () => {
+    localStorage.removeItem('goalsData');
+    showSuccess("Goals data has been cleared.");
+    setTimeout(() => window.location.reload(), 1000);
+  };
+
   const totalTargetFutureValue = goals.reduce((sum, goal) => sum + goal.targetFutureValue, 0);
   const totalSipRequired = goals.reduce((sum, goal) => sum + goal.sipRequired, 0);
 
@@ -165,6 +182,27 @@ const Goals: React.FC = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Goals</h1>
         <div className="flex gap-2">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive">
+                <Trash2 className="mr-2 h-4 w-4" /> Clear Data
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will reset all goals on this page to their default state. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleClearData}>
+                  Yes, clear data
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <Button variant="outline" onClick={exportData}>
             <Upload className="mr-2 h-4 w-4" /> Export
           </Button>
