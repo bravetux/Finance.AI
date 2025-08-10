@@ -53,11 +53,11 @@ const navItems = [
     children: [
       { name: "FIRE Calculator", path: "/fire-calculator", icon: Flame },
       { name: "Retirement", path: "/retirement", icon: Landmark },
+      { name: "Projected Cashflow", path: "/projected-cashflow", icon: LineChart },
+      { name: "Future Value", path: "/future-value", icon: TrendingUp },
     ]
   },
-  { name: "Future Value", path: "/future-value", icon: TrendingUp, type: 'link' },
   { name: "Portfolio", path: "/portfolio", icon: Briefcase, type: 'link' },
-  { name: "Projected Cashflow", path: "/projected-cashflow", icon: LineChart, type: 'link' },
   { name: "Reports", path: "/reports", icon: FileText, type: 'link' },
   { name: "AI Prompt", path: "/ai-prompt", icon: Bot, type: 'link' },
 ];
