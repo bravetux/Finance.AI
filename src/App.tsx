@@ -17,6 +17,7 @@ import AIPrompt from "./pages/AIPrompt";
 import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
 import FireCalculator from "./pages/FireCalculator";
+import ExpenseTracker from "./pages/ExpenseTracker";
 
 const queryClient = new QueryClient();
 
@@ -31,15 +32,16 @@ const App = () => (
             <Route path="/" element={<DashboardLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="cashflow" element={<Cashflow />} />
+              <Route path="expense-tracker" element={<ExpenseTracker />} />
+              <Route path="projected-cashflow" element={<ProjectedCashflow />} />
               <Route path="net-worth" element={<NetWorthCalculator />} />
               <Route path="future-value" element={<FutureValueCalculator />} />
               <Route path="goals" element={<Goals />} />
               <Route path="retirement" element={<RetirementDashboard />} />
               <Route path="fire-calculator" element={<FireCalculator />} />
               <Route path="portfolio" element={<Portfolio />} />
-              <Route path="projected-cashflow" element={<ProjectedCashflow />} />
-              <Route path="ai-prompt" element={<AIPrompt />} />
               <Route path="reports" element={<Reports />} />
+              <Route path="ai-prompt" element={<AIPrompt />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

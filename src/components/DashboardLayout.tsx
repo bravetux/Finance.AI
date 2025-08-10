@@ -20,7 +20,8 @@ import {
   Bot,
   FileText,
   Briefcase,
-  Flame
+  Flame,
+  Sheet as SheetIcon
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -29,6 +30,7 @@ import { ThemeToggle } from "./theme-toggle";
 const navItems = [
   { name: "Dashboard", path: "/", icon: LayoutDashboard },
   { name: "Cashflow", path: "/cashflow", icon: ArrowDownUp },
+  { name: "Expense Tracker", path: "/expense-tracker", icon: SheetIcon },
   { name: "Projected Cashflow", path: "/projected-cashflow", icon: LineChart },
   { name: "Net Worth", path: "/net-worth", icon: Calculator },
   { name: "Future Value", path: "/future-value", icon: TrendingUp },
