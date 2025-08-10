@@ -156,19 +156,12 @@ const FireCalculator: React.FC = () => {
               <p>FAT FIRE Target (50x Yearly Expenses):</p>
               <p className="font-medium text-purple-500">{formatCurrency(calculations.fatFireTarget)}</p>
             </div>
-          </div>
-
-          <Separator />
-
-          {/* Coast FIRE Section */}
-          <div className="space-y-2">
-            <h3 className="text-lg font-semibold">Coast FIRE</h3>
             <div className="flex justify-between">
-              <p>Coast FIRE Target (Amount needed by age {inputs.coastFireAge}):</p>
+              <p>Coast FIRE Target (by age {inputs.coastFireAge}):</p>
               <p className="font-medium text-blue-500">{formatCurrency(calculations.coastFireTarget)}</p>
             </div>
             <p className="text-sm text-muted-foreground pt-2">
-              This is the amount you need to have invested by your Coast FIRE age. If you don't add another penny, it should grow to your FIRE Target by your desired retirement age.
+              <strong>Coast FIRE:</strong> This is the amount you need to have invested by your Coast FIRE age. If you don't add another penny, it should grow to your FIRE Target by your desired retirement age.
             </p>
           </div>
         </CardContent>
