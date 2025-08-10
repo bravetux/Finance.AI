@@ -177,7 +177,7 @@ const ExpenseTracker: React.FC = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="min-w-[250px] p-2">Category</TableHead>
-                  <TableHead className="p-2 text-right">Cost</TableHead>
+                  <TableHead className="p-2">Cost</TableHead>
                   <TableHead className="p-2">Action</TableHead>
                   <TableHead className="p-2 text-right">±1%</TableHead>
                   <TableHead className="p-2 text-right">±5%</TableHead>
@@ -189,12 +189,15 @@ const ExpenseTracker: React.FC = () => {
                   <TableRow key={expense.id}>
                     <TableCell className="font-medium p-2">{expense.category}</TableCell>
                     <TableCell className="p-0">
-                      <Input
-                        type="number"
-                        value={expense.monthlyCost}
-                        onChange={(e) => handleCostChange(expense.id, e.target.value)}
-                        className="w-28 border-0 rounded-none focus-visible:ring-1 focus-visible:ring-offset-0 p-2 h-auto bg-transparent text-right"
-                      />
+                      <div className="relative flex items-center">
+                        <span className="absolute left-3 text-muted-foreground">₹</span>
+                        <Input
+                          type="number"
+                          value={expense.monthlyCost}
+                          onChange={(e) => handleCostChange(expense.id, e.target.value)}
+                          className="w-28 border-0 rounded-none focus-visible:ring-1 focus-visible:ring-offset-0 p-2 pl-6 h-auto bg-transparent text-right"
+                        />
+                      </div>
                     </TableCell>
                     <TableCell className="p-0">
                       <Select
