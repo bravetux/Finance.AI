@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Upload, Download, FileInput, KeyRound, Loader2 } from "lucide-react";
 import { showError, showSuccess, showLoading, dismissToast } from "@/utils/toast";
 import { saveAs } from "file-saver";
-import * as pdfjs from "pdfjs-dist";
 
 interface Holding {
   isin: string;
@@ -22,14 +21,6 @@ const CDSLPortfolioImport: React.FC = () => {
   const [password, setPassword] = useState("");
   const [holdings, setHoldings] = useState<Holding[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    // Set the workerSrc for pdf.js to ensure it works with Vite
-    pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-      'pdfjs-dist/build/pdf.worker.min.js',
-      import.meta.url,
-    ).toString();
-  }, []);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -54,82 +45,41 @@ const CDSLPortfolioImport: React.FC = () => {
 
     setIsLoading(true);
     setHoldings([]);
-    const toastId = showLoading("Reading PDF file...");
+    const toastId = showLoading("Uploading and parsing statement with casparser.in...");
 
-    const reader = new FileReader();
-    reader.readAsArrayBuffer(pdfFile);
+    const formData = new FormData();
+    formData.append("file", pdfFile);
+    formData.append("password", password);
 
-    reader.onload = async (e) => {
-      let parsingToastId: string | number | undefined;
-      try {
-        const arrayBuffer = e.target?.result as ArrayBuffer;
-        if (!arrayBuffer) {
-          throw new Error("Could not read file.");
-        }
+    try {
+      const response = await fetch("https://casparser.in/api/v1/parseCAS", {
+        method: "POST",
+        body: formData,
+      });
 
-        dismissToast(toastId);
-        parsingToastId = showLoading("Parsing portfolio data...");
+      const data = await response.json();
 
-        const loadingTask = pdfjs.getDocument({
-          data: arrayBuffer,
-          password: password,
-        });
-
-        const pdfDoc = await loadingTask.promise;
-        let fullText = "";
-
-        for (let i = 1; i <= pdfDoc.numPages; i++) {
-          const page = await pdfDoc.getPage(i);
-          const textContent = await page.getTextContent();
-          // The type for item is complex, so we cast to any to access .str
-          const pageText = textContent.items.map(item => (item as any).str).join(" ");
-          fullText += pageText + "\n";
-        }
-
-        const parsedHoldings: Holding[] = [];
-        
-        // Regex to find lines with ISIN, name, and quantity.
-        const holdingRegex = /^(IN[A-Z0-9]{10})\s+(.*?)\s+([\d,]+\.\d{3})$/gm;
-        
-        let match;
-        while ((match = holdingRegex.exec(fullText)) !== null) {
-            const isin = match[1].trim();
-            const name = match[2].trim().replace(/\s{2,}/g, ' ');
-            const quantity = parseFloat(match[3].replace(/,/g, ''));
-
-            if (isin && name && !isNaN(quantity)) {
-                parsedHoldings.push({ isin, name, quantity });
-            }
-        }
-
-        if (parsedHoldings.length === 0) {
-          throw new Error("Could not find any holdings. The PDF format might be unsupported or not machine-readable.");
-        }
-
-        setHoldings(parsedHoldings);
-        dismissToast(parsingToastId);
-        showSuccess(`Successfully imported ${parsedHoldings.length} holdings.`);
-
-      } catch (error: any) {
-        if (parsingToastId) dismissToast(parsingToastId);
-        else dismissToast(toastId);
-        
-        if (error.message.includes("Invalid password")) {
-            showError("Incorrect password or password-protected file.");
-        } else {
-            showError(`Failed to parse PDF: ${error.message}`);
-        }
-        console.error("PDF Parsing Error:", error);
-      } finally {
-        setIsLoading(false);
+      if (!response.ok) {
+        throw new Error(data.error || `API Error (${response.status})`);
       }
-    };
 
-    reader.onerror = () => {
+      const parsedHoldings = data?.cas?.holdings;
+
+      if (!parsedHoldings || !Array.isArray(parsedHoldings) || parsedHoldings.length === 0) {
+        throw new Error("No holdings found in the statement, or the format is unsupported.");
+      }
+
+      setHoldings(parsedHoldings);
       dismissToast(toastId);
-      showError("Failed to read the file.");
+      showSuccess(`Successfully imported ${parsedHoldings.length} holdings.`);
+
+    } catch (error: any) {
+      dismissToast(toastId);
+      showError(`Failed to parse statement: ${error.message}`);
+      console.error("CAS Parser API Error:", error);
+    } finally {
       setIsLoading(false);
-    };
+    }
   };
 
   const handleExport = () => {
@@ -159,7 +109,7 @@ const CDSLPortfolioImport: React.FC = () => {
         <CardHeader>
           <CardTitle>Import CDSL e-CAS Statement</CardTitle>
           <CardDescription>
-            Upload your password-protected CDSL e-CAS PDF to automatically extract your holdings.
+            Upload your password-protected CDSL e-CAS PDF to automatically extract your holdings using the casparser.in service.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
