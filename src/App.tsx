@@ -19,6 +19,11 @@ import NotFound from "./pages/NotFound";
 import FireCalculator from "./pages/FireCalculator";
 import ExpenseReductionPlanner from "./pages/ExpenseReductionPlanner";
 import CDSLPortfolioImport from "./pages/CDSLPortfolioImport";
+import RealEstate from "./pages/RealEstate";
+import DomesticEquity from "./pages/DomesticEquity";
+import USEquity from "./pages/USEquity";
+import Debt from "./pages/Debt";
+import Gold from "./pages/Gold";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +41,11 @@ const App = () => (
               <Route path="expense-reduction-planner" element={<ExpenseReductionPlanner />} />
               <Route path="projected-cashflow" element={<ProjectedCashflow />} />
               <Route path="net-worth" element={<NetWorthCalculator />} />
+              <Route path="real-estate" element={<RealEstate />} />
+              <Route path="domestic-equity" element={<DomesticEquity />} />
+              <Route path="us-equity" element={<USEquity />} />
+              <Route path="debt" element={<Debt />} />
+              <Route path="gold" element={<Gold />} />
               <Route path="future-value" element={<FutureValueCalculator />} />
               <Route path="goals" element={<Goals />} />
               <Route path="retirement" element={<RetirementDashboard />} />

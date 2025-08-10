@@ -23,6 +23,10 @@ import {
   Flame,
   Sheet as SheetIcon,
   FileInput,
+  Wallet,
+  Home,
+  BarChart2,
+  Gem,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -45,7 +49,19 @@ const navItems = [
       { name: "Cashflow", path: "/cashflow", icon: ArrowDownUp },
     ]
   },
-  { name: "Net Worth", path: "/net-worth", icon: Calculator, type: 'link' },
+  { 
+    name: "Net Worth", 
+    icon: Wallet,
+    type: 'section',
+    children: [
+      { name: "Net Worth Calculator", path: "/net-worth", icon: Calculator },
+      { name: "Real Estate", path: "/real-estate", icon: Home },
+      { name: "Domestic Equity", path: "/domestic-equity", icon: BarChart2 },
+      { name: "US Equity", path: "/us-equity", icon: Landmark },
+      { name: "Debt", path: "/debt", icon: FileText },
+      { name: "Gold", path: "/gold", icon: Gem },
+    ]
+  },
   { name: "Goals", path: "/goals", icon: Target, type: 'link' },
   { 
     name: "Retirement Planning", 
