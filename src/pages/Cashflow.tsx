@@ -133,7 +133,28 @@ const Cashflow: React.FC = () => {
   };
 
   // Calculate totals
-  const totalRentalIncome = financeData.rentalProperty1 + financeData.rentalProperty2 + financeData.rentalProperty3;
+  const totalRentalIncome = (financeData.rentalProperty1 || 0) + (financeData.rentalProperty2 || 0) + (financeData.rentalProperty3 || 0);
+  const totalAnnualIncome =
+    (financeData.postTaxSalaryIncome || 0) +
+    (financeData.businessIncome || 0) +
+    totalRentalIncome +
+    (financeData.fdInterest || 0) +
+    (financeData.bondIncome || 0) +
+    (financeData.dividendIncome || 0);
+
+  const totalAnnualOutflows =
+    ((financeData.monthlyHouseholdExpense || 0) +
+    (financeData.monthlyPpf || 0) +
+    (financeData.monthlyUlip || 0) +
+    (financeData.monthlyInsurance || 0) +
+    (financeData.monthlyRds || 0) +
+    (financeData.monthlyLoanEMIs || 0) +
+    (financeData.monthlyDonation || 0) +
+    (financeData.monthlyEntertainment || 0) +
+    (financeData.monthlyTravel || 0) +
+    (financeData.monthlyOthers || 0)) * 12;
+
+  const surplusCashFlow = totalAnnualIncome - totalAnnualOutflows;
   
   const annualHouseholdExpense = financeData.monthlyHouseholdExpense * 12;
   const annualPpf = financeData.monthlyPpf * 12;
@@ -190,6 +211,42 @@ const Cashflow: React.FC = () => {
             </Label>
           </Button>
         </div>
+      </div>
+
+      {/* Summary Cards Row */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Annual Income</CardTitle>
+            <IndianRupee className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">₹{totalAnnualIncome.toLocaleString("en-IN")}</div>
+            <p className="text-xs text-muted-foreground">Summary of all income sources</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Annual Outflows</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">₹{totalAnnualOutflows.toLocaleString("en-IN")}</div>
+            <p className="text-xs text-muted-foreground">Summary of all expenses and investments</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Surplus Cash Flow</CardTitle>
+            <Wallet className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className={`text-2xl font-bold ${surplusCashFlow < 0 ? "text-red-500" : "text-green-500"}`}>
+              ₹{surplusCashFlow.toLocaleString("en-IN")}
+            </div>
+            <p className="text-xs text-muted-foreground">Income minus Outflows</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Three Column Breakdown */}
