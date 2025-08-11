@@ -194,31 +194,33 @@ const DomesticEquity: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[5%]">S.No</TableHead>
-                  <TableHead>Stock Name</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Current Value (INR)</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="w-[5%] p-2">S.No</TableHead>
+                  <TableHead className="p-2">Stock Name</TableHead>
+                  <TableHead className="p-2">Category</TableHead>
+                  <TableHead className="p-2">Current Value (INR)</TableHead>
+                  <TableHead className="text-right p-2">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {stocks.length > 0 ? stocks.map((stock, index) => (
                   <TableRow key={stock.id}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>
+                    <TableCell className="p-2">{index + 1}</TableCell>
+                    <TableCell className="p-1">
                       <Input
                         value={stock.stockName}
                         onChange={e => handleStockChange(stock.id, 'stockName', e.target.value)}
                         placeholder="Enter stock name"
-                        className="bg-transparent"
+                        className="bg-transparent border-0 focus-visible:ring-0 h-auto"
                       />
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="p-1">
                       <Select
                         value={stock.category}
                         onValueChange={(value: Stock['category']) => handleStockChange(stock.id, 'category', value)}
                       >
-                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="bg-transparent border-0 focus:ring-0 h-auto w-full">
+                          <SelectValue />
+                        </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Largecap">Largecap</SelectItem>
                           <SelectItem value="Midcap">Midcap</SelectItem>
@@ -227,15 +229,15 @@ const DomesticEquity: React.FC = () => {
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="p-1">
                       <Input
                         type="number"
                         value={stock.currentValue}
                         onChange={e => handleStockChange(stock.id, 'currentValue', Number(e.target.value))}
-                        className="bg-transparent"
+                        className="bg-transparent border-0 focus-visible:ring-0 h-auto"
                       />
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right p-2">
                       <Button variant="ghost" size="icon" onClick={() => handleDeleteRow(stock.id)}>
                         <Trash2 className="h-4 w-4 text-red-500" />
                       </Button>
@@ -251,9 +253,9 @@ const DomesticEquity: React.FC = () => {
               </TableBody>
               <TableFooter>
                 <TableRow className="bg-muted/50 font-bold">
-                  <TableCell colSpan={3}>Total Current Value</TableCell>
-                  <TableCell className="text-right">{formatCurrency(marketCapAllocation.totalValue)}</TableCell>
-                  <TableCell />
+                  <TableCell colSpan={3} className="p-2">Total Current Value</TableCell>
+                  <TableCell className="text-right p-2">{formatCurrency(marketCapAllocation.totalValue)}</TableCell>
+                  <TableCell className="p-2" />
                 </TableRow>
               </TableFooter>
             </Table>
