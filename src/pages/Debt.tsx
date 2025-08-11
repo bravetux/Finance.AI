@@ -194,17 +194,17 @@ const Debt: React.FC = () => {
           </CardHeader>
           <CardContent>
             <Table>
-              <TableHeader><TableRow><TableHead>Particulars</TableHead><TableHead className="text-right">Value</TableHead><TableHead className="w-[10%]"></TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead className="py-1 px-1">Particulars</TableHead><TableHead className="text-right py-1 px-1">Value</TableHead><TableHead className="w-[10%] py-1 px-1"></TableHead></TableRow></TableHeader>
               <TableBody>
                 {liquidAssets.map(item => (
-                  <TableRow key={item.id}>
-                    <TableCell><Input value={item.particulars} onChange={e => handleInputChange(setLiquidAssets, item.id, 'particulars', e.target.value)} className="h-8" /></TableCell>
-                    <TableCell><Input type="number" value={item.currentValue} onChange={e => handleInputChange(setLiquidAssets, item.id, 'currentValue', Number(e.target.value))} className="h-8 text-right" /></TableCell>
-                    <TableCell><Button variant="ghost" size="icon" onClick={() => handleDeleteRow(setLiquidAssets, item.id)}><Trash2 className="h-4 w-4 text-red-500" /></Button></TableCell>
+                  <TableRow key={item.id} className="h-9">
+                    <TableCell className="p-0"><Input value={item.particulars} onChange={e => handleInputChange(setLiquidAssets, item.id, 'particulars', e.target.value)} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm" /></TableCell>
+                    <TableCell className="p-0"><Input type="number" value={item.currentValue} onChange={e => handleInputChange(setLiquidAssets, item.id, 'currentValue', Number(e.target.value))} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm text-right" /></TableCell>
+                    <TableCell className="p-0 text-center"><Button variant="ghost" size="icon" onClick={() => handleDeleteRow(setLiquidAssets, item.id)} className="h-7 w-7"><Trash2 className="h-3.5 w-3.5 text-red-500" /></Button></TableCell>
                   </TableRow>
                 ))}
               </TableBody>
-              <TableFooter><TableRow><TableCell className="font-bold">Total</TableCell><TableCell className="text-right font-bold">{formatCurrency(totalLiquid)}</TableCell><TableCell></TableCell></TableRow></TableFooter>
+              <TableFooter><TableRow><TableCell className="font-bold py-1 px-1 text-sm">Total</TableCell><TableCell className="text-right font-bold py-1 px-1 text-sm">{formatCurrency(totalLiquid)}</TableCell><TableCell className="py-1 px-1"></TableCell></TableRow></TableFooter>
             </Table>
           </CardContent>
         </Card>
@@ -219,17 +219,17 @@ const Debt: React.FC = () => {
           </CardHeader>
           <CardContent>
             <Table>
-              <TableHeader><TableRow><TableHead>Bank Name</TableHead><TableHead className="text-right">Value</TableHead><TableHead className="w-[10%]"></TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead className="py-1 px-1">Bank Name</TableHead><TableHead className="text-right py-1 px-1">Value</TableHead><TableHead className="w-[10%] py-1 px-1"></TableHead></TableRow></TableHeader>
               <TableBody>
                 {fixedDeposits.map(item => (
-                  <TableRow key={item.id}>
-                    <TableCell><Input value={item.bankName} onChange={e => handleInputChange(setFixedDeposits, item.id, 'bankName', e.target.value)} className="h-8" /></TableCell>
-                    <TableCell><Input type="number" value={item.currentValue} onChange={e => handleInputChange(setFixedDeposits, item.id, 'currentValue', Number(e.target.value))} className="h-8 text-right" /></TableCell>
-                    <TableCell><Button variant="ghost" size="icon" onClick={() => handleDeleteRow(setFixedDeposits, item.id)}><Trash2 className="h-4 w-4 text-red-500" /></Button></TableCell>
+                  <TableRow key={item.id} className="h-9">
+                    <TableCell className="p-0"><Input value={item.bankName} onChange={e => handleInputChange(setFixedDeposits, item.id, 'bankName', e.target.value)} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm" /></TableCell>
+                    <TableCell className="p-0"><Input type="number" value={item.currentValue} onChange={e => handleInputChange(setFixedDeposits, item.id, 'currentValue', Number(e.target.value))} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm text-right" /></TableCell>
+                    <TableCell className="p-0 text-center"><Button variant="ghost" size="icon" onClick={() => handleDeleteRow(setFixedDeposits, item.id)} className="h-7 w-7"><Trash2 className="h-3.5 w-3.5 text-red-500" /></Button></TableCell>
                   </TableRow>
                 ))}
               </TableBody>
-              <TableFooter><TableRow><TableCell className="font-bold">Total</TableCell><TableCell className="text-right font-bold">{formatCurrency(totalFD)}</TableCell><TableCell></TableCell></TableRow></TableFooter>
+              <TableFooter><TableRow><TableCell className="font-bold py-1 px-1 text-sm">Total</TableCell><TableCell className="text-right font-bold py-1 px-1 text-sm">{formatCurrency(totalFD)}</TableCell><TableCell className="py-1 px-1"></TableCell></TableRow></TableFooter>
             </Table>
           </CardContent>
         </Card>
@@ -244,17 +244,17 @@ const Debt: React.FC = () => {
           </CardHeader>
           <CardContent>
             <Table>
-              <TableHeader><TableRow><TableHead>Name</TableHead><TableHead className="text-right">Value</TableHead><TableHead className="w-[10%]"></TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead className="py-1 px-1">Name</TableHead><TableHead className="text-right py-1 px-1">Value</TableHead><TableHead className="w-[10%] py-1 px-1"></TableHead></TableRow></TableHeader>
               <TableBody>
                 {debtFunds.map(item => (
-                  <TableRow key={item.id}>
-                    <TableCell><Input value={item.name} onChange={e => handleInputChange(setDebtFunds, item.id, 'name', e.target.value)} className="h-8" /></TableCell>
-                    <TableCell><Input type="number" value={item.currentValue} onChange={e => handleInputChange(setDebtFunds, item.id, 'currentValue', Number(e.target.value))} className="h-8 text-right" /></TableCell>
-                    <TableCell><Button variant="ghost" size="icon" onClick={() => handleDeleteRow(setDebtFunds, item.id)}><Trash2 className="h-4 w-4 text-red-500" /></Button></TableCell>
+                  <TableRow key={item.id} className="h-9">
+                    <TableCell className="p-0"><Input value={item.name} onChange={e => handleInputChange(setDebtFunds, item.id, 'name', e.target.value)} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm" /></TableCell>
+                    <TableCell className="p-0"><Input type="number" value={item.currentValue} onChange={e => handleInputChange(setDebtFunds, item.id, 'currentValue', Number(e.target.value))} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm text-right" /></TableCell>
+                    <TableCell className="p-0 text-center"><Button variant="ghost" size="icon" onClick={() => handleDeleteRow(setDebtFunds, item.id)} className="h-7 w-7"><Trash2 className="h-3.5 w-3.5 text-red-500" /></Button></TableCell>
                   </TableRow>
                 ))}
               </TableBody>
-              <TableFooter><TableRow><TableCell className="font-bold">Total</TableCell><TableCell className="text-right font-bold">{formatCurrency(totalDebtFunds)}</TableCell><TableCell></TableCell></TableRow></TableFooter>
+              <TableFooter><TableRow><TableCell className="font-bold py-1 px-1 text-sm">Total</TableCell><TableCell className="text-right font-bold py-1 px-1 text-sm">{formatCurrency(totalDebtFunds)}</TableCell><TableCell className="py-1 px-1"></TableCell></TableRow></TableFooter>
             </Table>
           </CardContent>
         </Card>
@@ -269,17 +269,17 @@ const Debt: React.FC = () => {
           </CardHeader>
           <CardContent>
             <Table>
-              <TableHeader><TableRow><TableHead>Name</TableHead><TableHead className="text-right">Value</TableHead><TableHead className="w-[10%]"></TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead className="py-1 px-1">Name</TableHead><TableHead className="text-right py-1 px-1">Value</TableHead><TableHead className="w-[10%] py-1 px-1"></TableHead></TableRow></TableHeader>
               <TableBody>
                 {govInvestments.map(item => (
-                  <TableRow key={item.id}>
-                    <TableCell><Input value={item.name} onChange={e => handleInputChange(setGovInvestments, item.id, 'name', e.target.value)} className="h-8" /></TableCell>
-                    <TableCell><Input type="number" value={item.currentValue} onChange={e => handleInputChange(setGovInvestments, item.id, 'currentValue', Number(e.target.value))} className="h-8 text-right" /></TableCell>
-                    <TableCell><Button variant="ghost" size="icon" onClick={() => handleDeleteRow(setGovInvestments, item.id)}><Trash2 className="h-4 w-4 text-red-500" /></Button></TableCell>
+                  <TableRow key={item.id} className="h-9">
+                    <TableCell className="p-0"><Input value={item.name} onChange={e => handleInputChange(setGovInvestments, item.id, 'name', e.target.value)} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm" /></TableCell>
+                    <TableCell className="p-0"><Input type="number" value={item.currentValue} onChange={e => handleInputChange(setGovInvestments, item.id, 'currentValue', Number(e.target.value))} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm text-right" /></TableCell>
+                    <TableCell className="p-0 text-center"><Button variant="ghost" size="icon" onClick={() => handleDeleteRow(setGovInvestments, item.id)} className="h-7 w-7"><Trash2 className="h-3.5 w-3.5 text-red-500" /></Button></TableCell>
                   </TableRow>
                 ))}
               </TableBody>
-              <TableFooter><TableRow><TableCell className="font-bold">Total</TableCell><TableCell className="text-right font-bold">{formatCurrency(totalGov)}</TableCell><TableCell></TableCell></TableRow></TableFooter>
+              <TableFooter><TableRow><TableCell className="font-bold py-1 px-1 text-sm">Total</TableCell><TableCell className="text-right font-bold py-1 px-1 text-sm">{formatCurrency(totalGov)}</TableCell><TableCell className="py-1 px-1"></TableCell></TableRow></TableFooter>
             </Table>
           </CardContent>
         </Card>
