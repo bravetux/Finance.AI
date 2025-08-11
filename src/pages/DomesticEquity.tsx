@@ -105,6 +105,22 @@ const DomesticEquity: React.FC = () => {
     return { allocationWithContribution, totalValue, chartData };
   }, [stocks]);
 
+  useEffect(() => {
+    try {
+      const savedNetWorthData = localStorage.getItem('netWorthData');
+      const netWorthData = savedNetWorthData ? JSON.parse(savedNetWorthData) : {};
+      
+      const updatedNetWorthData = {
+        ...netWorthData,
+        domesticStocks: marketCapAllocation.totalValue,
+      };
+
+      localStorage.setItem('netWorthData', JSON.stringify(updatedNetWorthData));
+    } catch (error) {
+      console.error("Failed to update net worth data from Domestic Equity page:", error);
+    }
+  }, [marketCapAllocation.totalValue]);
+
   const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 
   const exportData = () => {

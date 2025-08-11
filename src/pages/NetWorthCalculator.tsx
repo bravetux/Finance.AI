@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -70,6 +70,25 @@ const NetWorthCalculator: React.FC = () => {
       return defaultNetWorthData;
     }
   });
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const savedData = localStorage.getItem('netWorthData');
+        if (savedData) {
+          setData(JSON.parse(savedData));
+        }
+      } catch (e) {
+        console.error("Failed to reload net worth data from localStorage:", e);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   const handleInputChange = (field: keyof NetWorthData, value: string) => {
     const newData = {
@@ -372,7 +391,9 @@ const NetWorthCalculator: React.FC = () => {
                     type="number"
                     value={data.domesticStocks}
                     onChange={(e) => handleInputChange('domesticStocks', e.target.value)}
+                    disabled
                   />
+                   <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Domestic Equity page.</p>
                 </div>
                 <div>
                   <Label htmlFor="domesticMutualFunds">Domestic Mutual Funds</Label>
