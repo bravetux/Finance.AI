@@ -87,6 +87,31 @@ const RealEstate: React.FC = () => {
     localStorage.setItem('realEstateRentalProperties', JSON.stringify(rentalProperties));
   }, [rentalProperties]);
 
+  // Update net worth data in localStorage whenever property values change
+  useEffect(() => {
+    try {
+      const home1 = propertyValues.find(p => p.name === 'Home 1');
+      const home1Value = home1 ? home1.value : 0;
+
+      const totalPropertyValue = propertyValues.reduce((sum, p) => sum + p.value, 0);
+      const otherRealEstateValue = totalPropertyValue - home1Value;
+
+      const savedNetWorthData = localStorage.getItem('netWorthData');
+      const netWorthData = savedNetWorthData ? JSON.parse(savedNetWorthData) : {};
+      
+      const updatedNetWorthData = {
+        ...netWorthData,
+        homeValue: home1Value,
+        otherRealEstate: otherRealEstateValue,
+      };
+
+      localStorage.setItem('netWorthData', JSON.stringify(updatedNetWorthData));
+      window.dispatchEvent(new Event('storage'));
+    } catch (error) {
+      console.error("Failed to update net worth data from Real Estate page:", error);
+    }
+  }, [propertyValues]);
+
   // Handlers for input changes
   const handlePropertyValueChange = (id: string, value: string) => {
     if (value.length > 9) return;

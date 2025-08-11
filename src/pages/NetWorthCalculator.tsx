@@ -279,7 +279,9 @@ const NetWorthCalculator: React.FC = () => {
                     type="number"
                     value={data.homeValue}
                     onChange={(e) => handleInputChange('homeValue', e.target.value)}
+                    disabled
                   />
+                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Real Estate page.</p>
                 </div>
                 <div>
                   <Label htmlFor="otherRealEstate">Other Real Estate</Label>
@@ -288,7 +290,9 @@ const NetWorthCalculator: React.FC = () => {
                     type="number"
                     value={data.otherRealEstate}
                     onChange={(e) => handleInputChange('otherRealEstate', e.target.value)}
+                    disabled
                   />
+                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Real Estate page.</p>
                 </div>
                 <div>
                   <Label htmlFor="jewellery">Jewellery</Label>
