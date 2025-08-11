@@ -195,23 +195,23 @@ const MutualFundAllocation: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[5%] py-1 px-2">S.No</TableHead>
-                  <TableHead className="py-1 px-2">Mutual fund / ETF / Smallcase</TableHead>
-                  <TableHead className="py-1 px-2">Category</TableHead>
-                  <TableHead className="py-1 px-2">Current Value (INR)</TableHead>
-                  <TableHead className="text-right py-1 px-2">Actions</TableHead>
+                  <TableHead className="w-[3%] py-1 px-1">S.No</TableHead>
+                  <TableHead className="py-1 px-1">Mutual fund / ETF / Smallcase</TableHead>
+                  <TableHead className="py-1 px-1">Category</TableHead>
+                  <TableHead className="py-1 px-1">Current Value (INR)</TableHead>
+                  <TableHead className="text-right py-1 px-1">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {mutualFundEntries.length > 0 ? mutualFundEntries.map((entry, index) => (
-                  <TableRow key={entry.id} className="h-10">
-                    <TableCell className="py-0 px-2 align-middle">{index + 1}</TableCell>
+                  <TableRow key={entry.id} className="h-9"> {/* Reduced row height */}
+                    <TableCell className="py-0 px-1 align-middle text-xs">{index + 1}</TableCell> {/* Smaller text for S.No */}
                     <TableCell className="p-0">
                       <Input
                         value={entry.fundName}
                         onChange={e => handleEntryChange(entry.id, 'fundName', e.target.value)}
                         placeholder="Enter name"
-                        className="bg-transparent border-0 focus-visible:ring-0 h-8"
+                        className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm" /* Reduced height and text size */
                       />
                     </TableCell>
                     <TableCell className="p-0">
@@ -219,7 +219,9 @@ const MutualFundAllocation: React.FC = () => {
                         value={entry.category}
                         onValueChange={(value: FundCategory) => handleEntryChange(entry.id, 'category', value)}
                       >
-                        <SelectTrigger className="bg-transparent border-0 focus:ring-0 h-8 w-full"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="bg-transparent border-0 focus:ring-0 h-7 w-full text-sm"> {/* Reduced height and text size */}
+                          <SelectValue />
+                        </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Largecap">Largecap</SelectItem>
                           <SelectItem value="Midcap">Midcap</SelectItem>
@@ -234,18 +236,18 @@ const MutualFundAllocation: React.FC = () => {
                         type="number"
                         value={entry.currentValue}
                         onChange={e => handleEntryChange(entry.id, 'currentValue', Number(e.target.value))}
-                        className="bg-transparent border-0 focus-visible:ring-0 h-8"
+                        className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm" /* Reduced height and text size */
                       />
                     </TableCell>
-                    <TableCell className="text-right py-0 px-2">
-                      <Button variant="ghost" size="icon" onClick={() => handleDeleteRow(entry.id)} className="h-8 w-8">
-                        <Trash2 className="h-4 w-4 text-red-500" />
+                    <TableCell className="text-right py-0 px-1">
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteRow(entry.id)} className="h-7 w-7"> {/* Reduced button size */}
+                        <Trash2 className="h-3.5 w-3.5 text-red-500" /> {/* Reduced icon size */}
                       </Button>
                     </TableCell>
                   </TableRow>
                 )) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">
+                    <TableCell colSpan={5} className="text-center h-20 text-muted-foreground text-sm"> {/* Reduced height and text size */}
                       No entries added yet. Click "Add Entry" to begin.
                     </TableCell>
                   </TableRow>
@@ -253,9 +255,9 @@ const MutualFundAllocation: React.FC = () => {
               </TableBody>
               <TableFooter>
                 <TableRow className="bg-muted/50 font-bold">
-                  <TableCell colSpan={3} className="py-2 px-2">Total Current Value</TableCell>
-                  <TableCell className="text-right py-2 px-2">{formatCurrency(categoryAllocation.totalValue)}</TableCell>
-                  <TableCell className="py-2 px-2" />
+                  <TableCell colSpan={3} className="py-1 px-1 text-sm">Total Current Value</TableCell> {/* Reduced padding and text size */}
+                  <TableCell className="text-right py-1 px-1 text-sm">{formatCurrency(categoryAllocation.totalValue)}</TableCell> {/* Reduced padding and text size */}
+                  <TableCell className="py-1 px-1" />
                 </TableRow>
               </TableFooter>
             </Table>
@@ -274,25 +276,25 @@ const MutualFundAllocation: React.FC = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Category</TableHead>
-                    <TableHead className="text-right">Value (INR)</TableHead>
-                    <TableHead className="text-right">Contribution</TableHead>
+                    <TableHead className="py-1 px-1">Category</TableHead> {/* Reduced padding */}
+                    <TableHead className="text-right py-1 px-1">Value (INR)</TableHead> {/* Reduced padding */}
+                    <TableHead className="text-right py-1 px-1">Contribution</TableHead> {/* Reduced padding */}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {categoryAllocation.allocationWithContribution.map(item => (
-                    <TableRow key={item.name}>
-                      <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(item.value)}</TableCell>
-                      <TableCell className="text-right">{item.contribution.toFixed(2)}%</TableCell>
+                    <TableRow key={item.name} className="h-9"> {/* Reduced row height */}
+                      <TableCell className="font-medium py-0 px-1 text-sm">{item.name}</TableCell> {/* Reduced padding and text size */}
+                      <TableCell className="text-right py-0 px-1 text-sm">{formatCurrency(item.value)}</TableCell> {/* Reduced padding and text size */}
+                      <TableCell className="text-right py-0 px-1 text-sm">{item.contribution.toFixed(2)}%</TableCell> {/* Reduced padding and text size */}
                     </TableRow>
                   ))}
                 </TableBody>
                 <TableFooter>
-                  <TableRow>
-                    <TableCell className="font-bold">Total</TableCell>
-                    <TableCell className="font-bold text-right">{formatCurrency(categoryAllocation.totalValue)}</TableCell>
-                    <TableCell className="font-bold text-right">100.00%</TableCell>
+                  <TableRow className="bg-muted/50 font-bold">
+                    <TableCell className="py-1 px-1 text-sm">Total</TableCell> {/* Reduced padding and text size */}
+                    <TableCell className="font-bold text-right py-1 px-1 text-sm">{formatCurrency(categoryAllocation.totalValue)}</TableCell> {/* Reduced padding and text size */}
+                    <TableCell className="font-bold text-right py-1 px-1 text-sm">100.00%</TableCell> {/* Reduced padding and text size */}
                   </TableRow>
                 </TableFooter>
               </Table>
