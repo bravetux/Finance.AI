@@ -106,6 +106,10 @@ const MutualFundSIP: React.FC = () => {
     return { allocationWithContribution, totalValue, chartData };
   }, [sipEntries]);
 
+  useEffect(() => {
+    localStorage.setItem('sipOutflowData', JSON.stringify(categoryAllocation.totalValue));
+  }, [categoryAllocation.totalValue]);
+
   const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 
   const exportData = () => {

@@ -2,11 +2,11 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { IndianRupee, TrendingUp, Wallet } from "lucide-react";
+import { IndianRupee, TrendingUp, Wallet, Repeat } from "lucide-react";
 
 const CashflowSummary: React.FC = () => {
   // State for all financial data, loading from localStorage
-  const [financeData] = React.useState(() => {
+  const [financeData, setFinanceData] = React.useState(() => {
     try {
       const savedData = localStorage.getItem('finance-data');
       if (savedData) {
@@ -38,6 +38,19 @@ const CashflowSummary: React.FC = () => {
     };
   });
 
+  const [sipOutflow, setSipOutflow] = React.useState(0);
+
+  React.useEffect(() => {
+    try {
+        const savedSipOutflow = localStorage.getItem('sipOutflowData');
+        if (savedSipOutflow) {
+            setSipOutflow(JSON.parse(savedSipOutflow));
+        }
+    } catch (error) {
+        console.error("Failed to load SIP outflow data from localStorage:", error);
+    }
+  }, []);
+
   // Calculate totals
   const totalRentalIncome = (financeData.rentalProperty1 || 0) + (financeData.rentalProperty2 || 0) + (financeData.rentalProperty3 || 0);
   const totalAnnualIncome =
@@ -67,7 +80,7 @@ const CashflowSummary: React.FC = () => {
       <h1 className="text-3xl font-bold">Cashflow Summary</h1>
       
       {/* Summary Cards Row */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Annual Income</CardTitle>
@@ -98,6 +111,16 @@ const CashflowSummary: React.FC = () => {
               ₹{surplusCashFlow.toLocaleString("en-IN")}
             </div>
             <p className="text-xs text-muted-foreground">Income minus Outflows</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">SIP Outflow</CardTitle>
+            <Repeat className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">₹{sipOutflow.toLocaleString("en-IN")}</div>
+            <p className="text-xs text-muted-foreground">From Mutual Fund SIP page</p>
           </CardContent>
         </Card>
       </div>
