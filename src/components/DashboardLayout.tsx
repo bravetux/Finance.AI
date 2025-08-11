@@ -39,11 +39,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const navItems = [
   { name: "Dashboard", path: "/", icon: LayoutDashboard, type: 'link' },
   { 
-    name: "Financial Planning", 
+    name: "CashFlow Planning", 
     icon: Calculator,
     type: 'section',
     children: [
@@ -107,8 +108,8 @@ const DashboardLayout: React.FC = () => {
       <h2 className="text-2xl font-bold mb-6 text-sidebar-primary-foreground">
         Finance Dashboard
       </h2>
-      <div className="flex-grow flex flex-col">
-        <nav className="flex flex-col gap-1">
+      <ScrollArea className="flex-1">
+        <nav className="flex flex-col gap-1 pr-4">
           {navItems.map((item) =>
             item.type === 'section' && item.children ? (
               <Accordion key={item.name} type="single" collapsible className="w-full">
@@ -186,12 +187,12 @@ const DashboardLayout: React.FC = () => {
             )
           )}
         </nav>
-        <div className="mt-6 text-sm text-sidebar-foreground/80 px-2">
-          <p className="font-semibold">Designed and Developed by B.Vignesh Kumar</p>
-          <a href="mailto:vigneshkumarb@bravetux.com" className="hover:underline">
-            vigneshkumarb@bravetux.com
-          </a>
-        </div>
+      </ScrollArea>
+      <div className="mt-6 text-sm text-sidebar-foreground/80 px-2">
+        <p className="font-semibold">Designed and Developed by B.Vignesh Kumar</p>
+        <a href="mailto:vigneshkumarb@bravetux.com" className="hover:underline">
+          vigneshkumarb@bravetux.com
+        </a>
       </div>
       <div className="mt-auto flex items-center justify-end">
         <ThemeToggle />
