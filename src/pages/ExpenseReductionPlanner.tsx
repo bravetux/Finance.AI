@@ -160,9 +160,13 @@ const ExpenseReductionPlanner: React.FC = () => {
   };
 
   const handleClearData = () => {
-    localStorage.removeItem('expenseTrackerData');
-    showSuccess("Expense data has been cleared.");
-    setTimeout(() => window.location.reload(), 1000);
+    const clearedExpenses = expenses.map(expense => ({
+      ...expense,
+      monthlyCost: 0,
+      action: 'Same' as Action,
+    }));
+    setExpenses(clearedExpenses);
+    showSuccess("All expense fields have been cleared.");
   };
 
   return (
