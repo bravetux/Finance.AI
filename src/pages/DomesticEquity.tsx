@@ -194,31 +194,31 @@ const DomesticEquity: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[5%] p-2">S.No</TableHead>
-                  <TableHead className="p-2">Stock Name</TableHead>
-                  <TableHead className="p-2">Category</TableHead>
-                  <TableHead className="p-2">Current Value (INR)</TableHead>
-                  <TableHead className="text-right p-2">Actions</TableHead>
+                  <TableHead className="w-[5%] py-1 px-2">S.No</TableHead>
+                  <TableHead className="py-1 px-2">Stock Name</TableHead>
+                  <TableHead className="py-1 px-2">Category</TableHead>
+                  <TableHead className="py-1 px-2">Current Value (INR)</TableHead>
+                  <TableHead className="text-right py-1 px-2">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {stocks.length > 0 ? stocks.map((stock, index) => (
-                  <TableRow key={stock.id}>
-                    <TableCell className="p-2">{index + 1}</TableCell>
-                    <TableCell className="p-1">
+                  <TableRow key={stock.id} className="h-10">
+                    <TableCell className="py-0 px-2 align-middle">{index + 1}</TableCell>
+                    <TableCell className="p-0">
                       <Input
                         value={stock.stockName}
                         onChange={e => handleStockChange(stock.id, 'stockName', e.target.value)}
                         placeholder="Enter stock name"
-                        className="bg-transparent border-0 focus-visible:ring-0 h-auto"
+                        className="bg-transparent border-0 focus-visible:ring-0 h-8"
                       />
                     </TableCell>
-                    <TableCell className="p-1">
+                    <TableCell className="p-0">
                       <Select
                         value={stock.category}
                         onValueChange={(value: Stock['category']) => handleStockChange(stock.id, 'category', value)}
                       >
-                        <SelectTrigger className="bg-transparent border-0 focus:ring-0 h-auto w-full">
+                        <SelectTrigger className="bg-transparent border-0 focus:ring-0 h-8 w-full">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -229,16 +229,16 @@ const DomesticEquity: React.FC = () => {
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell className="p-1">
+                    <TableCell className="p-0">
                       <Input
                         type="number"
                         value={stock.currentValue}
                         onChange={e => handleStockChange(stock.id, 'currentValue', Number(e.target.value))}
-                        className="bg-transparent border-0 focus-visible:ring-0 h-auto"
+                        className="bg-transparent border-0 focus-visible:ring-0 h-8"
                       />
                     </TableCell>
-                    <TableCell className="text-right p-2">
-                      <Button variant="ghost" size="icon" onClick={() => handleDeleteRow(stock.id)}>
+                    <TableCell className="text-right py-0 px-2">
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteRow(stock.id)} className="h-8 w-8">
                         <Trash2 className="h-4 w-4 text-red-500" />
                       </Button>
                     </TableCell>
@@ -253,9 +253,9 @@ const DomesticEquity: React.FC = () => {
               </TableBody>
               <TableFooter>
                 <TableRow className="bg-muted/50 font-bold">
-                  <TableCell colSpan={3} className="p-2">Total Current Value</TableCell>
-                  <TableCell className="text-right p-2">{formatCurrency(marketCapAllocation.totalValue)}</TableCell>
-                  <TableCell className="p-2" />
+                  <TableCell colSpan={3} className="py-2 px-2">Total Current Value</TableCell>
+                  <TableCell className="text-right py-2 px-2">{formatCurrency(marketCapAllocation.totalValue)}</TableCell>
+                  <TableCell className="py-2 px-2" />
                 </TableRow>
               </TableFooter>
             </Table>
