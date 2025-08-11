@@ -71,10 +71,10 @@ const RetirementDashboard: React.FC = () => {
   const [netWorth, setNetWorth] = useState(0);
   const [retirementData, setRetirementData] = useState<RetirementState>(() => {
     const defaultState: RetirementState = {
-      currentAge: 30,
-      retirementAge: 60,
-      lifeExpectancy: 100,
-      currentAnnualExpenses: 500000,
+      currentAge: 0,
+      retirementAge: 0,
+      lifeExpectancy: 0,
+      currentAnnualExpenses: 0,
       inflation: 6,
       allocations: { equity: 50, fds: 25, bonds: 20, cash: 5 },
       returns: { equity: 12, fds: 7, bonds: 8, cash: 2.5 },

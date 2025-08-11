@@ -59,11 +59,11 @@ const getInitialFinanceData = () => {
   }
   // Default values if localStorage is empty or fails
   return {
-    postTaxSalaryIncome: 1200000,
-    rentalIncome: 390000,
-    otherIncome: 580000,
-    variableAnnualExpenses: 550000,
-    fixedAnnualOutflows: 250000,
+    postTaxSalaryIncome: 0,
+    rentalIncome: 0,
+    otherIncome: 0,
+    variableAnnualExpenses: 0,
+    fixedAnnualOutflows: 0,
   };
 };
 
@@ -95,8 +95,8 @@ const ProjectedCashflow: React.FC = () => {
       console.error("Failed to load settings from localStorage:", error);
     }
     return {
-      currentAge: 30,
-      retirementAge: 60,
+      currentAge: 0,
+      retirementAge: 0,
       surplusIncrement: 3,
       expenseIncrement: 10,
       equityAllocationPre55: 50,

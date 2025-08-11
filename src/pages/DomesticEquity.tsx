@@ -36,12 +36,7 @@ interface Stock {
   currentValue: number;
 }
 
-const initialStocks: Stock[] = [
-  { id: '1', stockName: 'RELIANCE INDUSTRIES', category: 'Largecap', currentValue: 500000 },
-  { id: '2', stockName: 'TATA CONSULTANCY', category: 'Largecap', currentValue: 450000 },
-  { id: '3', stockName: 'TRENT', category: 'Midcap', currentValue: 200000 },
-  { id: '4', stockName: 'KEI INDUSTRIES', category: 'Smallcap', currentValue: 150000 },
-];
+const initialStocks: Stock[] = [];
 
 const DomesticEquity: React.FC = () => {
   const [stocks, setStocks] = useState<Stock[]>(() => {

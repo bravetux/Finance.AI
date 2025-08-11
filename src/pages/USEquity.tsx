@@ -34,7 +34,7 @@ interface USEquityAsset {
 }
 
 const initialAssets: USEquityAsset[] = [
-  { id: 'sp500', name: 'S&P500 ETF', value: 32900 },
+  { id: 'sp500', name: 'S&P500 ETF', value: 0 },
   { id: 'otherEtf', name: 'Other ETFs', value: 0 },
   { id: 'usMf', name: 'US Mutual funds', value: 0 },
 ];

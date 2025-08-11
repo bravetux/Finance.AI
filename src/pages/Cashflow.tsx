@@ -68,26 +68,7 @@ const Cashflow: React.FC = () => {
       console.error("Failed to load finance data from localStorage:", error);
     }
     // Default values if nothing in localStorage
-    return {
-      postTaxSalaryIncome: 1200000,
-      businessIncome: 500000,
-      rentalProperty1: 180000,
-      rentalProperty2: 120000,
-      rentalProperty3: 90000,
-      fdInterest: 45000,
-      bondIncome: 20000,
-      dividendIncome: 15000,
-      monthlyHouseholdExpense: 30000,
-      monthlyPpf: 12500,
-      monthlyUlip: 4166.67,
-      monthlyInsurance: 2500,
-      monthlyRds: 2000,
-      monthlyLoanEMIs: 20000,
-      monthlyDonation: 833.33,
-      monthlyEntertainment: 5000,
-      monthlyTravel: 6666.67,
-      monthlyOthers: 2083.33
-    };
+    return defaultFinanceData;
   });
 
   // Save to localStorage whenever financeData changes

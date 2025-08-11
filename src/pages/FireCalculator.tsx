@@ -22,11 +22,11 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const initialInputs = {
-  monthlyExpenses: 50000,
-  currentAge: 30,
-  retirementAge: 60,
+  monthlyExpenses: 0,
+  currentAge: 0,
+  retirementAge: 0,
   inflation: 6,
-  coastFireAge: 40,
+  coastFireAge: 0,
   expectedReturn: 12,
 };
 

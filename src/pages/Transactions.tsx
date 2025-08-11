@@ -14,12 +14,7 @@ import {
 import { PlusCircle } from "lucide-react";
 
 const Transactions: React.FC = () => {
-  const transactions = [
-    { id: "1", date: "2023-10-26", description: "Groceries", amount: -75.50, type: "Expense" },
-    { id: "2", date: "2023-10-25", description: "Salary", amount: 2500.00, type: "Income" },
-    { id: "3", date: "2023-10-24", description: "Coffee Shop", amount: -5.25, type: "Expense" },
-    { id: "4", date: "2023-10-23", description: "Freelance Work", amount: 500.00, type: "Income" },
-  ];
+  const transactions: { id: string; date: string; description: string; amount: number; type: string; }[] = [];
 
   return (
     <div className="space-y-6">

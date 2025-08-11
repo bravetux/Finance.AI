@@ -43,18 +43,18 @@ interface RentalProperty {
 
 // Initial data based on the image
 const initialPropertyValues: PropertyValue[] = [
-  { id: 'pv1', name: 'Home 1', value: 10000000 },
-  { id: 'pv2', name: 'Home 2', value: 35000000 },
-  { id: 'pv3', name: 'Commercial 1', value: 2500000 },
+  { id: 'pv1', name: 'Home 1', value: 0 },
+  { id: 'pv2', name: 'Home 2', value: 0 },
+  { id: 'pv3', name: 'Commercial 1', value: 0 },
   { id: 'pv4', name: 'Commercial 2', value: 0 },
   { id: 'pv5', name: 'Land/Reit 1', value: 0 },
   { id: 'pv6', name: 'Land/Reit 2', value: 0 },
 ];
 
 const initialRentalProperties: RentalProperty[] = [
-  { id: 'rp1', name: 'Home 1', value: 6000000, rent: 21000 },
-  { id: 'rp2', name: 'Commercial 1', value: 2500000, rent: 9500 },
-  { id: 'rp3', name: 'Home 2', value: 12000000, rent: 25000 },
+  { id: 'rp1', name: 'Home 1', value: 0, rent: 0 },
+  { id: 'rp2', name: 'Commercial 1', value: 0, rent: 0 },
+  { id: 'rp3', name: 'Home 2', value: 0, rent: 0 },
 ];
 
 const RealEstate: React.FC = () => {

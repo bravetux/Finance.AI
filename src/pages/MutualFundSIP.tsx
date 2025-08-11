@@ -37,12 +37,7 @@ interface SIPEntry {
   sipAmount: number;
 }
 
-const initialSIPEntries: SIPEntry[] = [
-  { id: '1', fundName: 'Axis Bluechip Fund', category: 'Largecap', sipAmount: 5000 },
-  { id: '2', fundName: 'Mirae Asset Midcap Fund', category: 'Midcap', sipAmount: 3000 },
-  { id: '3', fundName: 'Nippon India Small Cap Fund', category: 'Smallcap', sipAmount: 2000 },
-  { id: '4', fundName: 'Parag Parikh Flexi Cap Fund', category: 'Flexi/Multi cap', sipAmount: 5000 },
-];
+const initialSIPEntries: SIPEntry[] = [];
 
 const MutualFundSIP: React.FC = () => {
   const [sipEntries, setSipEntries] = useState<SIPEntry[]>(() => {

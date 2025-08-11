@@ -37,12 +37,7 @@ interface MutualFundEntry {
   currentValue: number;
 }
 
-const initialMutualFundEntries: MutualFundEntry[] = [
-  { id: '1', fundName: 'Axis Bluechip Fund', category: 'Largecap', currentValue: 270230 },
-  { id: '2', fundName: 'Mirae Asset Midcap Fund', category: 'Midcap', currentValue: 2300 },
-  { id: '3', fundName: 'Nippon India Small Cap Fund', category: 'Smallcap', currentValue: 6140 },
-  { id: '4', fundName: 'Parag Parikh Flexi Cap Fund', category: 'Flexi/Multi cap', currentValue: 12377 },
-];
+const initialMutualFundEntries: MutualFundEntry[] = [];
 
 const MutualFundAllocation: React.FC = () => {
   const [mutualFundEntries, setMutualFundEntries] = useState<MutualFundEntry[]>(() => {
