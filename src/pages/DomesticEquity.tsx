@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { BarChart2, Upload, Download, Trash2, Edit, Save } from "lucide-react";
+import { BarChart2, Upload, Download, Trash2, PlusCircle } from "lucide-react";
 import { saveAs } from "file-saver";
 import { showSuccess, showError } from "@/utils/toast";
 import {
@@ -26,76 +26,90 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import GenericPieChart from "@/components/GenericPieChart";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-// Equity Data
-interface EquityData {
+// New interface for individual stocks
+interface Stock {
   id: string;
-  name: 'Largecap' | 'Midcap' | 'Smallcap';
-  value: number;
+  stockName: string;
+  category: 'Largecap' | 'Midcap' | 'Smallcap' | 'Not Assigned';
+  currentValue: number;
 }
 
-const initialEquityData: EquityData[] = [
-  { id: 'large', name: 'Largecap', value: 11475843 },
-  { id: 'mid', name: 'Midcap', value: 4120442 },
-  { id: 'small', name: 'Smallcap', value: 3602340 },
+const initialStocks: Stock[] = [
+  { id: '1', stockName: 'RELIANCE INDUSTRIES', category: 'Largecap', currentValue: 500000 },
+  { id: '2', stockName: 'TATA CONSULTANCY', category: 'Largecap', currentValue: 450000 },
+  { id: '3', stockName: 'TRENT', category: 'Midcap', currentValue: 200000 },
+  { id: '4', stockName: 'KEI INDUSTRIES', category: 'Smallcap', currentValue: 150000 },
 ];
 
 const DomesticEquity: React.FC = () => {
-  // State for editing
-  const [isEquityEditing, setIsEquityEditing] = useState(false);
-
-  // State for equity data
-  const [equityData, setEquityData] = useState<EquityData[]>(() => {
+  const [stocks, setStocks] = useState<Stock[]>(() => {
     try {
-      const saved = localStorage.getItem('domesticEquityData');
-      return saved ? JSON.parse(saved) : initialEquityData;
+      const saved = localStorage.getItem('domesticEquityStocks');
+      return saved ? JSON.parse(saved) : initialStocks;
     } catch {
-      return initialEquityData;
+      return initialStocks;
     }
   });
 
-  // Persist data to localStorage
   useEffect(() => {
-    localStorage.setItem('domesticEquityData', JSON.stringify(equityData));
-  }, [equityData]);
+    localStorage.setItem('domesticEquityStocks', JSON.stringify(stocks));
+  }, [stocks]);
 
-  // Handlers for input changes
-  const handleEquityValueChange = (id: string, value: string) => {
-    if (value.length > 10) return;
-    setEquityData(prev =>
-      prev.map(item => (item.id === id ? { ...item, value: Number(value) || 0 } : item))
+  const handleAddRow = () => {
+    const newStock: Stock = {
+      id: Date.now().toString(),
+      stockName: '',
+      category: 'Not Assigned',
+      currentValue: 0,
+    };
+    setStocks(prev => [...prev, newStock]);
+  };
+
+  const handleDeleteRow = (id: string) => {
+    setStocks(prev => prev.filter(stock => stock.id !== id));
+  };
+
+  const handleStockChange = (id: string, field: keyof Stock, value: string | number) => {
+    setStocks(prev =>
+      prev.map(stock => (stock.id === id ? { ...stock, [field]: value } : stock))
     );
   };
 
-  // Calculations for equity
-  const equityCalculations = useMemo(() => {
-    const totalValue = equityData.reduce((sum, item) => sum + item.value, 0);
-    const dataWithContribution = equityData.map(item => ({
-      ...item,
-      contribution: totalValue > 0 ? (item.value / totalValue) * 100 : 0,
-    }));
-    return { totalValue, dataWithContribution };
-  }, [equityData]);
+  const marketCapAllocation = useMemo(() => {
+    const allocation: { [key in 'Largecap' | 'Midcap' | 'Smallcap']: number } = {
+      Largecap: 0,
+      Midcap: 0,
+      Smallcap: 0,
+    };
 
-  // Chart data
-  const equityChartData = useMemo(() => {
-    return equityCalculations.dataWithContribution
-      .filter(item => item.value > 0)
-      .map(item => ({
-        name: item.name,
-        value: item.value,
-      }));
-  }, [equityCalculations.dataWithContribution]);
+    stocks.forEach(stock => {
+      if (stock.category !== 'Not Assigned') {
+        allocation[stock.category] += stock.currentValue;
+      }
+    });
+
+    const totalValue = Object.values(allocation).reduce((sum, val) => sum + val, 0);
+    
+    const chartData = Object.entries(allocation)
+      .map(([name, value]) => ({ name, value }))
+      .filter(item => item.value > 0);
+    
+    const allocationWithContribution = Object.entries(allocation).map(([name, value]) => ({
+      name,
+      value,
+      contribution: totalValue > 0 ? (value / totalValue) * 100 : 0,
+    }));
+
+    return { allocationWithContribution, totalValue, chartData };
+  }, [stocks]);
 
   const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 
-  // Data management
   const exportData = () => {
-    const dataToExport = {
-      equityData,
-    };
-    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
-    saveAs(blob, 'domestic-equity-data.json');
+    const blob = new Blob([JSON.stringify(stocks, null, 2)], { type: 'application/json' });
+    saveAs(blob, 'domestic-equity-stocks.json');
     showSuccess('Domestic Equity data exported successfully!');
   };
 
@@ -107,9 +121,9 @@ const DomesticEquity: React.FC = () => {
       try {
         const content = e.target?.result as string;
         const data = JSON.parse(content);
-        if (data.equityData) {
-          setEquityData(data.equityData);
-          showSuccess('Domestic Equity data imported successfully!');
+        if (Array.isArray(data) && data.every(item => 'id' in item && 'stockName' in item && 'category' in item && 'currentValue' in item)) {
+          setStocks(data);
+          showSuccess('Stock data imported successfully!');
         } else {
           showError('Invalid file format.');
         }
@@ -122,13 +136,12 @@ const DomesticEquity: React.FC = () => {
   };
 
   const handleClearData = () => {
-    setEquityData(initialEquityData);
-    showSuccess('Domestic Equity data has been reset.');
+    setStocks([]);
+    showSuccess('All stock data has been cleared.');
   };
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <BarChart2 className="h-8 w-8" />
@@ -145,7 +158,7 @@ const DomesticEquity: React.FC = () => {
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will reset all data on this page to its default state. This action cannot be undone.
+                  This will delete all stock entries on this page. This action cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -166,75 +179,122 @@ const DomesticEquity: React.FC = () => {
         </div>
       </div>
 
-      {/* Equity Allocation Section */}
-      <ResizablePanelGroup
-        direction="horizontal"
-        className="min-h-[300px] w-full rounded-lg border"
-      >
-        <ResizablePanel defaultSize={60}>
-          <Card className="h-full border-0 shadow-none rounded-none">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Market Cap Allocation</CardTitle>
-              <Button variant="outline" size="sm" onClick={() => setIsEquityEditing(!isEquityEditing)}>
-                {isEquityEditing ? (
-                  <><Save className="mr-2 h-4 w-4" /> Save</>
-                ) : (
-                  <><Edit className="mr-2 h-4 w-4" /> Edit</>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Stock Holdings</CardTitle>
+            <CardDescription>Add and categorize your individual stock holdings.</CardDescription>
+          </div>
+          <Button onClick={handleAddRow}>
+            <PlusCircle className="mr-2 h-4 w-4" /> Add Stock
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[5%]">S.No</TableHead>
+                  <TableHead>Stock Name</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Current Value (INR)</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {stocks.length > 0 ? stocks.map((stock, index) => (
+                  <TableRow key={stock.id}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>
+                      <Input
+                        value={stock.stockName}
+                        onChange={e => handleStockChange(stock.id, 'stockName', e.target.value)}
+                        placeholder="Enter stock name"
+                        className="bg-transparent"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Select
+                        value={stock.category}
+                        onValueChange={(value: Stock['category']) => handleStockChange(stock.id, 'category', value)}
+                      >
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Largecap">Largecap</SelectItem>
+                          <SelectItem value="Midcap">Midcap</SelectItem>
+                          <SelectItem value="Smallcap">Smallcap</SelectItem>
+                          <SelectItem value="Not Assigned">Not Assigned</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        value={stock.currentValue}
+                        onChange={e => handleStockChange(stock.id, 'currentValue', Number(e.target.value))}
+                        className="bg-transparent"
+                      />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteRow(stock.id)}>
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                )) : (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">
+                      No stocks added yet. Click "Add Stock" to begin.
+                    </TableCell>
+                  </TableRow>
                 )}
-              </Button>
-            </CardHeader>
-            <CardContent>
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Market Cap Summary</CardTitle>
+          <CardDescription>A summary of your portfolio based on market capitalization.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResizablePanelGroup direction="horizontal" className="min-h-[300px] w-full">
+            <ResizablePanel defaultSize={50}>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Company size</TableHead>
-                    <TableHead className="text-right">Current value (INR)</TableHead>
-                    <TableHead className="text-right">Contribution %</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead className="text-right">Value (INR)</TableHead>
+                    <TableHead className="text-right">Contribution</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {equityCalculations.dataWithContribution.map(item => (
-                    <TableRow key={item.id}>
+                  {marketCapAllocation.allocationWithContribution.map(item => (
+                    <TableRow key={item.name}>
                       <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell className="p-1 text-right">
-                        {isEquityEditing ? (
-                          <Input
-                            type="number"
-                            value={item.value}
-                            onChange={e => handleEquityValueChange(item.id, e.target.value)}
-                            className="w-full text-right bg-transparent border-0 focus-visible:ring-1 focus-visible:ring-offset-0 h-auto"
-                          />
-                        ) : (
-                          <span className="px-3">{formatCurrency(item.value)}</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">{item.contribution.toFixed(0)}%</TableCell>
+                      <TableCell className="text-right">{formatCurrency(item.value)}</TableCell>
+                      <TableCell className="text-right">{item.contribution.toFixed(2)}%</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
                 <TableFooter>
                   <TableRow>
                     <TableCell className="font-bold">Total</TableCell>
-                    <TableCell className="font-bold text-right">{formatCurrency(equityCalculations.totalValue)}</TableCell>
-                    <TableCell className="text-right font-bold">100%</TableCell>
+                    <TableCell className="font-bold text-right">{formatCurrency(marketCapAllocation.totalValue)}</TableCell>
+                    <TableCell className="font-bold text-right">100.00%</TableCell>
                   </TableRow>
                 </TableFooter>
               </Table>
-            </CardContent>
-          </Card>
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={40}>
-          <Card className="h-full border-0 shadow-none rounded-none">
-            <CardHeader>
-              <CardTitle>Allocation Chart</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <GenericPieChart data={equityChartData} />
-            </CardContent>
-          </Card>
-        </ResizablePanel>
-      </ResizablePanelGroup>
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={50}>
+              <GenericPieChart data={marketCapAllocation.chartData} />
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </CardContent>
+      </Card>
     </div>
   );
 };
