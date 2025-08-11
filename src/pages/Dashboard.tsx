@@ -1,11 +1,6 @@
 "use client";
 
-import React from<think>**Adding Comprehensive Data Reset**
-
-I've now moved the "Reset All Data" function into the Reports page. I've expanded the `keysToRemove` array to be more inclusive. The new "Clear All LocalStorage" button and its dialog are also implemented, ensuring a more comprehensive data management system. I'm focused on final testing.
-
-
-</think> "react";
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { IndianRupee, TrendingUp, Wallet, BarChart2, PieChart, Target, Landmark } from "lucide-react";
 import {
