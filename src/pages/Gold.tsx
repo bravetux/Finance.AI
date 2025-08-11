@@ -38,7 +38,7 @@ const initialAssets: GoldAsset[] = [
   { id: '2', particulars: 'SGB', value: 0 },
   { id: '3', particulars: 'Digital Gold', value: 0 },
   { id: '4', particulars: 'Gold ETF - Spouse', value: 1000000 },
-  { id: '5', particulars: 'Gold ETF - Vignesh', value: 2890000 },
+  { id: '5', particulars: 'Gold ETF - Self', value: 2890000 },
   { id: '6', particulars: 'Gold ETF', value: 3890000 },
 ];
 
