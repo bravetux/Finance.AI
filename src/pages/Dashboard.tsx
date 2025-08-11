@@ -1,8 +1,13 @@
 "use client";
 
-import React from "react";
+import React from<think>**Adding Comprehensive Data Reset**
+
+I've now moved the "Reset All Data" function into the Reports page. I've expanded the `keysToRemove` array to be more inclusive. The new "Clear All LocalStorage" button and its dialog are also implemented, ensuring a more comprehensive data management system. I'm focused on final testing.
+
+
+</think> "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { IndianRupee, TrendingUp, Wallet, BarChart2, PieChart, Target, Landmark, Trash2 } from "lucide-react";
+import { IndianRupee, TrendingUp, Wallet, BarChart2, PieChart, Target, Landmark } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -139,57 +144,6 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleReset = () => {
-    // Define zeroed-out data structures
-    const zeroedFinanceData = {
-      postTaxSalaryIncome: 0, businessIncome: 0,
-      rentalProperty1: 0, rentalProperty2: 0, rentalProperty3: 0,
-      fdInterest: 0, bondIncome: 0, dividendIncome: 0,
-      monthlyHouseholdExpense: 0, monthlyPpf: 0, monthlyUlip: 0,
-      monthlyInsurance: 0, monthlyRds: 0, monthlyLoanEMIs: 0,
-      monthlyDonation: 0, monthlyEntertainment: 0, monthlyTravel: 0,
-      monthlyOthers: 0
-    };
-    const zeroedNetWorthData = {
-      homeValue: 0, otherRealEstate: 0, jewellery: 0, sovereignGoldBonds: 0,
-      ulipsSurrenderValue: 0, epfPpfVpf: 0, fixedDeposits: 0, debtFunds: 0,
-      domesticStocks: 0, domesticMutualFunds: 0, internationalFunds: 0,
-      smallCases: 0, savingsBalance: 0, goldEtf: 0, cryptocurrency: 0,
-      reits: 0, homeLoan: 0, educationLoan: 0, carLoan: 0, personalLoan: 0,
-      creditCardDues: 0, otherLiabilities: 0
-    };
-    const zeroedRetirementData = {
-      currentAge: 0,
-      retirementAge: 0,
-      lifeExpectancy: 100,
-      currentAnnualExpenses: 0,
-      inflation: 6,
-      allocations: { equity: 50, fds: 25, bonds: 20, cash: 5 },
-      returns: { equity: 12, fds: 7, bonds: 8, cash: 2.5 },
-    };
-
-    // Set specific keys to zeroed-out state
-    localStorage.setItem('finance-data', JSON.stringify(zeroedFinanceData));
-    localStorage.setItem('netWorthData', JSON.stringify(zeroedNetWorthData));
-    localStorage.setItem('retirementData', JSON.stringify(zeroedRetirementData));
-
-    // Remove other keys to reset them to their initial state
-    const keysToRemove = [
-      'future-value-data',
-      'goalsData',
-      'projectedCashflowSettings',
-      'projectedAccumulatedCorpus',
-      'portfolioData'
-    ];
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-
-    showSuccess("All application data has been reset.");
-
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
-  };
-
   // Calculate cashflow data
   const cashflowData = getCashflowData();
   const totalRentalIncome = (cashflowData.rentalProperty1 || 0) + (cashflowData.rentalProperty2 || 0) + (cashflowData.rentalProperty3 || 0);
@@ -287,27 +241,6 @@ const Dashboard: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="destructive">
-              <Trash2 className="mr-2 h-4 w-4" /> Reset All Data
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete all your financial data entered into the application and reset all fields to their default values.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleReset}>
-                Yes, reset everything
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
       
       {/* Summary Cards */}
