@@ -11,14 +11,12 @@ import NetWorthCalculator from "./pages/NetWorthCalculator";
 import FutureValueCalculator from "./pages/FutureValueCalculator";
 import Goals from "./pages/Goals";
 import RetirementDashboard from "./pages/RetirementDashboard";
-import Portfolio from "./pages/Portfolio";
 import ProjectedCashflow from "./pages/ProjectedCashflow";
 import AIPrompt from "./pages/AIPrompt";
 import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
 import FireCalculator from "./pages/FireCalculator";
 import ExpenseReductionPlanner from "./pages/ExpenseReductionPlanner";
-import CDSLPortfolioImport from "./pages/CDSLPortfolioImport";
 import RealEstate from "./pages/RealEstate";
 import DomesticEquity from "./pages/DomesticEquity";
 import USEquity from "./pages/USEquity";
@@ -56,8 +54,6 @@ const App = () => (
               <Route path="goals" element={<Goals />} />
               <Route path="retirement" element={<RetirementDashboard />} />
               <Route path="fire-calculator" element={<FireCalculator />} />
-              <Route path="portfolio" element={<Portfolio />} />
-              <Route path="cdsl-portfolio-import" element={<CDSLPortfolioImport />} />
               <Route path="reports" element={<Reports />} />
               <Route path="ai-prompt" element={<AIPrompt />} />
             </Route>

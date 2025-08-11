@@ -87,15 +87,6 @@ const navItems = [
       { name: "Future Value", path: "/future-value", icon: TrendingUp, type: 'link' },
     ]
   },
-  { 
-    name: "Portfolio Management", 
-    icon: Briefcase,
-    type: 'section',
-    children: [
-      { name: "Portfolio Analysis", path: "/portfolio", icon: Briefcase, type: 'link' },
-      { name: "CDSL Portfolio Import", path: "/cdsl-portfolio-import", icon: FileInput, type: 'link' },
-    ]
-  },
   { name: "Reports", path: "/reports", icon: FileText, type: 'link' },
   { name: "AI Prompt", path: "/ai-prompt", icon: Bot, type: 'link' },
 ];
