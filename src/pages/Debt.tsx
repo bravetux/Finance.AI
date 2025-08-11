@@ -49,16 +49,16 @@ const initialLiquidAssets: LiquidAsset[] = [
   { id: 'l1', particulars: 'TMB', currentValue: 10000 },
   { id: 'l2', particulars: 'HDFC', currentValue: 140000 },
   { id: 'l3', particulars: 'IDFC', currentValue: 22800 },
-  { id: 'l4', particulars: 'TMB Sankari', currentValue: 97000 },
+  { id: 'l4', particulars: 'TMB Spouse', currentValue: 97000 },
 ];
 const initialFixedDeposits: FixedDeposit[] = [
-  { id: 'fd1', bankName: 'TMB - Sankari - 001 - 0199', currentValue: 304408 },
-  { id: 'fd2', bankName: 'TMB - Sankari - 002 - 0138', currentValue: 104000 },
-  { id: 'fd3', bankName: 'TMB - Sankari - 003 - 0134', currentValue: 23000 },
-  { id: 'fd4', bankName: 'TMB - Sankari - 004 - 0135', currentValue: 200000 },
-  { id: 'fd5', bankName: 'TMB - Sankari - 005 - 0133', currentValue: 50000 },
-  { id: 'fd6', bankName: 'TMB - Sankari - 004 - 0925', currentValue: 360000 },
-  { id: 'fd7', bankName: 'TMB - Sankari - 005 - 1745', currentValue: 20000 },
+  { id: 'fd1', bankName: 'TMB - Spouse - 001 - 0199', currentValue: 304408 },
+  { id: 'fd2', bankName: 'TMB - Spouse - 002 - 0138', currentValue: 104000 },
+  { id: 'fd3', bankName: 'TMB - Spouse - 003 - 0134', currentValue: 23000 },
+  { id: 'fd4', bankName: 'TMB - Spouse - 004 - 0135', currentValue: 200000 },
+  { id: 'fd5', bankName: 'TMB - Spouse - 005 - 0133', currentValue: 50000 },
+  { id: 'fd6', bankName: 'TMB - Spouse - 004 - 0925', currentValue: 360000 },
+  { id: 'fd7', bankName: 'TMB - Spouse - 005 - 1745', currentValue: 20000 },
 ];
 const initialDebtFunds: DebtFund[] = [
   { id: 'df1', name: 'INCRED FINANCIAL SERVICE Expiry 10-Nov-2026', currentValue: 10000 },
@@ -77,7 +77,7 @@ const initialGovInvestments: GovInvestment[] = [
   { id: 'gi1', name: 'PPF', currentValue: 4750000 },
   { id: 'gi2', name: 'PF', currentValue: 1436125 },
   { id: 'gi3', name: 'LIC', currentValue: 1500000 },
-  { id: 'gi4', name: 'PPF Sankari', currentValue: 1000000 },
+  { id: 'gi4', name: 'PPF Spouse', currentValue: 1000000 },
   { id: 'gi5', name: 'PPF Vishnu', currentValue: 669000 },
 ];
 
