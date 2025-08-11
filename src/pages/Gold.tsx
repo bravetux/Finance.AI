@@ -172,12 +172,15 @@ const Gold: React.FC = () => {
                     <TableRow key={p.id} className="h-10">
                       <TableCell className="font-medium py-1 px-2">{p.particulars}</TableCell>
                       <TableCell className="p-1">
-                        <Input
-                          type="number"
-                          value={p.value}
-                          onChange={e => handleValueChange(p.id, Number(e.target.value))}
-                          className="bg-transparent border-0 focus-visible:ring-1 h-8 text-sm text-right"
-                        />
+                        <div className="relative flex items-center">
+                          <span className="absolute left-3 text-muted-foreground">₹</span>
+                          <Input
+                            type="number"
+                            value={p.value}
+                            onChange={e => handleValueChange(p.id, Number(e.target.value))}
+                            className="bg-transparent border-0 focus-visible:ring-1 h-8 text-sm text-right pl-7"
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
