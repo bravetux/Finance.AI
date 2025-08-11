@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, Table
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Repeat, Upload, Download, Trash2, Edit, Save } from "lucide-react";
+import { Repeat, Upload, Download, Trash2, PlusCircle } from "lucide-react";
 import { saveAs } from "file-saver";
 import { showSuccess, showError } from "@/utils/toast";
 import {
@@ -21,51 +21,59 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-interface SIPData {
+interface SIPEntry {
   id: string;
   fundName: string;
   sipAmount: number;
-  startDate: string;
 }
 
-const initialSIPData: SIPData[] = Array.from({ length: 10 }, (_, i) => ({
+const initialSIPEntries: SIPEntry[] = Array.from({ length: 10 }, (_, i) => ({
   id: `sip-${i + 1}`,
   fundName: `Fund ${i + 1}`,
   sipAmount: 0,
-  startDate: new Date().toISOString().split('T')[0], // Default to today's date
 }));
 
 const MutualFundSIP: React.FC = () => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [sipData, setSipData] = useState<SIPData[]>(() => {
+  const [sipEntries, setSipEntries] = useState<SIPEntry[]>(() => {
     try {
       const saved = localStorage.getItem('mutualFundSIPData');
-      return saved ? JSON.parse(saved) : initialSIPData;
+      return saved ? JSON.parse(saved) : initialSIPEntries;
     } catch {
-      return initialSIPData;
+      return initialSIPEntries;
     }
   });
 
   useEffect(() => {
-    localStorage.setItem('mutualFundSIPData', JSON.stringify(sipData));
-  }, [sipData]);
+    localStorage.setItem('mutualFundSIPData', JSON.stringify(sipEntries));
+  }, [sipEntries]);
 
-  const handleInputChange = (id: string, field: keyof SIPData, value: string) => {
-    setSipData(prev =>
-      prev.map(item => (item.id === id ? { ...item, [field]: field === 'sipAmount' ? Number(value) || 0 : value } : item))
+  const handleAddRow = () => {
+    const newEntry: SIPEntry = {
+      id: Date.now().toString(),
+      fundName: '',
+      sipAmount: 0,
+    };
+    setSipEntries(prev => [...prev, newEntry]);
+  };
+
+  const handleDeleteRow = (id: string) => {
+    setSipEntries(prev => prev.filter(entry => entry.id !== id));
+  };
+
+  const handleEntryChange = (id: string, field: keyof SIPEntry, value: string | number) => {
+    setSipEntries(prev =>
+      prev.map(entry => (entry.id === id ? { ...entry, [field]: value } : entry))
     );
   };
 
-  const totals = useMemo(() => {
-    const monthlyTotal = sipData.reduce((sum, item) => sum + item.sipAmount, 0);
-    const annualTotal = monthlyTotal * 12;
-    return { monthlyTotal, annualTotal };
-  }, [sipData]);
+  const totalSIPAmount = useMemo(() => {
+    return sipEntries.reduce((sum, entry) => sum + entry.sipAmount, 0);
+  }, [sipEntries]);
 
   const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 
   const exportData = () => {
-    const blob = new Blob([JSON.stringify(sipData, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(sipEntries, null, 2)], { type: 'application/json' });
     saveAs(blob, 'mutual-fund-sip-data.json');
     showSuccess('SIP data exported successfully!');
   };
@@ -78,9 +86,9 @@ const MutualFundSIP: React.FC = () => {
       try {
         const content = e.target?.result as string;
         const data = JSON.parse(content);
-        if (Array.isArray(data) && data.every(item => 'id' in item && 'fundName' in item && 'sipAmount' in item && 'startDate' in item)) {
-          setSipData(data);
-          showSuccess('SIP data imported successfully!');
+        if (Array.isArray(data) && data.every(item => 'id' in item && 'fundName' in item && 'sipAmount' in item)) {
+          setSipEntries(data);
+          showSuccess('Data imported successfully!');
         } else {
           showError('Invalid file format.');
         }
@@ -93,8 +101,8 @@ const MutualFundSIP: React.FC = () => {
   };
 
   const handleClearData = () => {
-    setSipData(initialSIPData);
-    showSuccess('SIP data has been reset.');
+    setSipEntries(initialSIPEntries);
+    showSuccess('All SIP data has been cleared.');
   };
 
   return (
@@ -115,7 +123,7 @@ const MutualFundSIP: React.FC = () => {
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will reset all SIP data on this page to its default state. This action cannot be undone.
+                  This will reset all data on this page to its default state. This action cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -124,13 +132,6 @@ const MutualFundSIP: React.FC = () => {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <Button variant="outline" onClick={() => setIsEditing(!isEditing)}>
-            {isEditing ? (
-              <><Save className="mr-2 h-4 w-4" /> Save</>
-            ) : (
-              <><Edit className="mr-2 h-4 w-4" /> Edit</>
-            )}
-          </Button>
           <Button variant="outline" onClick={exportData}>
             <Upload className="mr-2 h-4 w-4" /> Export
           </Button>
@@ -144,70 +145,65 @@ const MutualFundSIP: React.FC = () => {
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>SIP Tracker</CardTitle>
-          <CardDescription>Manage and track your monthly Systematic Investment Plans.</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>SIP Holdings</CardTitle>
+            <CardDescription>Add and track your Systematic Investment Plans.</CardDescription>
+          </div>
+          <Button onClick={handleAddRow}>
+            <PlusCircle className="mr-2 h-4 w-4" /> Add Entry
+          </Button>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[40%]">Fund Name</TableHead>
-                  <TableHead>SIP Amount (INR)</TableHead>
-                  <TableHead>Start Date</TableHead>
+                  <TableHead className="w-[3%] py-1 px-1">S.No</TableHead>
+                  <TableHead className="py-1 px-1">Mutual fund / ETF / Smallcase</TableHead>
+                  <TableHead className="py-1 px-1">SIP Amount (INR)</TableHead>
+                  <TableHead className="text-right py-1 px-1">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sipData.map(item => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium p-1">
-                      {isEditing ? (
-                        <Input
-                          type="text"
-                          value={item.fundName}
-                          onChange={e => handleInputChange(item.id, 'fundName', e.target.value)}
-                          className="bg-transparent border-0 focus-visible:ring-1 focus-visible:ring-offset-0 h-auto"
-                        />
-                      ) : (
-                        <span className="px-3">{item.fundName}</span>
-                      )}
+                {sipEntries.length > 0 ? sipEntries.map((entry, index) => (
+                  <TableRow key={entry.id} className="h-9">
+                    <TableCell className="py-0 px-1 align-middle text-xs">{index + 1}</TableCell>
+                    <TableCell className="p-0">
+                      <Input
+                        value={entry.fundName}
+                        onChange={e => handleEntryChange(entry.id, 'fundName', e.target.value)}
+                        placeholder="Enter name"
+                        className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm"
+                      />
                     </TableCell>
-                    <TableCell className="p-1">
-                      {isEditing ? (
-                        <Input
-                          type="number"
-                          value={item.sipAmount}
-                          onChange={e => handleInputChange(item.id, 'sipAmount', e.target.value)}
-                          className="bg-transparent border-0 focus-visible:ring-1 focus-visible:ring-offset-0 h-auto"
-                        />
-                      ) : (
-                        <span className="px-3">{formatCurrency(item.sipAmount)}</span>
-                      )}
+                    <TableCell className="p-0">
+                      <Input
+                        type="number"
+                        value={entry.sipAmount}
+                        onChange={e => handleEntryChange(entry.id, 'sipAmount', Number(e.target.value))}
+                        className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm"
+                      />
                     </TableCell>
-                    <TableCell className="p-1">
-                      {isEditing ? (
-                        <Input
-                          type="date"
-                          value={item.startDate}
-                          onChange={e => handleInputChange(item.id, 'startDate', e.target.value)}
-                          className="bg-transparent border-0 focus-visible:ring-1 focus-visible:ring-offset-0 h-auto"
-                        />
-                      ) : (
-                        <span className="px-3">{item.startDate}</span>
-                      )}
+                    <TableCell className="text-right py-0 px-1">
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteRow(entry.id)} className="h-7 w-7">
+                        <Trash2 className="h-3.5 w-3.5 text-red-500" />
+                      </Button>
                     </TableCell>
                   </TableRow>
-                ))}
+                )) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center h-20 text-muted-foreground text-sm">
+                      No entries added yet. Click "Add Entry" to begin.
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
               <TableFooter>
                 <TableRow className="bg-muted/50 font-bold">
-                  <TableCell>Total Monthly SIP</TableCell>
-                  <TableCell colSpan={2}>{formatCurrency(totals.monthlyTotal)}</TableCell>
-                </TableRow>
-                <TableRow className="bg-muted/50 font-bold">
-                  <TableCell>Total Annual SIP</TableCell>
-                  <TableCell colSpan={2}>{formatCurrency(totals.annualTotal)}</TableCell>
+                  <TableCell colSpan={2} className="py-1 px-1 text-sm">Total SIP Amount</TableCell>
+                  <TableCell className="text-right py-1 px-1 text-sm">{formatCurrency(totalSIPAmount)}</TableCell>
+                  <TableCell className="py-1 px-1" />
                 </TableRow>
               </TableFooter>
             </Table>
