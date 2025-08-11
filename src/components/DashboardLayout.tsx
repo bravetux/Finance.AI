@@ -97,9 +97,9 @@ const DashboardLayout: React.FC = () => {
 
   const SidebarContent = () => (
     <div className="flex h-full flex-col p-4 bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
-      <h2 className="text-2xl font-bold mb-6 text-sidebar-primary-foreground">
-        Finance Dashboard
-      </h2>
+      <Link to="/" className="text-2xl font-bold mb-6 text-sidebar-primary-foreground">
+        Financial Planner
+      </Link>
       <ScrollArea className="flex-1">
         <nav className="flex flex-col gap-1 pr-4">
           {navItems.map((item) =>
@@ -196,7 +196,7 @@ const DashboardLayout: React.FC = () => {
     return (
       <div className="flex flex-col min-h-screen">
         <header className="flex items-center justify-between p-4 border-b bg-background">
-          <h1 className="text-xl font-bold">Finance Dashboard</h1>
+          <h1 className="text-xl font-bold">Financial Planner</h1>
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
