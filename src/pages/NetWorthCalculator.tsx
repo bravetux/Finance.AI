@@ -402,7 +402,9 @@ const NetWorthCalculator: React.FC = () => {
                     type="number"
                     value={data.domesticMutualFunds}
                     onChange={(e) => handleInputChange('domesticMutualFunds', e.target.value)}
+                    disabled
                   />
+                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Mutual Fund Allocation page.</p>
                 </div>
                 <div>
                   <Label htmlFor="internationalFunds">International Funds</Label>

@@ -106,6 +106,22 @@ const MutualFundAllocation: React.FC = () => {
     return { allocationWithContribution, totalValue, chartData };
   }, [mutualFundEntries]);
 
+  useEffect(() => {
+    try {
+      const savedNetWorthData = localStorage.getItem('netWorthData');
+      const netWorthData = savedNetWorthData ? JSON.parse(savedNetWorthData) : {};
+      
+      const updatedNetWorthData = {
+        ...netWorthData,
+        domesticMutualFunds: categoryAllocation.totalValue,
+      };
+
+      localStorage.setItem('netWorthData', JSON.stringify(updatedNetWorthData));
+    } catch (error) {
+      console.error("Failed to update net worth data from Mutual Fund Allocation page:", error);
+    }
+  }, [categoryAllocation.totalValue]);
+
   const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 
   const exportData = () => {
