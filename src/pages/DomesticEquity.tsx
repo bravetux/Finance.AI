@@ -249,6 +249,13 @@ const DomesticEquity: React.FC = () => {
                   </TableRow>
                 )}
               </TableBody>
+              <TableFooter>
+                <TableRow className="bg-muted/50 font-bold">
+                  <TableCell colSpan={3}>Total Current Value</TableCell>
+                  <TableCell className="text-right">{formatCurrency(marketCapAllocation.totalValue)}</TableCell>
+                  <TableCell />
+                </TableRow>
+              </TableFooter>
             </Table>
           </div>
         </CardContent>
