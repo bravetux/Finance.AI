@@ -20,23 +20,34 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import GenericPieChart from "@/components/GenericPieChart";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+type FundCategory = 'Largecap' | 'Midcap' | 'Smallcap' | 'Flexi/Multi cap' | 'Not Assigned';
 
 interface SIPEntry {
   id: string;
   fundName: string;
+  category: FundCategory;
   sipAmount: number;
 }
 
-const initialSIPEntries: SIPEntry[] = Array.from({ length: 10 }, (_, i) => ({
-  id: `sip-${i + 1}`,
-  fundName: ``,
-  sipAmount: 0,
-}));
+const initialSIPEntries: SIPEntry[] = [
+  { id: '1', fundName: 'Axis Bluechip Fund', category: 'Largecap', sipAmount: 5000 },
+  { id: '2', fundName: 'Mirae Asset Midcap Fund', category: 'Midcap', sipAmount: 3000 },
+  { id: '3', fundName: 'Nippon India Small Cap Fund', category: 'Smallcap', sipAmount: 2000 },
+  { id: '4', fundName: 'Parag Parikh Flexi Cap Fund', category: 'Flexi/Multi cap', sipAmount: 5000 },
+];
 
 const MutualFundSIP: React.FC = () => {
   const [sipEntries, setSipEntries] = useState<SIPEntry[]>(() => {
     try {
-      const saved = localStorage.getItem('mutualFundSIPData');
+      const saved = localStorage.getItem('mutualFundSIPEntries');
       return saved ? JSON.parse(saved) : initialSIPEntries;
     } catch {
       return initialSIPEntries;
@@ -44,13 +55,14 @@ const MutualFundSIP: React.FC = () => {
   });
 
   useEffect(() => {
-    localStorage.setItem('mutualFundSIPData', JSON.stringify(sipEntries));
+    localStorage.setItem('mutualFundSIPEntries', JSON.stringify(sipEntries));
   }, [sipEntries]);
 
   const handleAddRow = () => {
     const newEntry: SIPEntry = {
       id: Date.now().toString(),
       fundName: '',
+      category: 'Not Assigned',
       sipAmount: 0,
     };
     setSipEntries(prev => [...prev, newEntry]);
@@ -66,8 +78,32 @@ const MutualFundSIP: React.FC = () => {
     );
   };
 
-  const totalSIPAmount = useMemo(() => {
-    return sipEntries.reduce((sum, entry) => sum + entry.sipAmount, 0);
+  const categoryAllocation = useMemo(() => {
+    const allocation: { [key in FundCategory]: number } = {
+      Largecap: 0,
+      Midcap: 0,
+      Smallcap: 0,
+      'Flexi/Multi cap': 0,
+      'Not Assigned': 0,
+    };
+
+    sipEntries.forEach(entry => {
+      allocation[entry.category] += entry.sipAmount;
+    });
+
+    const totalValue = Object.values(allocation).reduce((sum, val) => sum + val, 0);
+    
+    const chartData = Object.entries(allocation)
+      .map(([name, value]) => ({ name, value }))
+      .filter(item => item.value > 0);
+    
+    const allocationWithContribution = Object.entries(allocation).map(([name, value]) => ({
+      name,
+      value,
+      contribution: totalValue > 0 ? (value / totalValue) * 100 : 0,
+    }));
+
+    return { allocationWithContribution, totalValue, chartData };
   }, [sipEntries]);
 
   const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
@@ -75,7 +111,7 @@ const MutualFundSIP: React.FC = () => {
   const exportData = () => {
     const blob = new Blob([JSON.stringify(sipEntries, null, 2)], { type: 'application/json' });
     saveAs(blob, 'mutual-fund-sip-data.json');
-    showSuccess('SIP data exported successfully!');
+    showSuccess('Mutual Fund SIP data exported successfully!');
   };
 
   const importData = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,7 +122,7 @@ const MutualFundSIP: React.FC = () => {
       try {
         const content = e.target?.result as string;
         const data = JSON.parse(content);
-        if (Array.isArray(data) && data.every(item => 'id' in item && 'fundName' in item && 'sipAmount' in item)) {
+        if (Array.isArray(data) && data.every(item => 'id' in item && 'fundName' in item && 'category' in item && 'sipAmount' in item)) {
           setSipEntries(data);
           showSuccess('Data imported successfully!');
         } else {
@@ -101,8 +137,8 @@ const MutualFundSIP: React.FC = () => {
   };
 
   const handleClearData = () => {
-    setSipEntries(initialSIPEntries.map(e => ({...e, fundName: '', sipAmount: 0})));
-    showSuccess('All SIP data has been cleared.');
+    setSipEntries([]);
+    showSuccess('All mutual fund SIP data has been cleared.');
   };
 
   return (
@@ -148,7 +184,7 @@ const MutualFundSIP: React.FC = () => {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>SIP Holdings</CardTitle>
-            <CardDescription>Add and track your Systematic Investment Plans.</CardDescription>
+            <CardDescription>Add and categorize your Systematic Investment Plans.</CardDescription>
           </div>
           <Button onClick={handleAddRow}>
             <PlusCircle className="mr-2 h-4 w-4" /> Add Entry
@@ -161,6 +197,7 @@ const MutualFundSIP: React.FC = () => {
                 <TableRow>
                   <TableHead className="w-[3%] py-1 px-1">S.No</TableHead>
                   <TableHead className="py-1 px-1">Mutual fund / ETF / Smallcase</TableHead>
+                  <TableHead className="py-1 px-1">Category</TableHead>
                   <TableHead className="py-1 px-1">SIP Amount (INR)</TableHead>
                   <TableHead className="text-right py-1 px-1">Actions</TableHead>
                 </TableRow>
@@ -178,6 +215,23 @@ const MutualFundSIP: React.FC = () => {
                       />
                     </TableCell>
                     <TableCell className="p-0">
+                      <Select
+                        value={entry.category}
+                        onValueChange={(value: FundCategory) => handleEntryChange(entry.id, 'category', value)}
+                      >
+                        <SelectTrigger className="bg-transparent border-0 focus:ring-0 h-7 w-full text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Largecap">Largecap</SelectItem>
+                          <SelectItem value="Midcap">Midcap</SelectItem>
+                          <SelectItem value="Smallcap">Smallcap</SelectItem>
+                          <SelectItem value="Flexi/Multi cap">Flexi/Multi cap</SelectItem>
+                          <SelectItem value="Not Assigned">Not Assigned</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell className="p-0">
                       <Input
                         type="number"
                         value={entry.sipAmount}
@@ -193,7 +247,7 @@ const MutualFundSIP: React.FC = () => {
                   </TableRow>
                 )) : (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center h-20 text-muted-foreground text-sm">
+                    <TableCell colSpan={5} className="text-center h-20 text-muted-foreground text-sm">
                       No entries added yet. Click "Add Entry" to begin.
                     </TableCell>
                   </TableRow>
@@ -201,13 +255,55 @@ const MutualFundSIP: React.FC = () => {
               </TableBody>
               <TableFooter>
                 <TableRow className="bg-muted/50 font-bold">
-                  <TableCell colSpan={2} className="py-1 px-1 text-sm">Total SIP Amount</TableCell>
-                  <TableCell className="text-right py-1 px-1 text-sm">{formatCurrency(totalSIPAmount)}</TableCell>
+                  <TableCell colSpan={3} className="py-1 px-1 text-sm">Total SIP Amount</TableCell>
+                  <TableCell className="text-right py-1 px-1 text-sm">{formatCurrency(categoryAllocation.totalValue)}</TableCell>
                   <TableCell className="py-1 px-1" />
                 </TableRow>
               </TableFooter>
             </Table>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>SIP Category Allocation</CardTitle>
+          <CardDescription>A summary of your SIP portfolio based on category.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResizablePanelGroup direction="horizontal" className="min-h-[300px] w-full">
+            <ResizablePanel defaultSize={50}>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="py-1 px-1">Category</TableHead>
+                    <TableHead className="text-right py-1 px-1">SIP Amount (INR)</TableHead>
+                    <TableHead className="text-right py-1 px-1">Contribution</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {categoryAllocation.allocationWithContribution.map(item => (
+                    <TableRow key={item.name} className="h-9">
+                      <TableCell className="font-medium py-0 px-1 text-sm">{item.name}</TableCell>
+                      <TableCell className="text-right py-0 px-1 text-sm">{formatCurrency(item.value)}</TableCell>
+                      <TableCell className="text-right py-0 px-1 text-sm">{item.contribution.toFixed(2)}%</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+                <TableFooter>
+                  <TableRow className="bg-muted/50 font-bold">
+                    <TableCell className="py-1 px-1 text-sm">Total</TableCell>
+                    <TableCell className="font-bold text-right py-1 px-1 text-sm">{formatCurrency(categoryAllocation.totalValue)}</TableCell>
+                    <TableCell className="font-bold text-right py-1 px-1 text-sm">100.00%</TableCell>
+                  </TableRow>
+                </TableFooter>
+              </Table>
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={50}>
+              <GenericPieChart data={categoryAllocation.chartData} />
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </CardContent>
       </Card>
     </div>
