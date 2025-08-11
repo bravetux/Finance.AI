@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, Table
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Gem, Upload, Download, Trash2, PlusCircle } from "lucide-react";
+import { Gem, Upload, Download, Trash2 } from "lucide-react";
 import { saveAs } from "file-saver";
 import { showSuccess, showError } from "@/utils/toast";
 import {
@@ -56,23 +56,10 @@ const Gold: React.FC = () => {
     localStorage.setItem('goldData', JSON.stringify(assets));
   }, [assets]);
 
-  const handleInputChange = (id: string, field: keyof GoldAsset, value: string | number) => {
+  const handleValueChange = (id: string, value: number) => {
     setAssets(prev =>
-      prev.map(p => (p.id === id ? { ...p, [field]: value } : p))
+      prev.map(p => (p.id === id ? { ...p, value: value } : p))
     );
-  };
-
-  const handleAddRow = () => {
-    const newAsset: GoldAsset = {
-      id: Date.now().toString(),
-      particulars: '',
-      value: 0,
-    };
-    setAssets(prev => [...prev, newAsset]);
-  };
-
-  const handleDeleteRow = (id: string) => {
-    setAssets(prev => prev.filter(asset => asset.id !== id));
   };
 
   const totalValue = useMemo(() => {
@@ -119,8 +106,9 @@ const Gold: React.FC = () => {
   };
 
   const handleClearData = () => {
-    setAssets([]);
-    showSuccess('Gold data has been cleared.');
+    const clearedAssets = assets.map(asset => ({ ...asset, value: 0 }));
+    setAssets(clearedAssets);
+    showSuccess('Gold data values have been cleared.');
   };
 
   return (
@@ -134,19 +122,19 @@ const Gold: React.FC = () => {
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive">
-                <Trash2 className="mr-2 h-4 w-4" /> Clear Data
+                <Trash2 className="mr-2 h-4 w-4" /> Clear Values
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will delete all gold asset entries. This action cannot be undone.
+                  This will reset all gold asset values to zero. This action cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleClearData}>Yes, clear data</AlertDialogAction>
+                <AlertDialogAction onClick={handleClearData}>Yes, clear values</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -168,52 +156,36 @@ const Gold: React.FC = () => {
       >
         <ResizablePanel defaultSize={50}>
           <Card className="h-full border-0 shadow-none rounded-none">
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader>
               <CardTitle>Gold Holdings</CardTitle>
-              <Button size="sm" onClick={handleAddRow}>
-                <PlusCircle className="mr-2 h-4 w-4" /> Add
-              </Button>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="py-1 px-1">Particulars</TableHead>
-                    <TableHead className="text-right py-1 px-1">Value (INR)</TableHead>
-                    <TableHead className="w-[10%] py-1 px-1"></TableHead>
+                    <TableHead className="py-1 px-2">Particulars</TableHead>
+                    <TableHead className="text-right py-1 px-2">Value (INR)</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {assets.map(p => (
-                    <TableRow key={p.id} className="h-9">
-                      <TableCell className="p-0">
-                        <Input
-                          value={p.particulars}
-                          onChange={e => handleInputChange(p.id, 'particulars', e.target.value)}
-                          className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm"
-                        />
-                      </TableCell>
-                      <TableCell className="p-0">
+                    <TableRow key={p.id} className="h-10">
+                      <TableCell className="font-medium py-1 px-2">{p.particulars}</TableCell>
+                      <TableCell className="p-1">
                         <Input
                           type="number"
                           value={p.value}
-                          onChange={e => handleInputChange(p.id, 'value', Number(e.target.value))}
-                          className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm text-right"
+                          onChange={e => handleValueChange(p.id, Number(e.target.value))}
+                          className="bg-transparent border-0 focus-visible:ring-1 h-8 text-sm text-right"
                         />
-                      </TableCell>
-                      <TableCell className="p-0 text-center">
-                        <Button variant="ghost" size="icon" onClick={() => handleDeleteRow(p.id)} className="h-7 w-7">
-                          <Trash2 className="h-3.5 w-3.5 text-red-500" />
-                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
                 <TableFooter>
                   <TableRow>
-                    <TableCell className="font-bold py-1 px-1 text-sm">Total</TableCell>
-                    <TableCell className="text-right font-bold py-1 px-1 text-sm">{formatCurrency(totalValue)}</TableCell>
-                    <TableCell className="py-1 px-1"></TableCell>
+                    <TableCell className="font-bold py-2 px-2 text-sm">Total</TableCell>
+                    <TableCell className="text-right font-bold py-2 px-2 text-sm">{formatCurrency(totalValue)}</TableCell>
                   </TableRow>
                 </TableFooter>
               </Table>
