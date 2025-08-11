@@ -44,42 +44,11 @@ interface GovInvestment {
   currentValue: number;
 }
 
-// Initial data based on the image
-const initialLiquidAssets: LiquidAsset[] = [
-  { id: 'l1', particulars: 'TMB', currentValue: 10000 },
-  { id: 'l2', particulars: 'HDFC', currentValue: 140000 },
-  { id: 'l3', particulars: 'IDFC', currentValue: 22800 },
-  { id: 'l4', particulars: 'TMB Spouse', currentValue: 97000 },
-];
-const initialFixedDeposits: FixedDeposit[] = [
-  { id: 'fd1', bankName: 'TMB - Spouse - 001 - 0199', currentValue: 304408 },
-  { id: 'fd2', bankName: 'TMB - Spouse - 002 - 0138', currentValue: 104000 },
-  { id: 'fd3', bankName: 'TMB - Spouse - 003 - 0134', currentValue: 23000 },
-  { id: 'fd4', bankName: 'TMB - Spouse - 004 - 0135', currentValue: 200000 },
-  { id: 'fd5', bankName: 'TMB - Spouse - 005 - 0133', currentValue: 50000 },
-  { id: 'fd6', bankName: 'TMB - Spouse - 004 - 0925', currentValue: 360000 },
-  { id: 'fd7', bankName: 'TMB - Spouse - 005 - 1745', currentValue: 20000 },
-];
-const initialDebtFunds: DebtFund[] = [
-  { id: 'df1', name: 'INCRED FINANCIAL SERVICE Expiry 10-Nov-2026', currentValue: 10000 },
-  { id: 'df2', name: 'ICICI Prudential Liquid Fund', currentValue: 99 },
-  { id: 'df3', name: 'HDFC Liquid Fund', currentValue: 101 },
-  { id: 'df4', name: 'AKARA CAPITAL ADVISORS Expiry 22-Feb-2026', currentValue: 95106 },
-  { id: 'df5', name: 'TAPIR CONSTRUCTIONS Ltd Expiry 18-Jan-2027', currentValue: 100861 },
-  { id: 'df6', name: 'NAVI FINSERV LIMITED Expiry 31-Dec-2027', currentValue: 10019 },
-  { id: 'df7', name: 'Kosamattam Finance Limited Expiry 17-Jan-2028', currentValue: 20000 },
-  { id: 'df8', name: 'MUTHOOT FINCORP LIMITED Expiry 24-Dec-2032', currentValue: 30020 },
-  { id: 'df9', name: 'EDELWEISS FINANCIAL Ser. Expiry 29-Jan-2034', currentValue: 20000 },
-  { id: 'df10', name: 'Mohammed Yasin', currentValue: 126700 },
-  { id: 'df11', name: 'Annapurna Finance Private Ltd Expiry 24-Jan-2030', currentValue: 105000 },
-];
-const initialGovInvestments: GovInvestment[] = [
-  { id: 'gi1', name: 'PPF', currentValue: 4750000 },
-  { id: 'gi2', name: 'PF', currentValue: 1436125 },
-  { id: 'gi3', name: 'LIC', currentValue: 1500000 },
-  { id: 'gi4', name: 'PPF Spouse', currentValue: 1000000 },
-  { id: 'gi5', name: 'PPF Vishnu', currentValue: 669000 },
-];
+// Initial data is now empty
+const initialLiquidAssets: LiquidAsset[] = [];
+const initialFixedDeposits: FixedDeposit[] = [];
+const initialDebtFunds: DebtFund[] = [];
+const initialGovInvestments: GovInvestment[] = [];
 
 const Debt: React.FC = () => {
   const [liquidAssets, setLiquidAssets] = useState<LiquidAsset[]>(() => {
