@@ -77,6 +77,31 @@ const Debt: React.FC = () => {
     setter(prev => [...prev, newRow]);
   };
 
+  // Specific handler for adding a liquid asset with default text
+  const handleAddLiquidAsset = () => {
+    const bankSavingsEntries = liquidAssets.filter(asset => 
+        asset.particulars.startsWith('Bank Savings xxxx ')
+    );
+    
+    let maxNum = 0;
+    bankSavingsEntries.forEach(asset => {
+        const numStr = asset.particulars.split(' ').pop();
+        const num = numStr ? parseInt(numStr, 10) : 0;
+        if (!isNaN(num) && num > maxNum) {
+            maxNum = num;
+        }
+    });
+
+    const nextNumber = maxNum + 1;
+
+    const newRow: LiquidAsset = {
+        id: Date.now().toString(),
+        particulars: `Bank Savings xxxx ${nextNumber}`,
+        currentValue: 0,
+    };
+    setLiquidAssets(prev => [...prev, newRow]);
+  };
+
   // Generic handler for deleting a row
   const handleDeleteRow = <T extends { id: string }>(
     setter: React.Dispatch<React.SetStateAction<T[]>>,
@@ -218,7 +243,7 @@ const Debt: React.FC = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Liquid</CardTitle>
-            <Button size="sm" onClick={() => handleAddRow(setLiquidAssets, { id: Date.now().toString(), particulars: '', currentValue: 0 })}>
+            <Button size="sm" onClick={handleAddLiquidAsset}>
               <PlusCircle className="mr-2 h-4 w-4" /> Add
             </Button>
           </CardHeader>
