@@ -194,23 +194,23 @@ const DomesticEquity: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[5%] py-1 px-2">S.No</TableHead>
-                  <TableHead className="py-1 px-2">Stock Name</TableHead>
-                  <TableHead className="py-1 px-2">Category</TableHead>
-                  <TableHead className="py-1 px-2">Current Value (INR)</TableHead>
-                  <TableHead className="text-right py-1 px-2">Actions</TableHead>
+                  <TableHead className="w-[5%] py-1 px-1">S.No</TableHead>
+                  <TableHead className="py-1 px-1">Stock Name</TableHead>
+                  <TableHead className="py-1 px-1">Category</TableHead>
+                  <TableHead className="py-1 px-1">Current Value (INR)</TableHead>
+                  <TableHead className="text-right py-1 px-1">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {stocks.length > 0 ? stocks.map((stock, index) => (
-                  <TableRow key={stock.id} className="h-10">
-                    <TableCell className="py-0 px-2 align-middle">{index + 1}</TableCell>
+                  <TableRow key={stock.id} className="h-9">
+                    <TableCell className="py-0 px-1 align-middle text-xs">{index + 1}</TableCell>
                     <TableCell className="p-0">
                       <Input
                         value={stock.stockName}
                         onChange={e => handleStockChange(stock.id, 'stockName', e.target.value)}
                         placeholder="Enter stock name"
-                        className="bg-transparent border-0 focus-visible:ring-0 h-8"
+                        className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm"
                       />
                     </TableCell>
                     <TableCell className="p-0">
@@ -218,7 +218,7 @@ const DomesticEquity: React.FC = () => {
                         value={stock.category}
                         onValueChange={(value: Stock['category']) => handleStockChange(stock.id, 'category', value)}
                       >
-                        <SelectTrigger className="bg-transparent border-0 focus:ring-0 h-8 w-full">
+                        <SelectTrigger className="bg-transparent border-0 focus:ring-0 h-7 w-full text-sm">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -234,18 +234,18 @@ const DomesticEquity: React.FC = () => {
                         type="number"
                         value={stock.currentValue}
                         onChange={e => handleStockChange(stock.id, 'currentValue', Number(e.target.value))}
-                        className="bg-transparent border-0 focus-visible:ring-0 h-8"
+                        className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm"
                       />
                     </TableCell>
-                    <TableCell className="text-right py-0 px-2">
-                      <Button variant="ghost" size="icon" onClick={() => handleDeleteRow(stock.id)} className="h-8 w-8">
-                        <Trash2 className="h-4 w-4 text-red-500" />
+                    <TableCell className="text-right py-0 px-1">
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteRow(stock.id)} className="h-7 w-7">
+                        <Trash2 className="h-3.5 w-3.5 text-red-500" />
                       </Button>
                     </TableCell>
                   </TableRow>
                 )) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">
+                    <TableCell colSpan={5} className="text-center h-20 text-muted-foreground text-sm">
                       No stocks added yet. Click "Add Stock" to begin.
                     </TableCell>
                   </TableRow>
@@ -253,9 +253,9 @@ const DomesticEquity: React.FC = () => {
               </TableBody>
               <TableFooter>
                 <TableRow className="bg-muted/50 font-bold">
-                  <TableCell colSpan={3} className="py-2 px-2">Total Current Value</TableCell>
-                  <TableCell className="text-right py-2 px-2">{formatCurrency(marketCapAllocation.totalValue)}</TableCell>
-                  <TableCell className="py-2 px-2" />
+                  <TableCell colSpan={3} className="py-1 px-1 text-sm">Total Current Value</TableCell>
+                  <TableCell className="text-right py-1 px-1 text-sm">{formatCurrency(marketCapAllocation.totalValue)}</TableCell>
+                  <TableCell className="py-1 px-1" />
                 </TableRow>
               </TableFooter>
             </Table>
@@ -274,25 +274,25 @@ const DomesticEquity: React.FC = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Category</TableHead>
-                    <TableHead className="text-right">Value (INR)</TableHead>
-                    <TableHead className="text-right">Contribution</TableHead>
+                    <TableHead className="py-1 px-1">Category</TableHead>
+                    <TableHead className="text-right py-1 px-1">Value (INR)</TableHead>
+                    <TableHead className="text-right py-1 px-1">Contribution</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {marketCapAllocation.allocationWithContribution.map(item => (
-                    <TableRow key={item.name}>
-                      <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(item.value)}</TableCell>
-                      <TableCell className="text-right">{item.contribution.toFixed(2)}%</TableCell>
+                    <TableRow key={item.name} className="h-9">
+                      <TableCell className="font-medium py-0 px-1 text-sm">{item.name}</TableCell>
+                      <TableCell className="text-right py-0 px-1 text-sm">{formatCurrency(item.value)}</TableCell>
+                      <TableCell className="text-right py-0 px-1 text-sm">{item.contribution.toFixed(2)}%</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
                 <TableFooter>
-                  <TableRow>
-                    <TableCell className="font-bold">Total</TableCell>
-                    <TableCell className="font-bold text-right">{formatCurrency(marketCapAllocation.totalValue)}</TableCell>
-                    <TableCell className="font-bold text-right">100.00%</TableCell>
+                  <TableRow className="bg-muted/50 font-bold">
+                    <TableCell className="py-1 px-1 text-sm">Total</TableCell>
+                    <TableCell className="font-bold text-right py-1 px-1 text-sm">{formatCurrency(marketCapAllocation.totalValue)}</TableCell>
+                    <TableCell className="font-bold text-right py-1 px-1 text-sm">100.00%</TableCell>
                   </TableRow>
                 </TableFooter>
               </Table>
