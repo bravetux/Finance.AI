@@ -195,31 +195,31 @@ const MutualFundAllocation: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[5%]">S.No</TableHead>
-                  <TableHead>Mutual fund / ETF / Smallcase</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Current Value (INR)</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="w-[5%] py-1 px-2">S.No</TableHead>
+                  <TableHead className="py-1 px-2">Mutual fund / ETF / Smallcase</TableHead>
+                  <TableHead className="py-1 px-2">Category</TableHead>
+                  <TableHead className="py-1 px-2">Current Value (INR)</TableHead>
+                  <TableHead className="text-right py-1 px-2">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {mutualFundEntries.length > 0 ? mutualFundEntries.map((entry, index) => (
-                  <TableRow key={entry.id}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>
+                  <TableRow key={entry.id} className="h-10">
+                    <TableCell className="py-0 px-2 align-middle">{index + 1}</TableCell>
+                    <TableCell className="p-0">
                       <Input
                         value={entry.fundName}
                         onChange={e => handleEntryChange(entry.id, 'fundName', e.target.value)}
                         placeholder="Enter name"
-                        className="bg-transparent"
+                        className="bg-transparent border-0 focus-visible:ring-0 h-8"
                       />
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="p-0">
                       <Select
                         value={entry.category}
                         onValueChange={(value: FundCategory) => handleEntryChange(entry.id, 'category', value)}
                       >
-                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="bg-transparent border-0 focus:ring-0 h-8 w-full"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Largecap">Largecap</SelectItem>
                           <SelectItem value="Midcap">Midcap</SelectItem>
@@ -229,16 +229,16 @@ const MutualFundAllocation: React.FC = () => {
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="p-0">
                       <Input
                         type="number"
                         value={entry.currentValue}
                         onChange={e => handleEntryChange(entry.id, 'currentValue', Number(e.target.value))}
-                        className="bg-transparent"
+                        className="bg-transparent border-0 focus-visible:ring-0 h-8"
                       />
                     </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" onClick={() => handleDeleteRow(entry.id)}>
+                    <TableCell className="text-right py-0 px-2">
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteRow(entry.id)} className="h-8 w-8">
                         <Trash2 className="h-4 w-4 text-red-500" />
                       </Button>
                     </TableCell>
@@ -253,9 +253,9 @@ const MutualFundAllocation: React.FC = () => {
               </TableBody>
               <TableFooter>
                 <TableRow className="bg-muted/50 font-bold">
-                  <TableCell colSpan={3}>Total Current Value</TableCell>
-                  <TableCell className="text-right">{formatCurrency(categoryAllocation.totalValue)}</TableCell>
-                  <TableCell />
+                  <TableCell colSpan={3} className="py-2 px-2">Total Current Value</TableCell>
+                  <TableCell className="text-right py-2 px-2">{formatCurrency(categoryAllocation.totalValue)}</TableCell>
+                  <TableCell className="py-2 px-2" />
                 </TableRow>
               </TableFooter>
             </Table>
