@@ -48,6 +48,7 @@ const navItems = [
     icon: Calculator,
     type: 'section',
     children: [
+      { name: "Summary", path: "/cashflow-summary", icon: LayoutDashboard, type: 'link' },
       { name: "Expense Reduction Planner", path: "/expense-reduction-planner", icon: SheetIcon, type: 'link' },
       { name: "Cashflow", path: "/cashflow", icon: ArrowDownUp, type: 'link' },
     ]

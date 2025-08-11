@@ -26,6 +26,7 @@ import Debt from "./pages/Debt";
 import Gold from "./pages/Gold";
 import MutualFundAllocation from "./pages/MutualFundAllocation";
 import MutualFundSIP from "./pages/MutualFundSIP";
+import CashflowSummary from "./pages/CashflowSummary";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/" element={<DashboardLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="cashflow" element={<Cashflow />} />
+              <Route path="cashflow-summary" element={<CashflowSummary />} />
               <Route path="expense-reduction-planner" element={<ExpenseReductionPlanner />} />
               <Route path="projected-cashflow" element={<ProjectedCashflow />} />
               <Route path="net-worth" element={<NetWorthCalculator />} />
