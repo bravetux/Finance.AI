@@ -82,10 +82,23 @@ const initialGovInvestments: GovInvestment[] = [
 ];
 
 const Debt: React.FC = () => {
-  const [liquidAssets, setLiquidAssets] = useState<LiquidAsset[]>(initialLiquidAssets);
-  const [fixedDeposits, setFixedDeposits] = useState<FixedDeposit[]>(initialFixedDeposits);
-  const [debtFunds, setDebtFunds] = useState<DebtFund[]>(initialDebtFunds);
-  const [govInvestments, setGovInvestments] = useState<GovInvestment[]>(initialGovInvestments);
+  const [liquidAssets, setLiquidAssets] = useState<LiquidAsset[]>(() => {
+    try { const saved = localStorage.getItem('debtLiquidAssets'); return saved ? JSON.parse(saved) : initialLiquidAssets; } catch { return initialLiquidAssets; }
+  });
+  const [fixedDeposits, setFixedDeposits] = useState<FixedDeposit[]>(() => {
+    try { const saved = localStorage.getItem('debtFixedDeposits'); return saved ? JSON.parse(saved) : initialFixedDeposits; } catch { return initialFixedDeposits; }
+  });
+  const [debtFunds, setDebtFunds] = useState<DebtFund[]>(() => {
+    try { const saved = localStorage.getItem('debtDebtFunds'); return saved ? JSON.parse(saved) : initialDebtFunds; } catch { return initialDebtFunds; }
+  });
+  const [govInvestments, setGovInvestments] = useState<GovInvestment[]>(() => {
+    try { const saved = localStorage.getItem('debtGovInvestments'); return saved ? JSON.parse(saved) : initialGovInvestments; } catch { return initialGovInvestments; }
+  });
+
+  useEffect(() => { localStorage.setItem('debtLiquidAssets', JSON.stringify(liquidAssets)); }, [liquidAssets]);
+  useEffect(() => { localStorage.setItem('debtFixedDeposits', JSON.stringify(fixedDeposits)); }, [fixedDeposits]);
+  useEffect(() => { localStorage.setItem('debtDebtFunds', JSON.stringify(debtFunds)); }, [debtFunds]);
+  useEffect(() => { localStorage.setItem('debtGovInvestments', JSON.stringify(govInvestments)); }, [govInvestments]);
 
   // Generic handler for adding a new row
   const handleAddRow = <T extends { id: string }>(
@@ -130,6 +143,51 @@ const Debt: React.FC = () => {
 
   const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 
+  const exportData = () => {
+    const dataToExport = {
+      liquidAssets,
+      fixedDeposits,
+      debtFunds,
+      govInvestments,
+    };
+    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+    saveAs(blob, 'debt-data.json');
+    showSuccess('Debt data exported successfully!');
+  };
+
+  const importData = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const content = e.target?.result as string;
+        const data = JSON.parse(content);
+        if (data.liquidAssets && data.fixedDeposits && data.debtFunds && data.govInvestments) {
+          setLiquidAssets(data.liquidAssets);
+          setFixedDeposits(data.fixedDeposits);
+          setDebtFunds(data.debtFunds);
+          setGovInvestments(data.govInvestments);
+          showSuccess('Debt data imported successfully!');
+        } else {
+          showError('Invalid file format.');
+        }
+      } catch (err) {
+        showError('Failed to parse the file.');
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  };
+
+  const handleClearData = () => {
+    setLiquidAssets([]);
+    setFixedDeposits([]);
+    setDebtFunds([]);
+    setGovInvestments([]);
+    showSuccess("All debt data has been cleared.");
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -153,16 +211,19 @@ const Debt: React.FC = () => {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => {
-                  setLiquidAssets([]);
-                  setFixedDeposits([]);
-                  setDebtFunds([]);
-                  setGovInvestments([]);
-                  showSuccess("All debt data has been cleared.");
-                }}>Yes, clear all</AlertDialogAction>
+                <AlertDialogAction onClick={handleClearData}>Yes, clear all</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          <Button variant="outline" onClick={exportData}>
+            <Upload className="mr-2 h-4 w-4" /> Export
+          </Button>
+          <Button variant="outline" asChild>
+            <Label htmlFor="import-file" className="cursor-pointer">
+              <Download className="mr-2 h-4 w-4" /> Import
+              <Input id="import-file" type="file" accept=".json" className="hidden" onChange={importData} />
+            </Label>
+          </Button>
         </div>
       </div>
 
