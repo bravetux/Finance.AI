@@ -188,9 +188,9 @@ const RealEstate: React.FC = () => {
   };
 
   const handleClearData = () => {
-    setPropertyValues(initialPropertyValues);
-    setRentalProperties(initialRentalProperties);
-    showSuccess('Real estate data has been reset.');
+    setPropertyValues(initialPropertyValues.map(p => ({ ...p, value: 0 })));
+    setRentalProperties(initialRentalProperties.map(p => ({ ...p, value: 0, rent: 0 })));
+    showSuccess('Real estate data has been cleared.');
   };
 
   return (
