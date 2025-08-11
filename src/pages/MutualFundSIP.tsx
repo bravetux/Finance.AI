@@ -29,7 +29,7 @@ interface SIPEntry {
 
 const initialSIPEntries: SIPEntry[] = Array.from({ length: 10 }, (_, i) => ({
   id: `sip-${i + 1}`,
-  fundName: `Fund ${i + 1}`,
+  fundName: ``,
   sipAmount: 0,
 }));
 
@@ -101,7 +101,7 @@ const MutualFundSIP: React.FC = () => {
   };
 
   const handleClearData = () => {
-    setSipEntries(initialSIPEntries);
+    setSipEntries(initialSIPEntries.map(e => ({...e, fundName: '', sipAmount: 0})));
     showSuccess('All SIP data has been cleared.');
   };
 
