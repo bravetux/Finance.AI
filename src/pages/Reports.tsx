@@ -102,48 +102,33 @@ const Reports: React.FC = () => {
   };
 
   const handleReset = () => {
-    const zeroedFinanceData = {
-      postTaxSalaryIncome: 0, businessIncome: 0,
-      rentalProperty1: 0, rentalProperty2: 0, rentalProperty3: 0,
-      fdInterest: 0, bondIncome: 0, dividendIncome: 0,
-      monthlyHouseholdExpense: 0, monthlyPpf: 0, monthlyUlip: 0,
-      monthlyInsurance: 0, monthlyRds: 0, monthlyLoanEMIs: 0,
-      monthlyDonation: 0, monthlyEntertainment: 0, monthlyTravel: 0,
-      monthlyOthers: 0
-    };
-    const zeroedNetWorthData = {
-      homeValue: 0, otherRealEstate: 0, jewellery: 0, sovereignGoldBonds: 0,
-      ulipsSurrenderValue: 0, epfPpfVpf: 0, fixedDeposits: 0, debtFunds: 0,
-      domesticStocks: 0, domesticMutualFunds: 0, internationalFunds: 0,
-      smallCases: 0, savingsBalance: 0, goldEtf: 0, cryptocurrency: 0,
-      reits: 0, homeLoan: 0, educationLoan: 0, carLoan: 0, personalLoan: 0,
-      creditCardDues: 0, otherLiabilities: 0
-    };
-    const zeroedRetirementData = {
-      currentAge: 0,
-      retirementAge: 0,
-      lifeExpectancy: 100,
-      currentAnnualExpenses: 0,
-      inflation: 6,
-      allocations: { equity: 50, fds: 25, bonds: 20, cash: 5 },
-      returns: { equity: 12, fds: 7, bonds: 8, cash: 2.5 },
-    };
-
-    localStorage.setItem('finance-data', JSON.stringify(zeroedFinanceData));
-    localStorage.setItem('netWorthData', JSON.stringify(zeroedNetWorthData));
-    localStorage.setItem('retirementData', JSON.stringify(zeroedRetirementData));
-
-    const keysToRemove = [
-      'future-value-data', 'goalsData', 'projectedCashflowSettings',
-      'projectedAccumulatedCorpus', 'portfolioData', 'expenseTrackerData',
-      'usEquityData', 'realEstatePropertyValues', 'realEstateRentalProperties',
-      'domesticEquityStocks', 'mutualFundAllocationEntries', 'mutualFundSIPEntries',
-      'goldData', 'debtLiquidAssets', 'debtFixedDeposits', 'debtDebtFunds', 'debtGovInvestments',
+    const keysToClear = [
+      'finance-data',
+      'netWorthData',
+      'retirementData',
+      'future-value-data',
+      'goalsData',
+      'projectedCashflowSettings',
+      'projectedAccumulatedCorpus',
+      'portfolioData',
+      'expenseTrackerData',
+      'usEquityData',
+      'realEstatePropertyValues',
+      'realEstateRentalProperties',
+      'domesticEquityStocks',
+      'mutualFundAllocationEntries',
+      'mutualFundSIPEntries',
+      'goldData',
+      'debtLiquidAssets',
+      'debtFixedDeposits',
+      'debtDebtFunds',
+      'debtGovInvestments',
       'sipOutflowData'
     ];
-    keysToRemove.forEach(key => localStorage.removeItem(key));
 
-    showSuccess("All application data has been reset.");
+    keysToClear.forEach(key => localStorage.removeItem(key));
+
+    showSuccess("All application data has been reset to default values.");
 
     setTimeout(() => {
       window.location.reload();
