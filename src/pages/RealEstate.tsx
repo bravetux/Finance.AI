@@ -41,14 +41,13 @@ interface RentalProperty {
   rent: number;
 }
 
-// Initial data based on the image
+// Initial data now excludes REIT
 const initialPropertyValues: PropertyValue[] = [
   { id: 'pv1', name: 'Home 1', value: 0 },
   { id: 'pv2', name: 'Home 2', value: 0 },
   { id: 'pv3', name: 'Commercial 1', value: 0 },
   { id: 'pv4', name: 'Commercial 2', value: 0 },
   { id: 'pv5', name: 'Land', value: 0 },
-  { id: 'pv6', name: 'REIT', value: 0 },
 ];
 
 const initialRentalProperties: RentalProperty[] = [
@@ -68,6 +67,16 @@ const RealEstate: React.FC = () => {
     }
   });
 
+  // State for REIT value
+  const [reitValue, setReitValue] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('realEstateReitValue');
+      return saved ? JSON.parse(saved) : 0;
+    } catch {
+      return 0;
+    }
+  });
+
   // State for rental yield properties
   const [rentalProperties, setRentalProperties] = useState<RentalProperty[]>(() => {
     try {
@@ -84,10 +93,14 @@ const RealEstate: React.FC = () => {
   }, [propertyValues]);
 
   useEffect(() => {
+    localStorage.setItem('realEstateReitValue', JSON.stringify(reitValue));
+  }, [reitValue]);
+
+  useEffect(() => {
     localStorage.setItem('realEstateRentalProperties', JSON.stringify(rentalProperties));
   }, [rentalProperties]);
 
-  // Update net worth data in localStorage whenever property values change
+  // Update net worth data in localStorage whenever property or REIT values change
   useEffect(() => {
     try {
       const home1 = propertyValues.find(p => p.name === 'Home 1');
@@ -103,6 +116,7 @@ const RealEstate: React.FC = () => {
         ...netWorthData,
         homeValue: home1Value,
         otherRealEstate: otherRealEstateValue,
+        reits: reitValue,
       };
 
       localStorage.setItem('netWorthData', JSON.stringify(updatedNetWorthData));
@@ -110,7 +124,7 @@ const RealEstate: React.FC = () => {
     } catch (error) {
       console.error("Failed to update net worth data from Real Estate page:", error);
     }
-  }, [propertyValues]);
+  }, [propertyValues, reitValue]);
 
   // Handlers for input changes
   const handlePropertyValueChange = (id: string, value: string) => {
@@ -118,6 +132,11 @@ const RealEstate: React.FC = () => {
     setPropertyValues(prev =>
       prev.map(p => (p.id === id ? { ...p, value: Number(value) || 0 } : p))
     );
+  };
+
+  const handleReitValueChange = (value: string) => {
+    if (value.length > 9) return;
+    setReitValue(Number(value) || 0);
   };
 
   const handleRentalPropertyChange = (id: string, field: 'value' | 'rent', value: string) => {
@@ -158,6 +177,7 @@ const RealEstate: React.FC = () => {
     const dataToExport = {
       propertyValues,
       rentalProperties,
+      reitValue,
     };
     const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
     saveAs(blob, 'real-estate-data.json');
@@ -175,6 +195,9 @@ const RealEstate: React.FC = () => {
         if (data.propertyValues && data.rentalProperties) {
           setPropertyValues(data.propertyValues);
           setRentalProperties(data.rentalProperties);
+          if (typeof data.reitValue === 'number') {
+            setReitValue(data.reitValue);
+          }
           showSuccess('Real estate data imported successfully!');
         } else {
           showError('Invalid file format.');
@@ -190,6 +213,7 @@ const RealEstate: React.FC = () => {
   const handleClearData = () => {
     setPropertyValues(initialPropertyValues.map(p => ({ ...p, value: 0 })));
     setRentalProperties(initialRentalProperties.map(p => ({ ...p, value: 0, rent: 0 })));
+    setReitValue(0);
     showSuccess('Real estate data has been cleared.');
   };
 
@@ -286,6 +310,26 @@ const RealEstate: React.FC = () => {
           </Card>
         </ResizablePanel>
       </ResizablePanelGroup>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>REIT (Real Estate Investment Trust)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="reit-value" className="text-lg font-medium">Current Value (INR)</Label>
+            <div className="w-1/3">
+              <Input
+                id="reit-value"
+                type="number"
+                value={reitValue}
+                onChange={e => handleReitValueChange(e.target.value)}
+                className="text-right text-lg font-bold"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
