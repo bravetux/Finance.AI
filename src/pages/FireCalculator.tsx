@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,7 +31,18 @@ const initialInputs = {
 };
 
 const FireCalculator: React.FC = () => {
-  const [inputs, setInputs] = useState(initialInputs);
+  const [inputs, setInputs] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fireCalculatorData');
+      return saved ? JSON.parse(saved) : initialInputs;
+    } catch {
+      return initialInputs;
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('fireCalculatorData', JSON.stringify(inputs));
+  }, [inputs]);
 
   const handleInputChange = (field: keyof typeof inputs, value: string) => {
     setInputs(prev => ({ ...prev, [field]: Number(value) || 0 }));
@@ -109,6 +120,7 @@ const FireCalculator: React.FC = () => {
 
   const handleClearFields = () => {
     setInputs(initialInputs);
+    localStorage.removeItem('fireCalculatorData');
     showSuccess("FIRE Calculator fields have been reset.");
   };
 

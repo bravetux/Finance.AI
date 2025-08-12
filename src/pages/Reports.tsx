@@ -21,32 +21,71 @@ import {
 
 type ReportFormat = "json" | "txt";
 
+const safeJSONParse = (key: string, defaultValue: any = {}) => {
+  try {
+    const item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : defaultValue;
+  } catch (e) {
+    console.error(`Failed to parse JSON for key: ${key}`, e);
+    return defaultValue;
+  }
+};
+
 const Reports: React.FC = () => {
   const [format, setFormat] = useState<ReportFormat>("json");
 
   const gatherAllData = () => {
     try {
       const allData = {
-        dashboard: {
-          cashflow: JSON.parse(localStorage.getItem('finance-data') || '{}'),
-          netWorth: JSON.parse(localStorage.getItem('netWorthData') || '{}'),
-          futureValue: JSON.parse(localStorage.getItem('future-value-data') || '[]'),
-          goals: JSON.parse(localStorage.getItem('goalsData') || '[]'),
-          retirement: JSON.parse(localStorage.getItem('retirementData') || '{}'),
-          projectedCashflow: {
-            settings: JSON.parse(localStorage.getItem('projectedCashflowSettings') || '{}'),
-            corpus: JSON.parse(localStorage.getItem('projectedAccumulatedCorpus') || '0'),
-          }
-        },
-        cashflow: JSON.parse(localStorage.getItem('finance-data') || '{}'),
-        netWorth: JSON.parse(localStorage.getItem('netWorthData') || '{}'),
-        futureValue: JSON.parse(localStorage.getItem('future-value-data') || '[]'),
-        goals: JSON.parse(localStorage.getItem('goalsData') || '[]'),
-        retirement: JSON.parse(localStorage.getItem('retirementData') || '{}'),
+        // Planning
+        cashflow: safeJSONParse('finance-data', {}),
+        netWorth: safeJSONParse('netWorthData', {}),
+        goals: safeJSONParse('goalsData', []),
+        expensePlanner: safeJSONParse('expenseTrackerData', []),
+        
+        // Retirement
+        retirementDashboard: safeJSONParse('retirementData', {}),
+        fireCalculator: safeJSONParse('fireCalculatorData', {}),
+        canYouRetireNow: safeJSONParse('canRetireNowData', {}),
         projectedCashflow: {
-          settings: JSON.parse(localStorage.getItem('projectedCashflowSettings') || '{}'),
-          corpus: JSON.parse(localStorage.getItem('projectedAccumulatedCorpus') || '0'),
-        }
+          settings: safeJSONParse('projectedCashflowSettings', {}),
+          corpus: safeJSONParse('projectedAccumulatedCorpus', 0),
+        },
+        postRetirementStrategy: {
+          settings: safeJSONParse('postRetirementStrategyPageSettings', {}),
+        },
+        futureValueCalculator: safeJSONParse('future-value-data', []),
+
+        // Assets
+        assets: {
+          realEstate: {
+            properties: safeJSONParse('realEstatePropertyValues', []),
+            rentals: safeJSONParse('realEstateRentalProperties', []),
+            reit: safeJSONParse('realEstateReitValue', 0),
+          },
+          equity: {
+            domesticStocks: safeJSONParse('domesticEquityStocks', []),
+            usEquity: safeJSONParse('usEquityData', []),
+          },
+          funds: {
+            mutualFundAllocation: safeJSONParse('mutualFundAllocationEntries', []),
+            mutualFundSips: safeJSONParse('mutualFundSIPEntries', []),
+            sipOutflow: safeJSONParse('sipOutflowData', 0),
+            smallCases: safeJSONParse('smallCaseData', []),
+          },
+          debt: {
+            liquid: safeJSONParse('debtLiquidAssets', []),
+            fixedDeposits: safeJSONParse('debtFixedDeposits', []),
+            debtFunds: safeJSONParse('debtDebtFunds', []),
+            govInvestments: safeJSONParse('debtGovInvestments', []),
+          },
+          preciousMetals: {
+            gold: safeJSONParse('goldData', []),
+            silver: safeJSONParse('silverData', []),
+            platinum: safeJSONParse('platinumData', []),
+            diamond: safeJSONParse('diamondData', []),
+          },
+        },
       };
       return allData;
     } catch (e) {
@@ -103,27 +142,37 @@ const Reports: React.FC = () => {
 
   const handleReset = () => {
     const keysToClear = [
+      // Planning
       'finance-data',
       'netWorthData',
-      'retirementData',
-      'future-value-data',
       'goalsData',
+      'expenseTrackerData',
+      // Retirement
+      'retirementData',
+      'fireCalculatorData',
+      'canRetireNowData',
       'projectedCashflowSettings',
       'projectedAccumulatedCorpus',
-      'portfolioData',
-      'expenseTrackerData',
-      'usEquityData',
+      'postRetirementStrategyPageSettings',
+      'future-value-data',
+      // Assets
       'realEstatePropertyValues',
+      'realEstateReitValue',
       'realEstateRentalProperties',
       'domesticEquityStocks',
+      'usEquityData',
       'mutualFundAllocationEntries',
       'mutualFundSIPEntries',
-      'goldData',
+      'sipOutflowData',
+      'smallCaseData',
       'debtLiquidAssets',
       'debtFixedDeposits',
       'debtDebtFunds',
       'debtGovInvestments',
-      'sipOutflowData'
+      'goldData',
+      'silverData',
+      'platinumData',
+      'diamondData',
     ];
 
     keysToClear.forEach(key => localStorage.removeItem(key));
