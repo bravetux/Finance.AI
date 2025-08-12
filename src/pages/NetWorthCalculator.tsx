@@ -301,7 +301,9 @@ const NetWorthCalculator: React.FC = () => {
                     type="number"
                     value={data.jewellery}
                     onChange={(e) => handleInputChange('jewellery', e.target.value)}
+                    disabled
                   />
+                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Precious Metals pages.</p>
                 </div>
                 <div>
                   <Label htmlFor="sovereignGoldBonds">Sovereign Gold Bonds</Label>
@@ -310,7 +312,9 @@ const NetWorthCalculator: React.FC = () => {
                     type="number"
                     value={data.sovereignGoldBonds}
                     onChange={(e) => handleInputChange('sovereignGoldBonds', e.target.value)}
+                    disabled
                   />
+                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Gold page.</p>
                 </div>
                 <div>
                   <Label htmlFor="ulipsSurrenderValue">ULIPs Surrender Value</Label>
