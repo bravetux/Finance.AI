@@ -112,7 +112,7 @@ const Landing: React.FC = () => {
             </a>
             . The source code is available on{' '}
             <a
-              href="https://github.com/bravetux/financial-planner"
+              href="https://github.com/bravetux/Finance.AI"
               target="_blank"
               rel="noreferrer"
               className="font-medium underline underline-offset-4"
