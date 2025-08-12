@@ -1,436 +1,191 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useEffect, useMemo } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Button } from "@/components/ui/button";
-import { Download, Upload, Trash2 } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { showError, showSuccess } from "@/utils/toast";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import AllocationPieChart from "@/components/AllocationPieChart";
+import { LineChart, Wallet, TrendingUp, TrendingDown } from "lucide-react";
 
-// Function to get initial financial data from localStorage
-const getInitialFinanceData = () => {
-  try {
-    const savedData = localStorage.getItem('finance-data');
-    if (savedData) {
-      const data = JSON.parse(savedData);
-      
-      const rentalIncome = (data.rentalProperty1 || 0) + (data.rentalProperty2 || 0) + (data.rentalProperty3 || 0);
-      
-      // All other income sources that are not salary or rental
-      const otherIncome = (data.businessIncome || 0) + (data.fdInterest || 0) + (data.bondIncome || 0) + (data.dividendIncome || 0);
-
-      // Expenses that are subject to the 'expenseIncrement' slider
-      const variableAnnualExpenses = ((data.monthlyHouseholdExpense || 0) + (data.monthlyEntertainment || 0) + (data.monthlyTravel || 0) + (data.monthlyOthers || 0) + (data.monthlyDonation || 0)) * 12;
-
-      // Outflows that are likely fixed and not subject to general expense inflation
-      const fixedAnnualOutflows = ((data.monthlyPpf || 0) + (data.monthlyUlip || 0) + (data.monthlyInsurance || 0) + (data.monthlyRds || 0) + (data.monthlyLoanEMIs || 0)) * 12;
-
-      return {
-        postTaxSalaryIncome: data.postTaxSalaryIncome || 0,
-        rentalIncome: rentalIncome,
-        otherIncome: otherIncome,
-        variableAnnualExpenses: variableAnnualExpenses,
-        fixedAnnualOutflows: fixedAnnualOutflows,
-      };
-    }
-  } catch (error) {
-    console.error("Failed to load finance data from localStorage:", error);
-  }
-  // Default values if localStorage is empty or fails
-  return {
-    postTaxSalaryIncome: 0,
-    rentalIncome: 0,
-    otherIncome: 0,
-    variableAnnualExpenses: 0,
-    fixedAnnualOutflows: 0,
-  };
-};
-
-
-interface ProjectionSettings {
-  currentAge: number;
-  retirementAge: number;
-  surplusIncrement: number;
-  expenseIncrement: number;
-  equityAllocationPre55: number;
-  equityReturns: number;
-  fdReturns: number;
+interface PostRetirementSettings {
+  lifeExpectancy: number;
+  inflation: number;
+  allocations: { equity: number; fds: number; bonds: number; cash: number; };
+  returns: { equity: number; fds: number; bonds: number; cash: number; };
 }
 
 const PostRetirementStrategy: React.FC = () => {
-  const [settings, setSettings] = useState<ProjectionSettings>(() => {
-    try {
-      const savedSettings = localStorage.getItem('postRetirementStrategySettings');
-      if (savedSettings) {
-        const parsed = JSON.parse(savedSettings);
-        // Migration for old data
-        if (parsed.salaryIncrement) {
-          parsed.surplusIncrement = parsed.salaryIncrement;
-          delete parsed.salaryIncrement;
-        }
-        return parsed;
-      }
-    } catch (error) {
-      console.error("Failed to load settings from localStorage:", error);
-    }
-    return {
-      currentAge: 0,
-      retirementAge: 0,
-      surplusIncrement: 3,
-      expenseIncrement: 10,
-      equityAllocationPre55: 50,
-      equityReturns: 12,
-      fdReturns: 7,
+  const [initialCorpus, setInitialCorpus] = useState(0);
+  const [initialAnnualExpenses, setInitialAnnualExpenses] = useState(0);
+  const [currentAge, setCurrentAge] = useState(0);
+
+  const [settings, setSettings] = useState<PostRetirementSettings>(() => {
+    const defaultState: PostRetirementSettings = {
+      lifeExpectancy: 85,
+      inflation: 6,
+      allocations: { equity: 30, fds: 40, bonds: 25, cash: 5 },
+      returns: { equity: 12, fds: 7, bonds: 8, cash: 2.5 },
     };
+    try {
+      const saved = localStorage.getItem('postRetirementStrategyPageSettings');
+      return saved ? JSON.parse(saved) : defaultState;
+    } catch {
+      return defaultState;
+    }
   });
 
-  const [initialData, setInitialData] = useState(getInitialFinanceData());
-
   useEffect(() => {
-    setInitialData(getInitialFinanceData());
+    const loadData = () => {
+      try {
+        const canRetireData = JSON.parse(localStorage.getItem('canRetireNowData') || '{}');
+        setInitialCorpus(canRetireData.corpus || 0);
+        setInitialAnnualExpenses(canRetireData.annualExpenses || 0);
+        setCurrentAge(canRetireData.currentAge || 0);
+      } catch (e) {
+        console.error("Failed to load data for post-retirement strategy", e);
+      }
+    };
+    loadData();
+    window.addEventListener('storage', loadData);
+    return () => window.removeEventListener('storage', loadData);
   }, []);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('postRetirementStrategySettings', JSON.stringify(settings));
-    } catch (error) {
-      console.error("Failed to save settings to localStorage:", error);
-    }
+    localStorage.setItem('postRetirementStrategyPageSettings', JSON.stringify(settings));
   }, [settings]);
 
-  const { projections, finalAccumulatedCorpus, finalAnnualExpense } = useMemo(() => {
-    const results = [];
-    // Initialize with values from state
-    let currentSalary = initialData.postTaxSalaryIncome;
-    let currentRental = initialData.rentalIncome;
-    const otherIncome = initialData.otherIncome; // Assuming this is constant
-    let currentVariableExpenses = initialData.variableAnnualExpenses;
-    const fixedOutflows = initialData.fixedAnnualOutflows; // Assuming this is constant
-    
-    let equityCorpus = 0;
-    let fdCorpus = 0;
+  const handleSettingsChange = (field: keyof PostRetirementSettings, value: any) => {
+    setSettings(prev => ({ ...prev, [field]: value }));
+  };
+  const handleAllocationChange = (category: keyof PostRetirementSettings["allocations"], value: number) => {
+    handleSettingsChange("allocations", { ...settings.allocations, [category]: value });
+  };
+  const handleReturnChange = (category: keyof PostRetirementSettings["returns"], value: number) => {
+    handleSettingsChange("returns", { ...settings.returns, [category]: Number(value) });
+  };
 
-    const duration = settings.retirementAge - settings.currentAge;
-    if (duration < 0) {
-        return { projections: [], finalAccumulatedCorpus: 0, finalAnnualExpense: currentVariableExpenses + fixedOutflows };
+  const totalAllocation = useMemo(() => Object.values(settings.allocations).reduce((sum, val) => sum + val, 0), [settings.allocations]);
+  
+  const weightedAvgReturn = useMemo(() => {
+    if (totalAllocation !== 100) return 0;
+    return Object.keys(settings.allocations).reduce((acc, key) => 
+      acc + (settings.allocations[key as keyof typeof settings.allocations] / 100) * settings.returns[key as keyof typeof settings.returns], 0
+    );
+  }, [settings.allocations, settings.returns, totalAllocation]);
+
+  const simulation = useMemo(() => {
+    if (initialCorpus <= 0 || initialAnnualExpenses <= 0 || totalAllocation !== 100) {
+      return { projections: [], yearsLasted: 0, finalCorpus: initialCorpus };
     }
 
-    for (let i = 0; i <= duration; i++) {
-      const age = settings.currentAge + i;
+    const projections = [];
+    let corpus = initialCorpus;
+    let withdrawal = initialAnnualExpenses;
+    const maxYears = settings.lifeExpectancy - currentAge;
 
-      // Apply increments AFTER the first year's calculation (i.e., starting from year 2)
-      if (i > 0) {
-        currentSalary *= (1 + settings.surplusIncrement / 100);
-        currentRental *= (1 + 0.05); // 5% rental increment
-        currentVariableExpenses *= (1 + settings.expenseIncrement / 100);
-      }
-
-      // At the start of age 56, move all equity to FD
-      if (age === 56) {
-        fdCorpus += equityCorpus;
-        equityCorpus = 0;
-      }
-
-      // Calculate savings for the current year
-      const totalIncome = currentSalary + currentRental + otherIncome;
-      const totalOutflows = currentVariableExpenses + fixedOutflows;
-      const annualSavings = totalIncome - totalOutflows;
-
-      // Add new savings to the corpus at the BEGINNING of the period
-      const equityAllocation = age <= 55 ? settings.equityAllocationPre55 : 0;
-      const newEquitySavings = annualSavings * (equityAllocation / 100);
-      const newFdSavings = annualSavings * ((100 - equityAllocation) / 100);
+    for (let year = 1; year <= maxYears; year++) {
+      const age = currentAge + year;
+      const openingBalance = corpus;
       
-      const equityCorpusBeforeGrowth = equityCorpus + newEquitySavings;
-      const fdCorpusBeforeGrowth = fdCorpus + newFdSavings;
-
-      // Calculate growth for the year based on the corpus that INCLUDES the new savings
-      const equityGrowth = equityCorpusBeforeGrowth * (settings.equityReturns / 100);
-      const fdGrowth = fdCorpusBeforeGrowth * (settings.fdReturns / 100);
-
-      // Apply growth to the corpuses to get the final end-of-year value
-      equityCorpus = equityCorpusBeforeGrowth + equityGrowth;
-      fdCorpus = fdCorpusBeforeGrowth + fdGrowth;
-
-      const accumulatedCorpus = equityCorpus + fdCorpus;
-
-      results.push({
-        year: i + 1,
-        age,
-        savings: annualSavings,
-        equityGrowth,
-        fdGrowth,
-        accumulatedCorpus,
-      });
-    }
-    
-    const finalCorpus = results.length > 0 ? results[results.length - 1].accumulatedCorpus : 0;
-    const finalExpense = currentVariableExpenses + fixedOutflows;
-
-    return { projections: results, finalAccumulatedCorpus: finalCorpus, finalAnnualExpense: finalExpense };
-  }, [settings, initialData]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('postRetirementStrategyCorpus', JSON.stringify(finalAccumulatedCorpus));
-    } catch (error) {
-      console.error("Failed to save projected corpus to localStorage:", error);
-    }
-  }, [finalAccumulatedCorpus]);
-
-  const exportData = () => {
-    const dataStr = JSON.stringify(settings, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    const exportFileDefaultName = 'post-retirement-strategy-settings.json';
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-  };
-
-  const importData = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const content = e.target?.result as string;
-        const importedSettings = JSON.parse(content);
-        const requiredKeys: (keyof ProjectionSettings)[] = ['currentAge', 'retirementAge', 'surplusIncrement', 'expenseIncrement', 'equityAllocationPre55', 'equityReturns', 'fdReturns'];
-        const hasAllKeys = requiredKeys.every(key => key in importedSettings);
-        if (hasAllKeys) {
-          setSettings(importedSettings);
-        } else {
-          showError('Invalid file format. Some settings are missing.');
-        }
-      } catch (error) {
-        showError('Error parsing file. Please check the file format.');
-        console.error('Error parsing file:', error);
+      corpus -= withdrawal;
+      if (corpus <= 0) {
+        projections.push({ year, age, openingBalance, withdrawal, earnings: 0, closingBalance: 0 });
+        break;
       }
-    };
-    reader.readAsText(file);
-  };
+      
+      const earnings = corpus * (weightedAvgReturn / 100);
+      corpus += earnings;
+      
+      projections.push({ year, age, openingBalance, withdrawal, earnings, closingBalance: corpus });
+      
+      withdrawal *= (1 + settings.inflation / 100);
+    }
 
-  const handleClearData = () => {
-    localStorage.removeItem('postRetirementStrategySettings');
-    showSuccess("Projection settings have been cleared.");
-    setTimeout(() => window.location.reload(), 1000);
-  };
+    return { projections, yearsLasted: projections.length, finalCorpus: corpus };
+  }, [initialCorpus, initialAnnualExpenses, currentAge, settings, weightedAvgReturn, totalAllocation]);
+
+  const formatCurrency = (value: number) => `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Post-Retirement Investment Strategy</h1>
-        <div className="flex gap-2">
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive">
-                <Trash2 className="mr-2 h-4 w-4" /> Clear Data
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will reset all projection settings on this page to their defaults. This action cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleClearData}>
-                  Yes, clear data
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-          <Button variant="outline" onClick={exportData}>
-            <Upload className="mr-2 h-4 w-4" /> Export
-          </Button>
-          <Button variant="outline" asChild>
-            <Label htmlFor="import-file">
-              <Download className="mr-2 h-4 w-4" /> Import
-              <Input 
-                id="import-file" 
-                type="file" 
-                accept=".json" 
-                className="hidden" 
-                onChange={importData}
-              />
-            </Label>
-          </Button>
-        </div>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
+      <h1 className="text-3xl font-bold">Post-Retirement Withdrawal Strategy</h1>
+      
+      <div className="grid md:grid-cols-3 gap-4">
         <Card>
-          <CardHeader>
-            <CardTitle>Projected Corpus at Retirement</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold text-blue-600">
-              ₹{finalAccumulatedCorpus.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              This is the estimated value of your savings at age {settings.retirementAge}.
-            </p>
-          </CardContent>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Starting Corpus</CardTitle><Wallet className="h-4 w-4 text-muted-foreground" /></CardHeader>
+          <CardContent><div className="text-2xl font-bold">{formatCurrency(initialCorpus)}</div><p className="text-xs text-muted-foreground">From 'Can You Retire Now?' page</p></CardContent>
         </Card>
         <Card>
-          <CardHeader>
-            <CardTitle>Projected Annual Expense at Retirement</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold text-orange-600">
-              ₹{finalAnnualExpense.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              This is your estimated annual expense in the first year of retirement.
-            </p>
-          </CardContent>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Corpus Lasts Until Age</CardTitle><LineChart className="h-4 w-4 text-muted-foreground" /></CardHeader>
+          <CardContent><div className="text-2xl font-bold text-blue-600">{currentAge + simulation.yearsLasted}</div><p className="text-xs text-muted-foreground">Your money is projected to last {simulation.yearsLasted} years.</p></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Final Balance</CardTitle><TrendingUp className="h-4 w-4 text-muted-foreground" /></CardHeader>
+          <CardContent><div className={`text-2xl font-bold ${simulation.finalCorpus > 0 ? 'text-green-600' : 'text-red-600'}`}>{formatCurrency(simulation.finalCorpus)}</div><p className="text-xs text-muted-foreground">Projected balance at age {settings.lifeExpectancy}.</p></CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Projection Inputs</CardTitle>
+            <CardTitle>Investment Strategy & Inputs</CardTitle>
+            <CardDescription>Define how your corpus will be allocated and the expected returns for each asset class.</CardDescription>
+            <p className={`text-sm pt-2 ${totalAllocation !== 100 ? 'text-red-500 font-bold' : 'text-muted-foreground'}`}>Total Allocation: {totalAllocation}% {totalAllocation !== 100 && "(Must be 100%)"}</p>
         </CardHeader>
-        <CardContent className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <Label htmlFor="currentAge">Current Age</Label>
-            <Input
-              id="currentAge"
-              type="number"
-              value={settings.currentAge}
-              onChange={(e) => setSettings(prev => ({ ...prev, currentAge: Number(e.target.value) }))}
-            />
-          </div>
-          <div>
-            <Label htmlFor="retirementAge">Retirement Age</Label>
-            <Input
-              id="retirementAge"
-              type="number"
-              value={settings.retirementAge}
-              onChange={(e) => setSettings(prev => ({ ...prev, retirementAge: Number(e.target.value) }))}
-            />
-          </div>
-          <div>
-            <Label>Surplus Increment (%)</Label>
-            <Slider
-              value={[settings.surplusIncrement]}
-              onValueChange={(val) => setSettings(prev => ({ ...prev, surplusIncrement: val[0] }))}
-              min={0}
-              max={5}
-              step={0.5}
-            />
-            <div className="text-center font-medium">{settings.surplusIncrement.toFixed(1)}%</div>
-          </div>
-          <div>
-            <Label>Expense Increment (%)</Label>
-            <Slider
-              value={[settings.expenseIncrement]}
-              onValueChange={(val) => setSettings(prev => ({ ...prev, expenseIncrement: val[0] }))}
-              min={1}
-              max={10}
-              step={0.5}
-            />
-            <div className="text-center font-medium">{settings.expenseIncrement.toFixed(1)}%</div>
-          </div>
-          <div>
-            <Label>Equity Returns (%)</Label>
-            <Slider
-              value={[settings.equityReturns]}
-              onValueChange={(val) => setSettings(prev => ({ ...prev, equityReturns: val[0] }))}
-              min={0}
-              max={18}
-              step={0.5}
-            />
-            <div className="text-center font-medium">{settings.equityReturns.toFixed(1)}%</div>
-          </div>
-          <div>
-            <Label>FD/Debt Returns (%)</Label>
-            <Slider
-              value={[settings.fdReturns]}
-              onValueChange={(val) => setSettings(prev => ({ ...prev, fdReturns: val[0] }))}
-              min={5}
-              max={12}
-              step={0.5}
-            />
-            <div className="text-center font-medium">{settings.fdReturns.toFixed(1)}%</div>
-          </div>
-          <div className="lg:col-span-3">
-            <Label>Equity Allocation (Upto Age 55)</Label>
-            <Slider
-              value={[settings.equityAllocationPre55]}
-              onValueChange={(val) => setSettings(prev => ({ ...prev, equityAllocationPre55: val[0] }))}
-              min={0}
-              max={100}
-              step={5}
-            />
-            <div className="flex justify-between text-sm font-medium mt-2">
-              <span>Equity: {settings.equityAllocationPre55}%</span>
-              <span>FDs/Debt: {100 - settings.equityAllocationPre55}%</span>
+        <CardContent className="grid gap-8 md:grid-cols-2">
+            <div className="flex items-center justify-center">
+              <AllocationPieChart data={settings.allocations} />
             </div>
-          </div>
+            <div className="space-y-6">
+              {Object.keys(settings.allocations).map((key) => {
+                const category = key as keyof PostRetirementSettings["allocations"];
+                const allocatedValue = initialCorpus * (settings.allocations[category] / 100);
+                return (
+                  <div key={category} className="grid grid-cols-2 gap-4 items-end">
+                    <div className="space-y-2">
+                      <Label className="capitalize text-md">{category}</Label>
+                      <Slider value={[settings.allocations[category]]} onValueChange={(val) => handleAllocationChange(category, val[0])} min={0} max={100} step={5} />
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">{settings.allocations[category]}%</span>
+                        <span className="text-sm text-muted-foreground">{formatCurrency(allocatedValue)}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor={`return-${category}`} className="text-xs">Return (%)</Label>
+                      <Input id={`return-${category}`} type="number" value={settings.returns[category]} onChange={(e) => handleReturnChange(category, Number(e.target.value))} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Year-over-Year Projections</CardTitle>
-        </CardHeader>
+        <CardHeader><CardTitle>Year-by-Year Withdrawal Projection</CardTitle></CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto max-h-96">
             <Table>
-              <TableHeader>
+              <TableHeader className="sticky top-0 bg-background">
                 <TableRow>
                   <TableHead>Year</TableHead>
                   <TableHead>Age</TableHead>
-                  <TableHead className="text-right">Annual Savings</TableHead>
-                  <TableHead className="text-right">Equity Growth</TableHead>
-                  <TableHead className="text-right">FD/Debt Growth</TableHead>
-                  <TableHead className="text-right">Accumulated Corpus</TableHead>
+                  <TableHead className="text-right">Opening Balance</TableHead>
+                  <TableHead className="text-right">Withdrawal</TableHead>
+                  <TableHead className="text-right">Earnings</TableHead>
+                  <TableHead className="text-right">Closing Balance</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {projections.map((p) => (
+                {simulation.projections.map((p) => (
                   <TableRow key={p.year}>
                     <TableCell>{p.year}</TableCell>
                     <TableCell>{p.age}</TableCell>
-                    <TableCell className={`text-right font-bold ${p.savings >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      ₹{p.savings.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
-                    </TableCell>
-                    <TableCell className="text-right text-green-500">
-                      ₹{p.equityGrowth.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
-                    </TableCell>
-                    <TableCell className="text-right text-yellow-500">
-                      ₹{p.fdGrowth.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
-                    </TableCell>
-                    <TableCell className="text-right font-bold text-blue-600">
-                      ₹{p.accumulatedCorpus.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
-                    </TableCell>
+                    <TableCell className="text-right">{formatCurrency(p.openingBalance)}</TableCell>
+                    <TableCell className="text-right text-red-500">({formatCurrency(p.withdrawal)})</TableCell>
+                    <TableCell className="text-right text-green-500">{formatCurrency(p.earnings)}</TableCell>
+                    <TableCell className="text-right font-bold">{formatCurrency(p.closingBalance)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

@@ -138,6 +138,18 @@ const CanYouRetireNow: React.FC = () => {
     };
   }, [totalStartingCorpus, annualExpenses, inputs, weightedAvgReturn, totalAllocation]);
 
+  useEffect(() => {
+    try {
+        localStorage.setItem('canRetireNowData', JSON.stringify({
+            corpus: totalStartingCorpus,
+            annualExpenses: annualExpenses,
+            currentAge: inputs.currentAge,
+        }));
+    } catch (error) {
+        console.error("Failed to save data for post-retirement page:", error);
+    }
+  }, [totalStartingCorpus, annualExpenses, inputs.currentAge]);
+
   const formatCurrency = (value: number) => `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 
   return (
