@@ -86,6 +86,7 @@ const PreciousMetalsSummary: React.FC = () => {
             ...netWorthData,
             jewellery: summary.totalJewelleryValue,
             sovereignGoldBonds: summary.goldSGBValue,
+            preciousMetals: summary.totalLiquidValue,
         };
 
         localStorage.setItem('netWorthData', JSON.stringify(updatedNetWorthData));
@@ -94,7 +95,7 @@ const PreciousMetalsSummary: React.FC = () => {
     } catch (error) {
         console.error("Failed to update net worth data from Precious Metals Summary:", error);
     }
-  }, [summary.totalJewelleryValue, summary.goldSGBValue]);
+  }, [summary.totalJewelleryValue, summary.goldSGBValue, summary.totalLiquidValue]);
 
   const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 

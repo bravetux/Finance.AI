@@ -57,7 +57,7 @@ const getNetWorthData = () => {
                             (data.sovereignGoldBonds || 0) + (data.ulipsSurrenderValue || 0) + (data.epfPpfVpf || 0) +
                             (data.fixedDeposits || 0) + (data.debtFunds || 0) + (data.domesticStocks || 0) + 
                             (data.domesticMutualFunds || 0) + (data.internationalFunds || 0) + (data.smallCases || 0) + 
-                            (data.savingsBalance || 0) + (data.goldEtf || 0) + (data.cryptocurrency || 0) + (data.reits || 0);
+                            (data.savingsBalance || 0) + (data.preciousMetals || 0) + (data.cryptocurrency || 0) + (data.reits || 0);
       const totalLiabilities = (data.homeLoan || 0) + (data.educationLoan || 0) + (data.carLoan || 0) + 
                                (data.personalLoan || 0) + (data.creditCardDues || 0) + (data.otherLiabilities || 0);
       return { totalAssets, totalLiabilities };

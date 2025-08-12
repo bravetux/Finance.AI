@@ -83,7 +83,7 @@ const Dashboard: React.FC = () => {
         internationalFunds: 0,
         smallCases: 0,
         savingsBalance: 0,
-        goldEtf: 0,
+        preciousMetals: 0,
         cryptocurrency: 0,
         reits: 0,
         homeLoan: 0,
@@ -108,7 +108,7 @@ const Dashboard: React.FC = () => {
         internationalFunds: 0,
         smallCases: 0,
         savingsBalance: 0,
-        goldEtf: 0,
+        preciousMetals: 0,
         cryptocurrency: 0,
         reits: 0,
         homeLoan: 0,
@@ -170,7 +170,7 @@ const Dashboard: React.FC = () => {
                             netWorthData.sovereignGoldBonds + netWorthData.ulipsSurrenderValue + netWorthData.epfPpfVpf;
   const totalLiquidAssets = netWorthData.fixedDeposits + netWorthData.debtFunds + netWorthData.domesticStocks + 
                           netWorthData.domesticMutualFunds + netWorthData.internationalFunds + netWorthData.smallCases + 
-                          netWorthData.savingsBalance + netWorthData.goldEtf + netWorthData.cryptocurrency + netWorthData.reits;
+                          netWorthData.savingsBalance + netWorthData.preciousMetals + netWorthData.cryptocurrency + netWorthData.reits;
   const totalAssets = totalIlliquidAssets + totalLiquidAssets;
   const totalLiabilities = netWorthData.homeLoan + netWorthData.educationLoan + netWorthData.carLoan + 
                          netWorthData.personalLoan + netWorthData.creditCardDues + netWorthData.otherLiabilities;

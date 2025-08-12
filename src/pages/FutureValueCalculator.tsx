@@ -71,7 +71,7 @@ const FutureValueCalculator: React.FC = () => {
       { name: "International Funds", key: "internationalFunds", roi: 10, duration: 10 },
       { name: "Small Cases", key: "smallCases", roi: 13, duration: 10 },
       { name: "Savings Balance", key: "savingsBalance", roi: 4, duration: 10 },
-      { name: "Gold ETF", key: "goldEtf", roi: 6, duration: 10 },
+      { name: "Precious Metals", key: "preciousMetals", roi: 6, duration: 10 },
       { name: "Cryptocurrency", key: "cryptocurrency", roi: 15, duration: 10 },
       { name: "REITs", key: "reits", roi: 9, duration: 10 },
     ];

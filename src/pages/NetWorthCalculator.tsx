@@ -37,7 +37,7 @@ interface NetWorthData {
   internationalFunds: number;
   smallCases: number;
   savingsBalance: number;
-  goldEtf: number;
+  preciousMetals: number;
   cryptocurrency: number;
   reits: number;
   
@@ -54,7 +54,7 @@ const defaultNetWorthData: NetWorthData = {
   homeValue: 0, otherRealEstate: 0, jewellery: 0, sovereignGoldBonds: 0,
   ulipsSurrenderValue: 0, epfPpfVpf: 0, fixedDeposits: 0, debtFunds: 0,
   domesticStocks: 0, domesticMutualFunds: 0, internationalFunds: 0,
-  smallCases: 0, savingsBalance: 0, goldEtf: 0, cryptocurrency: 0,
+  smallCases: 0, savingsBalance: 0, preciousMetals: 0, cryptocurrency: 0,
   reits: 0, homeLoan: 0, educationLoan: 0, carLoan: 0, personalLoan: 0,
   creditCardDues: 0, otherLiabilities: 0
 };
@@ -139,7 +139,7 @@ const NetWorthCalculator: React.FC = () => {
                             data.sovereignGoldBonds + data.ulipsSurrenderValue + data.epfPpfVpf;
   const totalLiquidAssets = data.fixedDeposits + data.debtFunds + data.domesticStocks + 
                           data.domesticMutualFunds + data.internationalFunds + data.smallCases + 
-                          data.savingsBalance + data.goldEtf + data.cryptocurrency + data.reits;
+                          data.savingsBalance + data.preciousMetals + data.cryptocurrency + data.reits;
   const totalAssets = totalIlliquidAssets + totalLiquidAssets;
   const totalLiabilities = data.homeLoan + data.educationLoan + data.carLoan + 
                          data.personalLoan + data.creditCardDues + data.otherLiabilities;
@@ -160,7 +160,7 @@ const NetWorthCalculator: React.FC = () => {
     { name: "Intl Funds", value: data.internationalFunds },
     { name: "Small Cases", value: data.smallCases },
     { name: "Savings", value: data.savingsBalance },
-    { name: "Gold ETF", value: data.goldEtf },
+    { name: "Precious Metals", value: data.preciousMetals },
     { name: "Crypto", value: data.cryptocurrency },
     { name: "REITs", value: data.reits },
   ].filter(asset => asset.value > 0);
@@ -442,13 +442,15 @@ const NetWorthCalculator: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="goldEtf">Gold ETF</Label>
+                  <Label htmlFor="preciousMetals">Precious Metals</Label>
                   <Input
-                    id="goldEtf"
+                    id="preciousMetals"
                     type="number"
-                    value={data.goldEtf}
-                    onChange={(e) => handleInputChange('goldEtf', e.target.value)}
+                    value={data.preciousMetals}
+                    onChange={(e) => handleInputChange('preciousMetals', e.target.value)}
+                    disabled
                   />
+                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Precious Metals pages.</p>
                 </div>
                 <div>
                   <Label htmlFor="cryptocurrency">Cryptocurrency</Label>
@@ -500,8 +502,8 @@ const NetWorthCalculator: React.FC = () => {
                   <span className="font-medium">₹{data.savingsBalance.toLocaleString("en-IN")}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Gold ETF:</span>
-                  <span className="font-medium">₹{data.goldEtf.toLocaleString("en-IN")}</span>
+                  <span>Precious Metals:</span>
+                  <span className="font-medium">₹{data.preciousMetals.toLocaleString("en-IN")}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Cryptocurrency:</span>
