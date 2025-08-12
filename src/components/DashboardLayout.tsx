@@ -164,18 +164,15 @@ const DashboardLayout: React.FC = () => {
                 </AccordionItem>
               </Accordion>
             ) : (
-              <Button
+              <Link
                 key={item.name}
-                variant="ghost"
-                className="justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground font-medium px-3 py-2 h-auto w-full"
-                asChild
+                to={item.path!}
                 onClick={() => isMobile && setIsSheetOpen(false)}
+                className="flex items-center justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:no-underline rounded-md px-3 py-2 w-full font-medium"
               >
-                <Link to={item.path!}>
-                  <item.icon className="mr-2 h-4 w-4" />
-                  {item.name}
-                </Link>
-              </Button>
+                <item.icon className="mr-2 h-4 w-4" />
+                {item.name}
+              </Link>
             )
           )}
         </nav>
