@@ -100,6 +100,7 @@ const CanYouRetireNow: React.FC = () => {
     handleInputChange("returns", { ...inputs.returns, [category]: Number(value) });
   };
 
+  const totalStartingCorpus = useMemo(() => liquidAssets + projectedCorpus, [liquidAssets, projectedCorpus]);
   const totalAllocation = useMemo(() => Object.values(inputs.allocations).reduce((sum, val) => sum + val, 0), [inputs.allocations]);
   
   const weightedAvgReturn = useMemo(() => {
@@ -110,8 +111,6 @@ const CanYouRetireNow: React.FC = () => {
   }, [inputs.allocations, inputs.returns, totalAllocation]);
 
   const { yearsCorpusWillLast, canRetire, shortfall } = useMemo(() => {
-    const totalStartingCorpus = liquidAssets + projectedCorpus;
-
     if (totalStartingCorpus <= 0 || annualExpenses <= 0 || totalAllocation !== 100) {
       return { yearsCorpusWillLast: 0, canRetire: false, shortfall: annualExpenses * 25 };
     }
@@ -137,7 +136,7 @@ const CanYouRetireNow: React.FC = () => {
       canRetire: canRetireStatus,
       shortfall: canRetireStatus ? 0 : Math.max(0, retirementCorpusNeeded - totalStartingCorpus),
     };
-  }, [liquidAssets, projectedCorpus, annualExpenses, inputs, weightedAvgReturn, totalAllocation]);
+  }, [totalStartingCorpus, annualExpenses, inputs, weightedAvgReturn, totalAllocation]);
 
   const formatCurrency = (value: number) => `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 
@@ -176,72 +175,66 @@ const CanYouRetireNow: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-lg">
-          <p>Your combined corpus of <strong>{formatCurrency(liquidAssets + projectedCorpus)}</strong> will last for approximately <strong>{yearsCorpusWillLast} years</strong> (until age {inputs.currentAge + yearsCorpusWillLast}).</p>
+          <p>Your combined corpus of <strong>{formatCurrency(totalStartingCorpus)}</strong> will last for approximately <strong>{yearsCorpusWillLast} years</strong> (until age {inputs.currentAge + yearsCorpusWillLast}).</p>
           {!canRetire && (
             <p>You have a shortfall of approximately <strong>{formatCurrency(shortfall)}</strong> to reach a standard retirement corpus.</p>
           )}
         </CardContent>
       </Card>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Retirement Simulation Inputs</CardTitle>
-            <CardDescription>Adjust these values to match your expectations.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div><Label htmlFor="currentAge">Current Age</Label><Input id="currentAge" type="number" value={inputs.currentAge} onChange={(e) => handleInputChange("currentAge", Number(e.target.value))} /></div>
-              <div><Label htmlFor="lifeExpectancy">Life Expectancy</Label><Input id="lifeExpectancy" type="number" value={inputs.lifeExpectancy} onChange={(e) => handleInputChange("lifeExpectancy", Number(e.target.value))} /></div>
-            </div>
-            <div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Retirement Simulation Inputs</CardTitle>
+          <CardDescription>Adjust these values to match your expectations.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div><Label htmlFor="currentAge">Current Age</Label><Input id="currentAge" type="number" value={inputs.currentAge} onChange={(e) => handleInputChange("currentAge", Number(e.target.value))} /></div>
+            <div><Label htmlFor="lifeExpectancy">Life Expectancy</Label><Input id="lifeExpectancy" type="number" value={inputs.lifeExpectancy} onChange={(e) => handleInputChange("lifeExpectancy", Number(e.target.value))} /></div>
+            <div className="md:col-span-2">
               <Label>Expected Annual Inflation</Label>
               <Slider value={[inputs.inflation]} onValueChange={(val) => handleInputChange("inflation", val[0])} min={4} max={10} step={0.5} />
               <div className="text-center font-medium">{inputs.inflation.toFixed(1)}%</div>
             </div>
-            <div className="border-t pt-4">
-              <div className="flex justify-between"><span className="text-muted-foreground">Total Starting Corpus:</span><span className="font-bold">{formatCurrency(liquidAssets + projectedCorpus)}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Current Annual Expenses:</span><span className="font-bold">{formatCurrency(annualExpenses)}</span></div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Post-Retirement Investment Allocation</CardTitle>
-            <p className={`text-sm ${totalAllocation !== 100 ? 'text-red-500 font-bold' : 'text-muted-foreground'}`}>Total Allocation: {totalAllocation}% {totalAllocation !== 100 && "(Must be 100%)"}</p>
-          </CardHeader>
-          <CardContent className="grid gap-6 sm:grid-cols-2">
-            {Object.keys(inputs.allocations).map((key) => {
-              const category = key as keyof RetirementInputs["allocations"];
-              return (
-                <div key={category} className="space-y-2">
-                  <Label className="capitalize text-md">{category}</Label>
-                  <Slider value={[inputs.allocations[category]]} onValueChange={(val) => handleAllocationChange(category, val[0])} min={0} max={100} step={5} />
-                  <div className="text-center font-medium">{inputs.allocations[category]}%</div>
-                </div>
-              );
-            })}
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+          <div className="border-t pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex justify-between"><span className="text-muted-foreground">Total Starting Corpus:</span><span className="font-bold">{formatCurrency(totalStartingCorpus)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Current Annual Expenses:</span><span className="font-bold">{formatCurrency(annualExpenses)}</span></div>
+          </div>
+        </CardContent>
+      </Card>
       
       <Card>
         <CardHeader>
-            <CardTitle>Asset Allocation & Returns</CardTitle>
+            <CardTitle>Post-Retirement Investment Strategy</CardTitle>
+            <CardDescription>Define how your corpus will be allocated and the expected returns for each asset class.</CardDescription>
+            <p className={`text-sm pt-2 ${totalAllocation !== 100 ? 'text-red-500 font-bold' : 'text-muted-foreground'}`}>Total Allocation: {totalAllocation}% {totalAllocation !== 100 && "(Must be 100%)"}</p>
         </CardHeader>
-        <CardContent className="grid gap-6 md:grid-cols-2">
-            <div><AllocationPieChart data={inputs.allocations} /></div>
-            <div className="grid gap-4 sm:grid-cols-2">
-                {Object.keys(inputs.returns).map((key) => {
-                    const category = key as keyof RetirementInputs["returns"];
-                    return (
-                        <div key={category}>
-                            <Label htmlFor={`return-${category}`} className="capitalize">{category} Return (%)</Label>
-                            <Input id={`return-${category}`} type="number" value={inputs.returns[category]} onChange={(e) => handleReturnChange(category, Number(e.target.value))} />
-                        </div>
-                    );
-                })}
+        <CardContent className="grid gap-8 md:grid-cols-2">
+            <div className="flex items-center justify-center">
+              <AllocationPieChart data={inputs.allocations} />
+            </div>
+            <div className="space-y-6">
+              {Object.keys(inputs.allocations).map((key) => {
+                const category = key as keyof RetirementInputs["allocations"];
+                const allocatedValue = totalStartingCorpus * (inputs.allocations[category] / 100);
+                return (
+                  <div key={category} className="grid grid-cols-2 gap-4 items-end">
+                    <div className="space-y-2">
+                      <Label className="capitalize text-md">{category}</Label>
+                      <Slider value={[inputs.allocations[category]]} onValueChange={(val) => handleAllocationChange(category, val[0])} min={0} max={100} step={5} />
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">{inputs.allocations[category]}%</span>
+                        <span className="text-sm text-muted-foreground">{formatCurrency(allocatedValue)}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor={`return-${category}`} className="text-xs">Return (%)</Label>
+                      <Input id={`return-${category}`} type="number" value={inputs.returns[category]} onChange={(e) => handleReturnChange(category, Number(e.target.value))} />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
         </CardContent>
       </Card>
