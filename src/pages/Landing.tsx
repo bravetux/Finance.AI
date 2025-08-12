@@ -62,7 +62,7 @@ const Landing: React.FC = () => {
       {/* Main Content */}
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="container flex flex-col items-center justify-center py-12 md:py-20 text-center">
+        <section className="container flex flex-col items-center justify-center py-12 text-center">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tighter">
             Take Control of Your Financial Future
           </h1>
@@ -72,27 +72,29 @@ const Landing: React.FC = () => {
         </section>
 
         {/* Features Section */}
-        <section className="container pb-16 bg-muted/40 rounded-lg">
+        <section className="container pb-16">
           <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
             <h2 className="text-3xl font-bold leading-[1.1] md:text-4xl">Features</h2>
             <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
               Everything you need to manage your personal finances, all in one place.
             </p>
           </div>
-          <div className="mx-auto mt-12 grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">
-            {features.map((feature, index) => (
-              <Card key={index} className="text-center">
-                <CardHeader>
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                    {feature.icon}
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <CardTitle>{feature.title}</CardTitle>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="mt-8 overflow-x-auto pb-4">
+            <div className="inline-grid grid-flow-col grid-rows-2 gap-6">
+              {features.map((feature, index) => (
+                <Card key={index} className="text-center w-[320px]">
+                  <CardHeader>
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                      {feature.icon}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <CardTitle>{feature.title}</CardTitle>
+                    <p className="text-muted-foreground">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         </section>
       </main>
