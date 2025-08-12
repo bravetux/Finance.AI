@@ -34,34 +34,49 @@ interface GoldAsset {
 }
 
 const initialAssets: GoldAsset[] = [
-  { id: '1', particulars: 'Jewellery', value: 0 },
-  { id: '2', particulars: 'SGB', value: 0 },
-  { id: '3', particulars: 'Digital Gold', value: 0 },
-  { id: '4', particulars: 'Gold ETF - Spouse', value: 0 },
+  { id: '1', particulars: 'Gold Jewellery', value: 0 },
+  { id: '2', particulars: 'Gold Coins', value: 0 },
+  { id: '3', particulars: 'SGB', value: 0 },
+  { id: '4', particulars: 'Digital Gold', value: 0 },
   { id: '5', particulars: 'Gold ETF - Self', value: 0 },
-  { id: '6', particulars: 'Gold ETF', value: 0 },
+  { id: '6', particulars: 'Gold ETF - Spouse', value: 0 },
+  { id: '7', particulars: 'Gold ETF', value: 0 },
+  { id: '8', particulars: 'Silver Jewellery', value: 0 },
+  { id: '9', particulars: 'Silver Bars', value: 0 },
+  { id: '10', particulars: 'Silver ETF', value: 0 },
 ];
 
 const Gold: React.FC = () => {
-  const [assets, setAssets] = useState<GoldAsset[]>(() => {
-    try {
-      const saved = localStorage.getItem('goldData');
-      return saved ? JSON.parse(saved) : initialAssets;
-    } catch {
-      return initialAssets;
-    }
-  });
+  const [assets, setAssets] = useState<GoldAsset[]>(initialAssets);
 
   useEffect(() => {
-    const migratedAssets = assets.map(asset => {
-      if (asset.particulars === 'Gold ETF - Vignesh') {
-        return { ...asset, particulars: 'Gold ETF - Self' };
-      }
-      return asset;
-    });
+    try {
+      const saved = localStorage.getItem('goldData');
+      if (saved) {
+        let savedAssets = JSON.parse(saved) as GoldAsset[];
+        
+        // Migration for names
+        savedAssets = savedAssets.map(asset => {
+          if (asset.particulars === 'Gold ETF - Vignesh') {
+            return { ...asset, particulars: 'Gold ETF - Self' };
+          }
+          if (asset.particulars === 'Jewellery') {
+            return { ...asset, particulars: 'Gold Jewellery' };
+          }
+          return asset;
+        });
 
-    if (JSON.stringify(migratedAssets) !== JSON.stringify(assets)) {
-      setAssets(migratedAssets);
+        const savedAssetsMap = new Map(savedAssets.map(a => [a.particulars, a]));
+
+        const mergedAssets = initialAssets.map(initialAsset => {
+          const savedAsset = savedAssetsMap.get(initialAsset.particulars);
+          return savedAsset ? { ...initialAsset, ...savedAsset } : initialAsset;
+        });
+        
+        setAssets(mergedAssets);
+      }
+    } catch (e) {
+      console.error("Failed to load or merge gold data", e);
     }
   }, []);
 
