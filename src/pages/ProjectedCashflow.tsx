@@ -78,6 +78,18 @@ interface ProjectionSettings {
   fdReturns: number;
 }
 
+interface Goal {
+  id: string;
+  name: string;
+  currentValue: number;
+  inflation: number;
+  duration: number;
+  rateOfGrowth: number;
+  amountAchieved: number;
+  targetFutureValue: number;
+  sipRequired: number;
+}
+
 const ProjectedCashflow: React.FC = () => {
   const [settings, setSettings] = useState<ProjectionSettings>(() => {
     try {
@@ -106,9 +118,18 @@ const ProjectedCashflow: React.FC = () => {
   });
 
   const [initialData, setInitialData] = useState(getInitialFinanceData());
+  const [goals, setGoals] = useState<Goal[]>([]);
 
   useEffect(() => {
     setInitialData(getInitialFinanceData());
+    try {
+        const savedGoals = localStorage.getItem('goalsData');
+        if (savedGoals) {
+            setGoals(JSON.parse(savedGoals));
+        }
+    } catch (error) {
+        console.error("Failed to load goals data from localStorage:", error);
+    }
   }, []);
 
   useEffect(() => {
@@ -138,6 +159,11 @@ const ProjectedCashflow: React.FC = () => {
 
     for (let i = 0; i <= duration; i++) {
       const age = settings.currentAge + i;
+      const currentYear = i + 1;
+
+      // Find goals for this year
+      const goalsDueThisYear = goals.filter(goal => goal.duration === currentYear);
+      const totalGoalsCost = goalsDueThisYear.reduce((sum, goal) => sum + goal.targetFutureValue, 0);
 
       // Apply increments AFTER the first year's calculation (i.e., starting from year 2)
       if (i > 0) {
@@ -155,7 +181,8 @@ const ProjectedCashflow: React.FC = () => {
       // Calculate savings for the current year
       const totalIncome = currentSalary + currentRental + otherIncome;
       const totalOutflows = currentVariableExpenses + fixedOutflows;
-      const annualSavings = totalIncome - totalOutflows;
+      const annualSavingsBeforeGoals = totalIncome - totalOutflows;
+      const annualSavings = annualSavingsBeforeGoals - totalGoalsCost;
 
       // Add new savings to the corpus at the BEGINNING of the period
       const equityAllocation = age <= 55 ? settings.equityAllocationPre55 : 0;
@@ -182,6 +209,7 @@ const ProjectedCashflow: React.FC = () => {
         equityGrowth,
         fdGrowth,
         accumulatedCorpus,
+        goalsCost: totalGoalsCost,
       });
     }
     
@@ -189,7 +217,7 @@ const ProjectedCashflow: React.FC = () => {
     const finalExpense = currentVariableExpenses + fixedOutflows;
 
     return { projections: results, finalAccumulatedCorpus: finalCorpus, finalAnnualExpense: finalExpense };
-  }, [settings, initialData]);
+  }, [settings, initialData, goals]);
 
   useEffect(() => {
     try {
@@ -412,6 +440,7 @@ const ProjectedCashflow: React.FC = () => {
                   <TableHead className="text-right">Equity Growth</TableHead>
                   <TableHead className="text-right">FD/Debt Growth</TableHead>
                   <TableHead className="text-right">Accumulated Corpus</TableHead>
+                  <TableHead className="text-right">Goals</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -430,6 +459,9 @@ const ProjectedCashflow: React.FC = () => {
                     </TableCell>
                     <TableCell className="text-right font-bold text-blue-600">
                       ₹{p.accumulatedCorpus.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                    </TableCell>
+                    <TableCell className="text-right text-red-500">
+                      {p.goalsCost > 0 ? `₹${p.goalsCost.toLocaleString("en-IN", { maximumFractionDigits: 0 })}` : '-'}
                     </TableCell>
                   </TableRow>
                 ))}
