@@ -47,8 +47,8 @@ const initialPropertyValues: PropertyValue[] = [
   { id: 'pv2', name: 'Home 2', value: 0 },
   { id: 'pv3', name: 'Commercial 1', value: 0 },
   { id: 'pv4', name: 'Commercial 2', value: 0 },
-  { id: 'pv5', name: 'Land/Reit 1', value: 0 },
-  { id: 'pv6', name: 'Land/Reit 2', value: 0 },
+  { id: 'pv5', name: 'Land', value: 0 },
+  { id: 'pv6', name: 'REIT', value: 0 },
 ];
 
 const initialRentalProperties: RentalProperty[] = [
