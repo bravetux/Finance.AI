@@ -72,6 +72,7 @@ const NetWorthCalculator: React.FC = () => {
 
         // Real Estate
         const realEstatePropertyValues = JSON.parse(localStorage.getItem('realEstatePropertyValues') || '[]');
+        const reitValue = JSON.parse(localStorage.getItem('realEstateReitValue') || '0');
         const home1 = realEstatePropertyValues.find((p: any) => p.name === 'Home 1');
         const homeValue = home1 ? home1.value : 0;
         const totalPropertyValue = realEstatePropertyValues.reduce((sum: number, p: any) => sum + p.value, 0);
@@ -114,6 +115,7 @@ const NetWorthCalculator: React.FC = () => {
           ...currentData,
           homeValue: homeValue,
           otherRealEstate: otherRealEstateValue,
+          reits: reitValue,
           jewellery: jewelleryValue,
           sovereignGoldBonds: sgbValue,
           preciousMetals: liquidPreciousMetalsValue,
@@ -526,7 +528,9 @@ const NetWorthCalculator: React.FC = () => {
                     type="number"
                     value={data.reits}
                     onChange={(e) => handleInputChange('reits', e.target.value)}
+                    disabled
                   />
+                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Real Estate page.</p>
                 </div>
               </>
             ) : (
