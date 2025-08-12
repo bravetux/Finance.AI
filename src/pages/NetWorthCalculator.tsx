@@ -101,6 +101,10 @@ const NetWorthCalculator: React.FC = () => {
         const mutualFundAllocationEntries = JSON.parse(localStorage.getItem('mutualFundAllocationEntries') || '[]');
         const domesticMutualFundsValue = mutualFundAllocationEntries.reduce((sum: number, entry: any) => sum + entry.currentValue, 0);
 
+        // US Equity
+        const usEquityData = JSON.parse(localStorage.getItem('usEquityData') || '[]');
+        const internationalFundsValue = usEquityData.reduce((sum: number, asset: any) => sum + asset.value, 0);
+
         // --- Create the new, synced data object ---
         const newData = {
           ...currentData,
@@ -111,6 +115,7 @@ const NetWorthCalculator: React.FC = () => {
           preciousMetals: liquidPreciousMetalsValue,
           domesticStocks: domesticStocksValue,
           domesticMutualFunds: domesticMutualFundsValue,
+          internationalFunds: internationalFundsValue,
         };
 
         // --- Update state and localStorage ---
@@ -465,7 +470,9 @@ const NetWorthCalculator: React.FC = () => {
                     type="number"
                     value={data.internationalFunds}
                     onChange={(e) => handleInputChange('internationalFunds', e.target.value)}
+                    disabled
                   />
+                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the US Equity page.</p>
                 </div>
                 <div>
                   <Label htmlFor="smallCases">Small Cases</Label>
