@@ -18,6 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Slider } from "@/components/ui/slider";
 
 interface Asset {
   name: string;
@@ -34,6 +35,7 @@ const calculateFutureValue = (pv: number, r: number, t: number) => {
 const FutureValueCalculator: React.FC = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [duration, setDuration] = useState(10);
+  const [maxDuration, setMaxDuration] = useState(10); // State for slider's max value
 
   useEffect(() => {
     try {
@@ -41,7 +43,9 @@ const FutureValueCalculator: React.FC = () => {
       if (savedRetirementData) {
         const retirementData = JSON.parse(savedRetirementData);
         const calculatedDuration = (retirementData.lifeExpectancy || 0) - (retirementData.retirementAge || 0);
-        setDuration(Math.max(0, calculatedDuration));
+        const finalDuration = Math.max(0, calculatedDuration);
+        setDuration(finalDuration); // Set initial duration to max
+        setMaxDuration(finalDuration); // Set max duration for the slider
       }
     } catch (error) {
       console.error("Failed to load retirement data for duration calculation:", error);
@@ -99,7 +103,7 @@ const FutureValueCalculator: React.FC = () => {
       setAssets(newAssets);
     };
     initializeAssets();
-  }, [duration]);
+  }, [duration]); // Re-calculate when duration changes
 
   const handleInputChange = (assetName: string, field: 'roi', value: string) => {
     if (value.length > 4) return;
@@ -268,11 +272,26 @@ const FutureValueCalculator: React.FC = () => {
         </div>
       </div>
 
-      <Card className="bg-blue-50 dark:bg-blue-900/30 border-blue-500">
-        <CardContent className="pt-6 flex items-center gap-4">
-          <Info className="h-6 w-6 text-blue-600" />
-          <p className="text-blue-800 dark:text-blue-300 font-medium">
-            All assets are projected for a duration of <span className="font-bold">{duration} years</span>. This is calculated from the Retirement page (Life Expectancy - Retirement Age).
+      <Card>
+        <CardHeader>
+          <CardTitle>Projection Duration</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-4">
+            <Slider
+              value={[duration]}
+              onValueChange={(val) => setDuration(val[0])}
+              min={0}
+              max={maxDuration}
+              step={1}
+              className="flex-1"
+            />
+            <div className="font-bold text-lg w-24 text-center border rounded-md p-2">
+              {duration} Years
+            </div>
+          </div>
+          <p className="text-sm text-muted-foreground mt-2">
+            Adjust the slider to project asset values over different time horizons. The maximum duration ({maxDuration} years) is calculated from the Retirement page (Life Expectancy - Retirement Age).
           </p>
         </CardContent>
       </Card>
