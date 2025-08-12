@@ -31,6 +31,7 @@ import Diamond from "./pages/Diamond";
 import PreciousMetalsSummary from "./pages/PreciousMetalsSummary";
 import SmallCase from "./pages/SmallCase";
 import CanYouRetireNow from "./pages/CanYouRetireNow";
+import PostRetirementStrategy from "./pages/PostRetirementStrategy";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +67,7 @@ const App = () => (
               <Route path="retirement" element={<RetirementDashboard />} />
               <Route path="can-you-retire-now" element={<CanYouRetireNow />} />
               <Route path="fire-calculator" element={<FireCalculator />} />
+              <Route path="post-retirement-strategy" element={<PostRetirementStrategy />} />
               <Route path="reports" element={<Reports />} />
               <Route path="ai-prompt" element={<AIPrompt />} />
             </Route>

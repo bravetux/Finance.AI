@@ -98,6 +98,7 @@ const navItems = [
       { name: "FIRE Calculator", path: "/fire-calculator", icon: Flame, type: 'link' },
       { name: "Retirement", path: "/retirement", icon: Landmark, type: 'link' },
       { name: "Projected Cashflow", path: "/projected-cashflow", icon: LineChart, type: 'link' },
+      { name: "Post-Retirement Strategy", path: "/post-retirement-strategy", icon: LineChart, type: 'link' },
       { name: "Future Value", path: "/future-value", icon: TrendingUp, type: 'link' },
     ]
   },
