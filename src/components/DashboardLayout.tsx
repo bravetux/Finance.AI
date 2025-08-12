@@ -106,7 +106,7 @@ const DashboardLayout: React.FC = () => {
             item.type === 'section' && item.children ? (
               <Accordion key={item.name} type="single" collapsible className="w-full">
                 <AccordionItem value={item.name} className="border-none">
-                  <AccordionTrigger className="justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:no-underline rounded-md px-3 py-2 w-full">
+                  <AccordionTrigger className="justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:no-underline rounded-md px-3 py-2 w-full font-medium">
                     <div className="flex items-center">
                       <item.icon className="mr-2 h-4 w-4" />
                       {item.name}
@@ -167,7 +167,7 @@ const DashboardLayout: React.FC = () => {
               <Button
                 key={item.name}
                 variant="ghost"
-                className="justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                className="justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground font-medium px-3 py-2 h-auto w-full"
                 asChild
                 onClick={() => isMobile && setIsSheetOpen(false)}
               >
