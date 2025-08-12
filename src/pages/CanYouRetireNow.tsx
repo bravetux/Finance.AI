@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, Wallet, LineChart } from "lucide-react";
 import AllocationPieChart from "@/components/AllocationPieChart";
 
 // Helper to get total liquid assets from Net Worth data
@@ -43,6 +43,16 @@ const getAnnualExpenses = () => {
   }
 };
 
+// Helper to get projected corpus
+const getProjectedCorpus = () => {
+  try {
+    const savedData = localStorage.getItem('projectedAccumulatedCorpus');
+    return savedData ? JSON.parse(savedData) : 0;
+  } catch {
+    return 0;
+  }
+};
+
 interface RetirementInputs {
   currentAge: number;
   lifeExpectancy: number;
@@ -53,6 +63,7 @@ interface RetirementInputs {
 
 const CanYouRetireNow: React.FC = () => {
   const [liquidAssets, setLiquidAssets] = useState(0);
+  const [projectedCorpus, setProjectedCorpus] = useState(0);
   const [annualExpenses, setAnnualExpenses] = useState(0);
 
   const [inputs, setInputs] = useState<RetirementInputs>(() => {
@@ -63,7 +74,6 @@ const CanYouRetireNow: React.FC = () => {
       allocations: { equity: 30, fds: 40, bonds: 25, cash: 5 },
       returns: { equity: 12, fds: 7, bonds: 8, cash: 2.5 },
     };
-    // You can also load these inputs from localStorage if you want them to be persistent
     return defaultState;
   });
 
@@ -71,6 +81,7 @@ const CanYouRetireNow: React.FC = () => {
     const updateData = () => {
       setLiquidAssets(getLiquidAssets());
       setAnnualExpenses(getAnnualExpenses());
+      setProjectedCorpus(getProjectedCorpus());
     };
     updateData();
     window.addEventListener('storage', updateData);
@@ -99,11 +110,13 @@ const CanYouRetireNow: React.FC = () => {
   }, [inputs.allocations, inputs.returns, totalAllocation]);
 
   const { yearsCorpusWillLast, canRetire, shortfall } = useMemo(() => {
-    if (liquidAssets <= 0 || annualExpenses <= 0 || totalAllocation !== 100) {
+    const totalStartingCorpus = liquidAssets + projectedCorpus;
+
+    if (totalStartingCorpus <= 0 || annualExpenses <= 0 || totalAllocation !== 100) {
       return { yearsCorpusWillLast: 0, canRetire: false, shortfall: annualExpenses * 25 };
     }
 
-    let currentFund = liquidAssets;
+    let currentFund = totalStartingCorpus;
     let currentWithdrawal = annualExpenses;
     let years = 0;
     const maxYears = inputs.lifeExpectancy - inputs.currentAge;
@@ -116,21 +129,44 @@ const CanYouRetireNow: React.FC = () => {
       years++;
     }
 
-    const retirementCorpusNeeded = annualExpenses * 25; // Using 4% rule as a benchmark
+    const retirementCorpusNeeded = annualExpenses * 25;
     const canRetireStatus = years >= maxYears;
     
     return {
       yearsCorpusWillLast: years,
       canRetire: canRetireStatus,
-      shortfall: canRetireStatus ? 0 : Math.max(0, retirementCorpusNeeded - liquidAssets),
+      shortfall: canRetireStatus ? 0 : Math.max(0, retirementCorpusNeeded - totalStartingCorpus),
     };
-  }, [liquidAssets, annualExpenses, inputs, weightedAvgReturn, totalAllocation]);
+  }, [liquidAssets, projectedCorpus, annualExpenses, inputs, weightedAvgReturn, totalAllocation]);
 
   const formatCurrency = (value: number) => `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Can You Retire Now?</h1>
+
+      <div className="grid md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Current Liquid Corpus</CardTitle>
+            <Wallet className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(liquidAssets)}</div>
+            <p className="text-xs text-muted-foreground">From your Net Worth page.</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Projected Corpus at Retirement</CardTitle>
+            <LineChart className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(projectedCorpus)}</div>
+            <p className="text-xs text-muted-foreground">From Projected Cashflow page.</p>
+          </CardContent>
+        </Card>
+      </div>
 
       <Card className={canRetire ? "bg-green-50 dark:bg-green-900/30 border-green-500" : "bg-red-50 dark:bg-red-900/30 border-red-500"}>
         <CardHeader>
@@ -140,7 +176,7 @@ const CanYouRetireNow: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-lg">
-          <p>Your current liquid corpus of <strong>{formatCurrency(liquidAssets)}</strong> will last for approximately <strong>{yearsCorpusWillLast} years</strong> (until age {inputs.currentAge + yearsCorpusWillLast}).</p>
+          <p>Your combined corpus of <strong>{formatCurrency(liquidAssets + projectedCorpus)}</strong> will last for approximately <strong>{yearsCorpusWillLast} years</strong> (until age {inputs.currentAge + yearsCorpusWillLast}).</p>
           {!canRetire && (
             <p>You have a shortfall of approximately <strong>{formatCurrency(shortfall)}</strong> to reach a standard retirement corpus.</p>
           )}
@@ -164,7 +200,7 @@ const CanYouRetireNow: React.FC = () => {
               <div className="text-center font-medium">{inputs.inflation.toFixed(1)}%</div>
             </div>
             <div className="border-t pt-4">
-              <div className="flex justify-between"><span className="text-muted-foreground">Total Liquid Assets:</span><span className="font-bold">{formatCurrency(liquidAssets)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Total Starting Corpus:</span><span className="font-bold">{formatCurrency(liquidAssets + projectedCorpus)}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Current Annual Expenses:</span><span className="font-bold">{formatCurrency(annualExpenses)}</span></div>
             </div>
           </CardContent>
