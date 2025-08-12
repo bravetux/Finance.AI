@@ -39,24 +39,30 @@ const PreciousMetalsSummary: React.FC = () => {
   const summary = useMemo(() => {
     const allAssets = [...goldData, ...silverData, ...platinumData, ...diamondData];
 
-    const totalJewelleryValue = allAssets
-      .filter(asset => asset.particulars.toLowerCase().includes('jewellery'))
+    const totalIlliquidValue = allAssets
+      .filter(asset => 
+        asset.particulars.toLowerCase().includes('jewellery') || 
+        asset.particulars.toLowerCase().includes('sgb')
+      )
       .reduce((sum, asset) => sum + (asset.value || 0), 0);
 
-    const totalOtherValue = allAssets
-      .filter(asset => !asset.particulars.toLowerCase().includes('jewellery'))
+    const totalLiquidValue = allAssets
+      .filter(asset => 
+        !asset.particulars.toLowerCase().includes('jewellery') && 
+        !asset.particulars.toLowerCase().includes('sgb')
+      )
       .reduce((sum, asset) => sum + (asset.value || 0), 0);
       
-    const totalValue = totalJewelleryValue + totalOtherValue;
+    const totalValue = totalIlliquidValue + totalLiquidValue;
 
     const chartData = [
-      { name: 'Jewellery', value: totalJewelleryValue },
-      { name: 'Other Precious Metals', value: totalOtherValue },
+      { name: 'Illiquid Assets', value: totalIlliquidValue },
+      { name: 'Liquid Assets', value: totalLiquidValue },
     ].filter(item => item.value > 0);
 
     return {
-      totalJewelleryValue,
-      totalOtherValue,
+      totalIlliquidValue,
+      totalLiquidValue,
       totalValue,
       chartData,
     };
@@ -86,21 +92,21 @@ const PreciousMetalsSummary: React.FC = () => {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Jewellery Value</CardTitle>
+            <CardTitle className="text-sm font-medium">Illiquid Assets</CardTitle>
             <Gem className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-pink-500">{formatCurrency(summary.totalJewelleryValue)}</div>
-            <p className="text-xs text-muted-foreground">Sum of all jewellery items.</p>
+            <div className="text-2xl font-bold text-pink-500">{formatCurrency(summary.totalIlliquidValue)}</div>
+            <p className="text-xs text-muted-foreground">Sum of all Jewellery and SGBs.</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Other Metals Value</CardTitle>
+            <CardTitle className="text-sm font-medium">Liquid Assets</CardTitle>
             <Gem className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-500">{formatCurrency(summary.totalOtherValue)}</div>
+            <div className="text-2xl font-bold text-yellow-500">{formatCurrency(summary.totalLiquidValue)}</div>
             <p className="text-xs text-muted-foreground">Sum of coins, bars, ETFs, etc.</p>
           </CardContent>
         </Card>
