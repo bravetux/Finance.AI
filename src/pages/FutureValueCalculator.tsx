@@ -100,6 +100,10 @@ const FutureValueCalculator: React.FC = () => {
 
   // Handle input changes
   const handleInputChange = (index: number, field: keyof Asset, value: string) => {
+    if (field === 'roi' && value.length > 4) {
+      return; // Do not update state if ROI input is too long
+    }
+
     setAssets(prev => {
       const newAssets = [...prev];
       const updatedAsset = {
@@ -265,7 +269,7 @@ const FutureValueCalculator: React.FC = () => {
                           type="number"
                           value={asset.roi}
                           onChange={(e) => handleInputChange(index, 'roi', e.target.value)}
-                          className="w-full h-8 text-sm"
+                          className="w-20 h-8 text-sm"
                         />
                       </td>
                       <td className="px-2 py-1 whitespace-nowrap">
