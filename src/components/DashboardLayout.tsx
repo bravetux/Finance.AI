@@ -43,15 +43,15 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const navItems = [
-  { name: "Dashboard", path: "/", icon: LayoutDashboard, type: 'link' },
+  { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard, type: 'link' },
   { 
     name: "CashFlow Planning", 
     icon: Calculator,
     type: 'section',
     children: [
-      { name: "Summary", path: "/cashflow-summary", icon: LayoutDashboard, type: 'link' },
-      { name: "Expense Reduction Planner", path: "/expense-reduction-planner", icon: SheetIcon, type: 'link' },
-      { name: "Cashflow", path: "/cashflow", icon: ArrowDownUp, type: 'link' },
+      { name: "Summary", path: "/dashboard/cashflow-summary", icon: LayoutDashboard, type: 'link' },
+      { name: "Expense Reduction Planner", path: "/dashboard/expense-reduction-planner", icon: SheetIcon, type: 'link' },
+      { name: "Cashflow", path: "/dashboard/cashflow", icon: ArrowDownUp, type: 'link' },
     ]
   },
   { 
@@ -59,51 +59,51 @@ const navItems = [
     icon: Wallet,
     type: 'section',
     children: [
-      { name: "Net Worth Calculator", path: "/net-worth", icon: Calculator, type: 'link' },
-      { name: "Real Estate", path: "/real-estate", icon: Home, type: 'link' },
+      { name: "Net Worth Calculator", path: "/dashboard/net-worth", icon: Calculator, type: 'link' },
+      { name: "Real Estate", path: "/dashboard/real-estate", icon: Home, type: 'link' },
       { 
         name: "Equity", 
         icon: BarChart2,
         type: 'section',
         children: [
-          { name: "Domestic Equity", path: "/domestic-equity", icon: BarChart2, type: 'link' },
-          { name: "Mutual Fund Allocation", path: "/mutual-fund-allocation", icon: PieChart, type: 'link' },
-          { name: "Mutual Fund SIP", path: "/mutual-fund-sip", icon: Repeat, type: 'link' },
-          { name: "Small Case", path: "/small-case", icon: Briefcase, type: 'link' },
-          { name: "US Equity", path: "/us-equity", icon: Landmark, type: 'link' },
+          { name: "Domestic Equity", path: "/dashboard/domestic-equity", icon: BarChart2, type: 'link' },
+          { name: "Mutual Fund Allocation", path: "/dashboard/mutual-fund-allocation", icon: PieChart, type: 'link' },
+          { name: "Mutual Fund SIP", path: "/dashboard/mutual-fund-sip", icon: Repeat, type: 'link' },
+          { name: "Small Case", path: "/dashboard/small-case", icon: Briefcase, type: 'link' },
+          { name: "US Equity", path: "/dashboard/us-equity", icon: Landmark, type: 'link' },
         ]
       },
-      { name: "Debt", path: "/debt", icon: FileText, type: 'link' },
+      { name: "Debt", path: "/dashboard/debt", icon: FileText, type: 'link' },
       { 
         name: "Precious Metals", 
         icon: Gem,
         type: 'section',
         children: [
-          { name: "Summary", path: "/precious-metals-summary", icon: LayoutDashboard, type: 'link' },
-          { name: "Gold", path: "/gold", icon: Gem, type: 'link' },
-          { name: "Silver", path: "/silver", icon: Gem, type: 'link' },
-          { name: "Platinum", path: "/platinum", icon: Gem, type: 'link' },
-          { name: "Diamond", path: "/diamond", icon: Gem, type: 'link' },
+          { name: "Summary", path: "/dashboard/precious-metals-summary", icon: LayoutDashboard, type: 'link' },
+          { name: "Gold", path: "/dashboard/gold", icon: Gem, type: 'link' },
+          { name: "Silver", path: "/dashboard/silver", icon: Gem, type: 'link' },
+          { name: "Platinum", path: "/dashboard/platinum", icon: Gem, type: 'link' },
+          { name: "Diamond", path: "/dashboard/diamond", icon: Gem, type: 'link' },
         ]
       },
     ]
   },
-  { name: "Goals", path: "/goals", icon: Target, type: 'link' },
+  { name: "Goals", path: "/dashboard/goals", icon: Target, type: 'link' },
   { 
     name: "Retirement Planning", 
     icon: Landmark,
     type: 'section',
     children: [
-      { name: "Can you retire now?", path: "/can-you-retire-now", icon: CheckCircle, type: 'link' },
-      { name: "FIRE Calculator", path: "/fire-calculator", icon: Flame, type: 'link' },
-      { name: "Retirement", path: "/retirement", icon: Landmark, type: 'link' },
-      { name: "Projected Cashflow", path: "/projected-cashflow", icon: LineChart, type: 'link' },
-      { name: "Post-Retirement Strategy", path: "/post-retirement-strategy", icon: LineChart, type: 'link' },
-      { name: "Future Value", path: "/future-value", icon: TrendingUp, type: 'link' },
+      { name: "Can you retire now?", path: "/dashboard/can-you-retire-now", icon: CheckCircle, type: 'link' },
+      { name: "FIRE Calculator", path: "/dashboard/fire-calculator", icon: Flame, type: 'link' },
+      { name: "Retirement", path: "/dashboard/retirement", icon: Landmark, type: 'link' },
+      { name: "Projected Cashflow", path: "/dashboard/projected-cashflow", icon: LineChart, type: 'link' },
+      { name: "Post-Retirement Strategy", path: "/dashboard/post-retirement-strategy", icon: LineChart, type: 'link' },
+      { name: "Future Value", path: "/dashboard/future-value", icon: TrendingUp, type: 'link' },
     ]
   },
-  { name: "Reports", path: "/reports", icon: FileText, type: 'link' },
-  { name: "AI Prompt", path: "/ai-prompt", icon: Bot, type: 'link' },
+  { name: "Reports", path: "/dashboard/reports", icon: FileText, type: 'link' },
+  { name: "AI Prompt", path: "/dashboard/ai-prompt", icon: Bot, type: 'link' },
 ];
 
 const DashboardLayout: React.FC = () => {
@@ -112,7 +112,7 @@ const DashboardLayout: React.FC = () => {
 
   const SidebarContent = () => (
     <div className="flex h-full flex-col p-4 bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
-      <Link to="/" className="text-2xl font-bold mb-6 text-sidebar-primary-foreground">
+      <Link to="/dashboard" className="text-2xl font-bold mb-6 text-sidebar-primary-foreground">
         Financial Planner
       </Link>
       <ScrollArea className="flex-1">

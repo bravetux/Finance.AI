@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import DashboardLayout from "./components/DashboardLayout";
+import Landing from "./pages/Landing";
 import Dashboard from "./pages/Dashboard";
 import Cashflow from "./pages/Cashflow";
 import NetWorthCalculator from "./pages/NetWorthCalculator";
@@ -43,7 +44,8 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<DashboardLayout />}>
+            <Route path="/" element={<Landing />} />
+            <Route path="/dashboard" element={<DashboardLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="cashflow" element={<Cashflow />} />
               <Route path="cashflow-summary" element={<CashflowSummary />} />
