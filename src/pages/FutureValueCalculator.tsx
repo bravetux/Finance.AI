@@ -99,25 +99,21 @@ const FutureValueCalculator: React.FC = () => {
   const [totalFutureValue, setTotalFutureValue] = React.useState(0);
 
   // Handle input changes
-  const handleInputChange = (index: number, field: keyof Asset, value: string) => {
-    if (field === 'roi' && value.length > 4) {
-      return;
-    }
-    if (field === 'duration' && value.length > 2) {
-      return;
-    }
-    if (field === 'currentValue' && value.length > 11) {
-      return;
-    }
+  const handleInputChange = (assetName: string, field: keyof Asset, value: string) => {
+    if (field === 'roi' && value.length > 4) return;
+    if (field === 'duration' && value.length > 2) return;
+    if (field === 'currentValue' && value.length > 11) return;
 
     setAssets(prev => {
       const newAssets = [...prev];
+      const assetIndex = newAssets.findIndex(a => a.name === assetName);
+      if (assetIndex === -1) return prev;
+
       const updatedAsset = {
-        ...newAssets[index],
+        ...newAssets[assetIndex],
         [field]: Number(value) || 0
       };
 
-      // Recalculate future value when a relevant field changes
       if (['currentValue', 'roi', 'duration'].includes(field)) {
         updatedAsset.futureValue = calculateFutureValue(
           updatedAsset.currentValue,
@@ -126,7 +122,7 @@ const FutureValueCalculator: React.FC = () => {
         );
       }
       
-      newAssets[index] = updatedAsset;
+      newAssets[assetIndex] = updatedAsset;
       return newAssets;
     });
   };
@@ -135,7 +131,7 @@ const FutureValueCalculator: React.FC = () => {
   React.useEffect(() => {
     const total = assets.reduce((sum, asset) => sum + asset.futureValue, 0);
     setTotalFutureValue(total);
-    localStorage.setItem('future-value-data', JSON.stringify(assets)); // Save to localStorage
+    localStorage.setItem('future-value-data', JSON.stringify(assets));
   }, [assets]);
 
   // Export data to JSON file
@@ -177,22 +173,66 @@ const FutureValueCalculator: React.FC = () => {
     setTimeout(() => window.location.reload(), 1000);
   };
 
-  const totalCurrentValue = useMemo(() => assets.reduce((sum, asset) => sum + asset.currentValue, 0), [assets]);
+  const illiquidAssetNames = ["Home Value", "Other Real Estate", "Jewellery"];
 
+  const illiquidAssets = useMemo(() => 
+      assets.filter(asset => illiquidAssetNames.includes(asset.name)),
+      [assets]
+  );
+
+  const liquidAssets = useMemo(() => 
+      assets.filter(asset => !illiquidAssetNames.includes(asset.name)),
+      [assets]
+  );
+
+  const totalCurrentValue = useMemo(() => assets.reduce((sum, asset) => sum + asset.currentValue, 0), [assets]);
   const averageRoi = useMemo(() => {
-    if (totalCurrentValue === 0) {
-      return 0;
-    }
+    if (totalCurrentValue === 0) return 0;
     const weightedSum = assets.reduce((sum, asset) => sum + asset.currentValue * asset.roi, 0);
     return weightedSum / totalCurrentValue;
   }, [assets, totalCurrentValue]);
-
   const growth = useMemo(() => {
-    if (totalCurrentValue === 0) {
-      return 0;
-    }
+    if (totalCurrentValue === 0) return 0;
     return ((totalFutureValue / totalCurrentValue) - 1) * 100;
   }, [totalFutureValue, totalCurrentValue]);
+
+  const AssetTable = ({ title, data }: { title: string, data: Asset[] }) => (
+    <Card>
+      <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
+      <CardContent>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Asset</th>
+                <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Current Value (₹)</th>
+                <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ROI (%)</th>
+                <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Duration (Yrs)</th>
+                <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Future Value (₹)</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+              {data.map((asset) => (
+                <tr key={asset.name} className="h-10">
+                  <td className="px-2 py-0 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{asset.name}</td>
+                  <td className="px-2 py-0 whitespace-nowrap">
+                    <Input type="number" value={asset.currentValue} onChange={(e) => handleInputChange(asset.name, 'currentValue', e.target.value)} className="w-36 h-7 text-sm" disabled />
+                  </td>
+                  <td className="px-2 py-0 whitespace-nowrap">
+                    <Input type="number" value={asset.roi} onChange={(e) => handleInputChange(asset.name, 'roi', e.target.value)} className="w-16 h-7 text-sm" />
+                  </td>
+                  <td className="px-2 py-0 whitespace-nowrap">
+                    <Input type="number" value={asset.duration} onChange={(e) => handleInputChange(asset.name, 'duration', e.target.value)} className="w-20 h-7 text-sm" />
+                  </td>
+                  <td className="px-2 py-0 whitespace-nowrap text-sm font-medium">₹{asset.futureValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   return (
     <div className="space-y-6">
@@ -201,135 +241,41 @@ const FutureValueCalculator: React.FC = () => {
         <div className="flex gap-2">
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive">
-                <Trash2 className="mr-2 h-4 w-4" /> Clear Data
-              </Button>
+              <Button variant="destructive"><Trash2 className="mr-2 h-4 w-4" /> Clear Data</Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will reset all ROI and Duration values on this page to their defaults. This action cannot be undone.
-                </AlertDialogDescription>
+                <AlertDialogDescription>This will reset all ROI and Duration values on this page to their defaults. This action cannot be undone.</AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleClearData}>
-                  Yes, clear data
-                </AlertDialogAction>
+                <AlertDialogAction onClick={handleClearData}>Yes, clear data</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <Button variant="outline" onClick={exportData}>
-            <Upload className="mr-2 h-4 w-4" /> Export
-          </Button>
+          <Button variant="outline" onClick={exportData}><Upload className="mr-2 h-4 w-4" /> Export</Button>
           <Button variant="outline" asChild>
-            <Label htmlFor="import-file">
-              <Download className="mr-2 h-4 w-4" /> Import
-              <Input 
-                id="import-file" 
-                type="file" 
-                accept=".json" 
-                className="hidden" 
-                onChange={importData}
-              />
-            </Label>
+            <Label htmlFor="import-file"><Download className="mr-2 h-4 w-4" /> Import<Input id="import-file" type="file" accept=".json" className="hidden" onChange={importData} /></Label>
           </Button>
         </div>
       </div>
 
-      <div className="grid gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Asset Future Value Projections</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead className="bg-gray-50 dark:bg-gray-800">
-                  <tr>
-                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Asset</th>
-                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Current Value (₹)</th>
-                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ROI (%)</th>
-                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Duration (Yrs)</th>
-                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Future Value (₹)</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                  {assets.map((asset, index) => (
-                    <tr key={index} className="h-10">
-                      <td className="px-2 py-0 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                        {asset.name}
-                      </td>
-                      <td className="px-2 py-0 whitespace-nowrap">
-                        <Input
-                          type="number"
-                          value={asset.currentValue}
-                          onChange={(e) => handleInputChange(index, 'currentValue', e.target.value)}
-                          className="w-36 h-7 text-sm"
-                          disabled
-                        />
-                      </td>
-                      <td className="px-2 py-0 whitespace-nowrap">
-                        <Input
-                          type="number"
-                          value={asset.roi}
-                          onChange={(e) => handleInputChange(index, 'roi', e.target.value)}
-                          className="w-16 h-7 text-sm"
-                        />
-                      </td>
-                      <td className="px-2 py-0 whitespace-nowrap">
-                        <Input
-                          type="number"
-                          value={asset.duration}
-                          onChange={(e) => handleInputChange(index, 'duration', e.target.value)}
-                          className="w-20 h-7 text-sm"
-                        />
-                      </td>
-                      <td className="px-2 py-0 whitespace-nowrap text-sm font-medium">
-                        ₹{asset.futureValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid gap-6">
+        <AssetTable title="Illiquid Assets" data={illiquidAssets} />
+        <AssetTable title="Liquid Assets" data={liquidAssets} />
 
         <Card>
-          <CardHeader>
-            <CardTitle>Summary</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Summary</CardTitle></CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="font-medium">Total Current Value:</span>
-                  <span className="font-bold">
-                    ₹{totalCurrentValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Average ROI:</span>
-                  <span className="font-bold">
-                    {averageRoi.toFixed(2)}%
-                  </span>
-                </div>
+                <div className="flex justify-between"><span className="font-medium">Total Current Value:</span><span className="font-bold">₹{totalCurrentValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</span></div>
+                <div className="flex justify-between"><span className="font-medium">Average ROI:</span><span className="font-bold">{averageRoi.toFixed(2)}%</span></div>
               </div>
               <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="font-medium">Total Future Value:</span>
-                  <span className="font-bold text-green-600">
-                    ₹{totalFutureValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Growth:</span>
-                  <span className="font-bold text-green-600">
-                    {growth.toFixed(2)}%
-                  </span>
-                </div>
+                <div className="flex justify-between"><span className="font-medium">Total Future Value:</span><span className="font-bold text-green-600">₹{totalFutureValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</span></div>
+                <div className="flex justify-between"><span className="font-medium">Growth:</span><span className="font-bold text-green-600">{growth.toFixed(2)}%</span></div>
               </div>
             </div>
           </CardContent>
