@@ -53,6 +53,19 @@ const Gold: React.FC = () => {
   });
 
   useEffect(() => {
+    const migratedAssets = assets.map(asset => {
+      if (asset.particulars === 'Gold ETF - Vignesh') {
+        return { ...asset, particulars: 'Gold ETF - Self' };
+      }
+      return asset;
+    });
+
+    if (JSON.stringify(migratedAssets) !== JSON.stringify(assets)) {
+      setAssets(migratedAssets);
+    }
+  }, []);
+
+  useEffect(() => {
     localStorage.setItem('goldData', JSON.stringify(assets));
   }, [assets]);
 
