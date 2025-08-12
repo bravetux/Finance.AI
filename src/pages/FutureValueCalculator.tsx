@@ -257,6 +257,7 @@ const FutureValueCalculator: React.FC = () => {
                           value={asset.currentValue}
                           onChange={(e) => handleInputChange(index, 'currentValue', e.target.value)}
                           className="w-full"
+                          disabled
                         />
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
