@@ -29,6 +29,7 @@ import Silver from "./pages/Silver";
 import Platinum from "./pages/Platinum";
 import Diamond from "./pages/Diamond";
 import PreciousMetalsSummary from "./pages/PreciousMetalsSummary";
+import SmallCase from "./pages/SmallCase";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ const App = () => (
               <Route path="domestic-equity" element={<DomesticEquity />} />
               <Route path="mutual-fund-allocation" element={<MutualFundAllocation />} />
               <Route path="mutual-fund-sip" element={<MutualFundSIP />} />
+              <Route path="small-case" element={<SmallCase />} />
               <Route path="us-equity" element={<USEquity />} />
               <Route path="debt" element={<Debt />} />
               <Route path="precious-metals-summary" element={<PreciousMetalsSummary />} />

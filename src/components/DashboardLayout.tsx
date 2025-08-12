@@ -68,6 +68,7 @@ const navItems = [
           { name: "Domestic Equity", path: "/domestic-equity", icon: BarChart2, type: 'link' },
           { name: "Mutual Fund Allocation", path: "/mutual-fund-allocation", icon: PieChart, type: 'link' },
           { name: "Mutual Fund SIP", path: "/mutual-fund-sip", icon: Repeat, type: 'link' },
+          { name: "Small Case", path: "/small-case", icon: Briefcase, type: 'link' },
           { name: "US Equity", path: "/us-equity", icon: Landmark, type: 'link' },
         ]
       },

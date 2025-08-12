@@ -105,6 +105,10 @@ const NetWorthCalculator: React.FC = () => {
         const usEquityData = JSON.parse(localStorage.getItem('usEquityData') || '[]');
         const internationalFundsValue = usEquityData.reduce((sum: number, asset: any) => sum + asset.value, 0);
 
+        // Small Case
+        const smallCaseData = JSON.parse(localStorage.getItem('smallCaseData') || '[]');
+        const smallCasesValue = smallCaseData.reduce((sum: number, entry: any) => sum + entry.currentValue, 0);
+
         // --- Create the new, synced data object ---
         const newData = {
           ...currentData,
@@ -116,6 +120,7 @@ const NetWorthCalculator: React.FC = () => {
           domesticStocks: domesticStocksValue,
           domesticMutualFunds: domesticMutualFundsValue,
           internationalFunds: internationalFundsValue,
+          smallCases: smallCasesValue,
         };
 
         // --- Update state and localStorage ---
@@ -481,7 +486,9 @@ const NetWorthCalculator: React.FC = () => {
                     type="number"
                     value={data.smallCases}
                     onChange={(e) => handleInputChange('smallCases', e.target.value)}
+                    disabled
                   />
+                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Small Case page.</p>
                 </div>
                 <div>
                   <Label htmlFor="savingsBalance">Savings Balance</Label>
