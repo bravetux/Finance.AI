@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Download, Upload, Trash2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Download, Upload, Trash2, Info } from "lucide-react";
 import { showError, showSuccess } from "@/utils/toast";
 import {
   AlertDialog,
@@ -24,7 +23,6 @@ interface Asset {
   name: string;
   currentValue: number;
   roi: number;
-  duration: number;
   futureValue: number;
 }
 
@@ -34,75 +32,77 @@ const calculateFutureValue = (pv: number, r: number, t: number) => {
 };
 
 const FutureValueCalculator: React.FC = () => {
-  const navigate = useNavigate();
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [duration, setDuration] = useState(10);
 
-  const initializeAssets = () => {
-    // 1. Get latest data from localStorage
-    const netWorthData = (() => {
-      try {
-        const savedData = localStorage.getItem('netWorthData');
-        return savedData ? JSON.parse(savedData) : {};
-      } catch {
-        return {};
+  useEffect(() => {
+    try {
+      const savedRetirementData = localStorage.getItem('retirementData');
+      if (savedRetirementData) {
+        const retirementData = JSON.parse(savedRetirementData);
+        const calculatedDuration = (retirementData.lifeExpectancy || 0) - (retirementData.retirementAge || 0);
+        setDuration(Math.max(0, calculatedDuration));
       }
-    })();
+    } catch (error) {
+      console.error("Failed to load retirement data for duration calculation:", error);
+    }
+  }, []);
 
-    const futureValueData = (() => {
-      try {
-        const savedData = localStorage.getItem('future-value-data');
-        return savedData ? JSON.parse(savedData) : [];
-      } catch {
-        return [];
-      }
-    })();
+  useEffect(() => {
+    const initializeAssets = () => {
+      const netWorthData = (() => {
+        try {
+          const savedData = localStorage.getItem('netWorthData');
+          return savedData ? JSON.parse(savedData) : {};
+        } catch { return {}; }
+      })();
 
-    // 2. Define the base structure of assets with default ROI and duration
-    const defaultAssets = [
-      { name: "Home Value", key: "homeValue", roi: 6, duration: 10 },
-      { name: "Other Real Estate", key: "otherRealEstate", roi: 7, duration: 10 },
-      { name: "Jewellery", key: "jewellery", roi: 4, duration: 10 },
-      { name: "Sovereign Gold Bonds", key: "sovereignGoldBonds", roi: 5, duration: 10 },
-      { name: "ULIPs Surrender Value", key: "ulipsSurrenderValue", roi: 8, duration: 10 },
-      { name: "EPF / PPF / VPF", key: "epfPpfVpf", roi: 7.1, duration: 10 },
-      { name: "Fixed Deposits", key: "fixedDeposits", roi: 6.5, duration: 10 },
-      { name: "Debt Funds", key: "debtFunds", roi: 7.5, duration: 10 },
-      { name: "Domestic Stocks", key: "domesticStocks", roi: 12, duration: 10 },
-      { name: "Domestic Mutual Funds", key: "domesticMutualFunds", roi: 11, duration: 10 },
-      { name: "International Funds", key: "internationalFunds", roi: 10, duration: 10 },
-      { name: "Small Cases", key: "smallCases", roi: 13, duration: 10 },
-      { name: "Savings Balance", key: "savingsBalance", roi: 4, duration: 10 },
-      { name: "Precious Metals", key: "preciousMetals", roi: 6, duration: 10 },
-      { name: "Cryptocurrency", key: "cryptocurrency", roi: 15, duration: 10 },
-      { name: "REITs", key: "reits", roi: 9, duration: 10 },
-    ];
+      const futureValueData = (() => {
+        try {
+          const savedData = localStorage.getItem('future-value-data');
+          return savedData ? JSON.parse(savedData) : [];
+        } catch { return []; }
+      })();
 
-    // 3. Map over the default structure and merge data
-    return defaultAssets.map(defaultAsset => {
-      const savedAsset = futureValueData.find((a: Asset) => a.name === defaultAsset.name);
+      const defaultAssets = [
+        { name: "Home Value", key: "homeValue", roi: 6 },
+        { name: "Other Real Estate", key: "otherRealEstate", roi: 7 },
+        { name: "Jewellery", key: "jewellery", roi: 4 },
+        { name: "Sovereign Gold Bonds", key: "sovereignGoldBonds", roi: 5 },
+        { name: "ULIPs Surrender Value", key: "ulipsSurrenderValue", roi: 8 },
+        { name: "EPF / PPF / VPF", key: "epfPpfVpf", roi: 7.1 },
+        { name: "Fixed Deposits", key: "fixedDeposits", roi: 6.5 },
+        { name: "Debt Funds", key: "debtFunds", roi: 7.5 },
+        { name: "Domestic Stocks", key: "domesticStocks", roi: 12 },
+        { name: "Domestic Mutual Funds", key: "domesticMutualFunds", roi: 11 },
+        { name: "International Funds", key: "internationalFunds", roi: 10 },
+        { name: "Small Cases", key: "smallCases", roi: 13 },
+        { name: "Savings Balance", key: "savingsBalance", roi: 4 },
+        { name: "Precious Metals", key: "preciousMetals", roi: 6 },
+        { name: "Cryptocurrency", key: "cryptocurrency", roi: 15 },
+        { name: "REITs", key: "reits", roi: 9 },
+      ];
 
-      const currentValue = netWorthData[defaultAsset.key] || 0;
-      const roi = savedAsset ? savedAsset.roi : defaultAsset.roi;
-      const duration = savedAsset ? savedAsset.duration : defaultAsset.duration;
-      const futureValue = calculateFutureValue(currentValue, roi, duration);
+      const newAssets = defaultAssets.map(defaultAsset => {
+        const savedAsset = futureValueData.find((a: { name: string, roi: number }) => a.name === defaultAsset.name);
+        const currentValue = netWorthData[defaultAsset.key] || 0;
+        const roi = savedAsset ? savedAsset.roi : defaultAsset.roi;
+        const futureValue = calculateFutureValue(currentValue, roi, duration);
 
-      return {
-        name: defaultAsset.name,
-        currentValue,
-        roi,
-        duration,
-        futureValue,
-      };
-    });
-  };
+        return {
+          name: defaultAsset.name,
+          currentValue,
+          roi,
+          futureValue,
+        };
+      });
+      setAssets(newAssets);
+    };
+    initializeAssets();
+  }, [duration]);
 
-  const [assets, setAssets] = React.useState<Asset[]>(initializeAssets());
-  const [totalFutureValue, setTotalFutureValue] = React.useState(0);
-
-  // Handle input changes
-  const handleInputChange = (assetName: string, field: keyof Asset, value: string) => {
-    if (field === 'roi' && value.length > 4) return;
-    if (field === 'duration' && value.length > 2) return;
-    if (field === 'currentValue' && value.length > 11) return;
+  const handleInputChange = (assetName: string, field: 'roi', value: string) => {
+    if (value.length > 4) return;
 
     setAssets(prev => {
       const newAssets = [...prev];
@@ -114,31 +114,29 @@ const FutureValueCalculator: React.FC = () => {
         [field]: Number(value) || 0
       };
 
-      if (['currentValue', 'roi', 'duration'].includes(field)) {
-        updatedAsset.futureValue = calculateFutureValue(
-          updatedAsset.currentValue,
-          updatedAsset.roi,
-          updatedAsset.duration
-        );
-      }
+      updatedAsset.futureValue = calculateFutureValue(
+        updatedAsset.currentValue,
+        updatedAsset.roi,
+        duration
+      );
       
       newAssets[assetIndex] = updatedAsset;
       return newAssets;
     });
   };
 
-  // Calculate total future value and save assets to localStorage whenever assets change
-  React.useEffect(() => {
-    const total = assets.reduce((sum, asset) => sum + asset.futureValue, 0);
-    setTotalFutureValue(total);
-    localStorage.setItem('future-value-data', JSON.stringify(assets));
+  useEffect(() => {
+    const dataToSave = assets.map(({ name, roi }) => ({ name, roi }));
+    if (dataToSave.length > 0) {
+      localStorage.setItem('future-value-data', JSON.stringify(dataToSave));
+    }
   }, [assets]);
 
-  // Export data to JSON file
   const exportData = () => {
-    const dataStr = JSON.stringify(assets, null, 2);
+    const dataToSave = assets.map(({ name, roi }) => ({ name, roi }));
+    const dataStr = JSON.stringify(dataToSave, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    const exportFileDefaultName = 'future-value-data.json';
+    const exportFileDefaultName = 'future-value-roi-data.json';
     
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
@@ -146,7 +144,6 @@ const FutureValueCalculator: React.FC = () => {
     linkElement.click();
   };
 
-  // Import data from file
   const importData = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -155,11 +152,13 @@ const FutureValueCalculator: React.FC = () => {
     reader.onload = (e) => {
       try {
         const content = e.target?.result as string;
-        const importedData = JSON.parse(content) as Asset[];
-        setAssets(importedData.map(asset => ({
-          ...asset,
-          futureValue: calculateFutureValue(asset.currentValue, asset.roi, asset.duration)
-        })));
+        const importedData = JSON.parse(content);
+        if (!Array.isArray(importedData) || !importedData.every(item => 'name' in item && 'roi' in item)) {
+          throw new Error("Invalid file format.");
+        }
+        localStorage.setItem('future-value-data', JSON.stringify(importedData));
+        showSuccess('Data imported successfully! Page will now reload.');
+        setTimeout(() => window.location.reload(), 1500);
       } catch (error) {
         showError('Error parsing file. Please check the file format.');
       }
@@ -169,28 +168,23 @@ const FutureValueCalculator: React.FC = () => {
 
   const handleClearData = () => {
     localStorage.removeItem('future-value-data');
-    showSuccess("Future Value data has been cleared.");
+    showSuccess("Future Value ROI data has been cleared.");
     setTimeout(() => window.location.reload(), 1000);
   };
 
   const illiquidAssetNames = ["Home Value", "Other Real Estate", "Jewellery"];
-
-  const illiquidAssets = useMemo(() => 
-      assets.filter(asset => illiquidAssetNames.includes(asset.name)),
-      [assets]
-  );
-
-  const liquidAssets = useMemo(() => 
-      assets.filter(asset => !illiquidAssetNames.includes(asset.name)),
-      [assets]
-  );
+  const illiquidAssets = useMemo(() => assets.filter(asset => illiquidAssetNames.includes(asset.name)), [assets]);
+  const liquidAssets = useMemo(() => assets.filter(asset => !illiquidAssetNames.includes(asset.name)), [assets]);
 
   const totalCurrentValue = useMemo(() => assets.reduce((sum, asset) => sum + asset.currentValue, 0), [assets]);
+  const totalFutureValue = useMemo(() => assets.reduce((sum, asset) => sum + asset.futureValue, 0), [assets]);
+  
   const averageRoi = useMemo(() => {
     if (totalCurrentValue === 0) return 0;
     const weightedSum = assets.reduce((sum, asset) => sum + asset.currentValue * asset.roi, 0);
     return weightedSum / totalCurrentValue;
   }, [assets, totalCurrentValue]);
+
   const growth = useMemo(() => {
     if (totalCurrentValue === 0) return 0;
     return ((totalFutureValue / totalCurrentValue) - 1) * 100;
@@ -211,7 +205,6 @@ const FutureValueCalculator: React.FC = () => {
                   <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Asset</th>
                   <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Current Value (₹)</th>
                   <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ROI (%)</th>
-                  <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Duration (Yrs)</th>
                   <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Future Value (₹)</th>
                 </tr>
               </thead>
@@ -220,13 +213,10 @@ const FutureValueCalculator: React.FC = () => {
                   <tr key={asset.name} className="h-10">
                     <td className="px-2 py-0 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{asset.name}</td>
                     <td className="px-2 py-0 whitespace-nowrap">
-                      <Input type="number" value={asset.currentValue} onChange={(e) => handleInputChange(asset.name, 'currentValue', e.target.value)} className="w-36 h-7 text-sm" disabled />
+                      <Input type="number" value={asset.currentValue} className="w-36 h-7 text-sm" disabled />
                     </td>
                     <td className="px-2 py-0 whitespace-nowrap">
                       <Input type="number" value={asset.roi} onChange={(e) => handleInputChange(asset.name, 'roi', e.target.value)} className="w-16 h-7 text-sm" />
-                    </td>
-                    <td className="px-2 py-0 whitespace-nowrap">
-                      <Input type="number" value={asset.duration} onChange={(e) => handleInputChange(asset.name, 'duration', e.target.value)} className="w-20 h-7 text-sm" />
                     </td>
                     <td className="px-2 py-0 whitespace-nowrap text-sm font-medium">₹{asset.futureValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</td>
                   </tr>
@@ -238,7 +228,7 @@ const FutureValueCalculator: React.FC = () => {
                   <td className="px-2 py-2 text-left text-sm">
                     ₹{totalCurrentValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
                   </td>
-                  <td colSpan={2}></td>
+                  <td className="px-2 py-2"></td>
                   <td className="px-2 py-2 text-left text-sm">
                     ₹{totalFutureValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
                   </td>
@@ -258,12 +248,12 @@ const FutureValueCalculator: React.FC = () => {
         <div className="flex gap-2">
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive"><Trash2 className="mr-2 h-4 w-4" /> Clear Data</Button>
+              <Button variant="destructive"><Trash2 className="mr-2 h-4 w-4" /> Clear ROI Data</Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                <AlertDialogDescription>This will reset all ROI and Duration values on this page to their defaults. This action cannot be undone.</AlertDialogDescription>
+                <AlertDialogDescription>This will reset all ROI values on this page to their defaults. This action cannot be undone.</AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -277,6 +267,15 @@ const FutureValueCalculator: React.FC = () => {
           </Button>
         </div>
       </div>
+
+      <Card className="bg-blue-50 dark:bg-blue-900/30 border-blue-500">
+        <CardContent className="pt-6 flex items-center gap-4">
+          <Info className="h-6 w-6 text-blue-600" />
+          <p className="text-blue-800 dark:text-blue-300 font-medium">
+            All assets are projected for a duration of <span className="font-bold">{duration} years</span>. This is calculated from the Retirement page (Life Expectancy - Retirement Age).
+          </p>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6">
         <AssetTable title="Illiquid Assets" data={illiquidAssets} />
