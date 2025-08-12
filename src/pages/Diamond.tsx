@@ -27,64 +27,29 @@ import {
 } from "@/components/ui/resizable";
 import GenericPieChart from "@/components/GenericPieChart";
 
-interface GoldAsset {
+interface DiamondAsset {
   id: string;
   particulars: string;
   value: number;
 }
 
-const initialAssets: GoldAsset[] = [
-  { id: '1', particulars: 'Gold Jewellery', value: 0 },
-  { id: '2', particulars: 'Gold Coins', value: 0 },
-  { id: '3', particulars: 'SGB', value: 0 },
-  { id: '4', particulars: 'Digital Gold', value: 0 },
-  { id: '5', particulars: 'Gold ETF - Self', value: 0 },
-  { id: '6', particulars: 'Gold ETF - Spouse', value: 0 },
-  { id: '7', particulars: 'Gold ETF', value: 0 },
+const initialAssets: DiamondAsset[] = [
+  { id: '1', particulars: 'Diamond Jewellery', value: 0 },
+  { id: '2', particulars: 'Loose Diamonds', value: 0 },
 ];
 
-const Gold: React.FC = () => {
-  const [assets, setAssets] = useState<GoldAsset[]>(initialAssets);
-
-  useEffect(() => {
+const Diamond: React.FC = () => {
+  const [assets, setAssets] = useState<DiamondAsset[]>(() => {
     try {
-      const saved = localStorage.getItem('goldData');
-      if (saved) {
-        let savedAssets = JSON.parse(saved) as GoldAsset[];
-        
-        // Filter to only include gold-related items for data cleanup
-        const goldKeywords = ['Gold', 'SGB'];
-        const filteredGoldAssets = savedAssets.filter(asset => 
-          goldKeywords.some(keyword => asset.particulars.includes(keyword))
-        );
-
-        // Migration for names
-        const migratedAssets = filteredGoldAssets.map(asset => {
-          if (asset.particulars === 'Gold ETF - Vignesh') {
-            return { ...asset, particulars: 'Gold ETF - Self' };
-          }
-          if (asset.particulars === 'Jewellery') {
-            return { ...asset, particulars: 'Gold Jewellery' };
-          }
-          return asset;
-        });
-
-        const savedAssetsMap = new Map(migratedAssets.map(a => [a.particulars, a]));
-
-        const mergedAssets = initialAssets.map(initialAsset => {
-          const savedAsset = savedAssetsMap.get(initialAsset.particulars);
-          return savedAsset ? { ...initialAsset, value: savedAsset.value } : initialAsset;
-        });
-        
-        setAssets(mergedAssets);
-      }
-    } catch (e) {
-      console.error("Failed to load or migrate gold data", e);
+      const saved = localStorage.getItem('diamondData');
+      return saved ? JSON.parse(saved) : initialAssets;
+    } catch {
+      return initialAssets;
     }
-  }, []);
+  });
 
   useEffect(() => {
-    localStorage.setItem('goldData', JSON.stringify(assets));
+    localStorage.setItem('diamondData', JSON.stringify(assets));
   }, [assets]);
 
   const handleValueChange = (id: string, value: number) => {
@@ -110,8 +75,8 @@ const Gold: React.FC = () => {
 
   const exportData = () => {
     const blob = new Blob([JSON.stringify(assets, null, 2)], { type: 'application/json' });
-    saveAs(blob, 'gold-data.json');
-    showSuccess('Gold data exported successfully!');
+    saveAs(blob, 'diamond-data.json');
+    showSuccess('Diamond data exported successfully!');
   };
 
   const importData = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,7 +104,7 @@ const Gold: React.FC = () => {
   const handleClearData = () => {
     const clearedAssets = assets.map(asset => ({ ...asset, value: 0 }));
     setAssets(clearedAssets);
-    showSuccess('Gold data values have been cleared.');
+    showSuccess('Diamond data values have been cleared.');
   };
 
   return (
@@ -147,7 +112,7 @@ const Gold: React.FC = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <Gem className="h-8 w-8" />
-          Gold
+          Diamond
         </h1>
         <div className="flex gap-2">
           <AlertDialog>
@@ -160,7 +125,7 @@ const Gold: React.FC = () => {
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will reset all gold asset values to zero. This action cannot be undone.
+                  This will reset all diamond asset values to zero. This action cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -188,7 +153,7 @@ const Gold: React.FC = () => {
         <ResizablePanel defaultSize={50}>
           <Card className="h-full border-0 shadow-none rounded-none">
             <CardHeader>
-              <CardTitle>Gold Holdings</CardTitle>
+              <CardTitle>Diamond Holdings</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
@@ -242,4 +207,4 @@ const Gold: React.FC = () => {
   );
 };
 
-export default Gold;
+export default Diamond;

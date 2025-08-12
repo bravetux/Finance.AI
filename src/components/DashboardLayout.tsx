@@ -72,7 +72,17 @@ const navItems = [
         ]
       },
       { name: "Debt", path: "/debt", icon: FileText, type: 'link' },
-      { name: "Gold", path: "/gold", icon: Gem, type: 'link' },
+      { 
+        name: "Precious Metals", 
+        icon: Gem,
+        type: 'section',
+        children: [
+          { name: "Gold", path: "/gold", icon: Gem, type: 'link' },
+          { name: "Silver", path: "/silver", icon: Gem, type: 'link' },
+          { name: "Platinum", path: "/platinum", icon: Gem, type: 'link' },
+          { name: "Diamond", path: "/diamond", icon: Gem, type: 'link' },
+        ]
+      },
     ]
   },
   { name: "Goals", path: "/goals", icon: Target, type: 'link' },
