@@ -55,7 +55,6 @@ const Gold: React.FC = () => {
       if (saved) {
         let savedAssets = JSON.parse(saved) as GoldAsset[];
         
-        // Migration for names
         savedAssets = savedAssets.map(asset => {
           if (asset.particulars === 'Gold ETF - Vignesh') {
             return { ...asset, particulars: 'Gold ETF - Self' };
@@ -70,7 +69,8 @@ const Gold: React.FC = () => {
 
         const mergedAssets = initialAssets.map(initialAsset => {
           const savedAsset = savedAssetsMap.get(initialAsset.particulars);
-          return savedAsset ? { ...initialAsset, ...savedAsset } : initialAsset;
+          // Correctly merge only the value, preserving the original ID
+          return savedAsset ? { ...initialAsset, value: savedAsset.value } : initialAsset;
         });
         
         setAssets(mergedAssets);
