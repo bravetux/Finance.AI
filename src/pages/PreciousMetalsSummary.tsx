@@ -59,43 +59,13 @@ const PreciousMetalsSummary: React.FC = () => {
       { name: 'Liquid Assets', value: totalLiquidValue },
     ].filter(item => item.value > 0);
 
-    const totalJewelleryValue = allAssets
-      .filter(asset => asset.particulars.toLowerCase().includes('jewellery'))
-      .reduce((sum, asset) => sum + (asset.value || 0), 0);
-    
-    const goldSGBValue = goldData
-      .find(asset => asset.particulars.toLowerCase() === 'sgb')
-      ?.value || 0;
-
     return {
       totalIlliquidValue,
       totalLiquidValue,
       totalValue,
       chartData,
-      totalJewelleryValue,
-      goldSGBValue,
     };
   }, [goldData, silverData, platinumData, diamondData]);
-
-  useEffect(() => {
-    try {
-        const savedNetWorthData = localStorage.getItem('netWorthData');
-        const netWorthData = savedNetWorthData ? JSON.parse(savedNetWorthData) : {};
-
-        const updatedNetWorthData = {
-            ...netWorthData,
-            jewellery: summary.totalJewelleryValue,
-            sovereignGoldBonds: summary.goldSGBValue,
-            preciousMetals: summary.totalLiquidValue,
-        };
-
-        localStorage.setItem('netWorthData', JSON.stringify(updatedNetWorthData));
-        window.dispatchEvent(new Event('storage'));
-
-    } catch (error) {
-        console.error("Failed to update net worth data from Precious Metals Summary:", error);
-    }
-  }, [summary.totalJewelleryValue, summary.goldSGBValue, summary.totalLiquidValue]);
 
   const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
 

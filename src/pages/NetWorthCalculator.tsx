@@ -61,60 +61,86 @@ const defaultNetWorthData: NetWorthData = {
 
 const NetWorthCalculator: React.FC = () => {
   const [isEditing, setIsEditing] = React.useState(false);
-  const [data, setData] = React.useState<NetWorthData>(() => {
-    try {
-      const savedDataString = localStorage.getItem('netWorthData');
-      if (savedDataString) {
-        let savedData = JSON.parse(savedDataString);
-        
-        // Migration logic for old data format
-        if ((savedData as any).goldEtf !== undefined) {
-          savedData.preciousMetals = savedData.preciousMetals || (savedData as any).goldEtf;
-          delete (savedData as any).goldEtf;
-        }
-
-        const migratedData = { ...defaultNetWorthData, ...savedData };
-        
-        // Persist the migrated data back to localStorage immediately
-        if (savedDataString !== JSON.stringify(migratedData)) {
-            localStorage.setItem('netWorthData', JSON.stringify(migratedData));
-        }
-
-        return migratedData;
-      }
-      return defaultNetWorthData;
-    } catch (e) {
-      console.error("Failed to load or migrate net worth data from localStorage:", e);
-      return defaultNetWorthData;
-    }
-  });
+  const [data, setData] = React.useState<NetWorthData>(defaultNetWorthData);
 
   useEffect(() => {
-    const handleStorageChange = () => {
+    const syncAllData = () => {
       try {
+        const currentData = JSON.parse(localStorage.getItem('netWorthData') || JSON.stringify(defaultNetWorthData));
+
+        // --- Sync data from other pages ---
+
+        // Real Estate
+        const realEstatePropertyValues = JSON.parse(localStorage.getItem('realEstatePropertyValues') || '[]');
+        const home1 = realEstatePropertyValues.find((p: any) => p.name === 'Home 1');
+        const homeValue = home1 ? home1.value : 0;
+        const totalPropertyValue = realEstatePropertyValues.reduce((sum: number, p: any) => sum + p.value, 0);
+        const otherRealEstateValue = totalPropertyValue - homeValue;
+
+        // Precious Metals
+        const goldData = JSON.parse(localStorage.getItem('goldData') || '[]');
+        const silverData = JSON.parse(localStorage.getItem('silverData') || '[]');
+        const platinumData = JSON.parse(localStorage.getItem('platinumData') || '[]');
+        const diamondData = JSON.parse(localStorage.getItem('diamondData') || '[]');
+        const allPreciousAssets = [...goldData, ...silverData, ...platinumData, ...diamondData];
+        
+        const jewelleryValue = allPreciousAssets
+          .filter((asset: any) => asset.particulars.toLowerCase().includes('jewellery'))
+          .reduce((sum: number, asset: any) => sum + (asset.value || 0), 0);
+        
+        const sgbValue = goldData.find((asset: any) => asset.particulars.toLowerCase() === 'sgb')?.value || 0;
+        
+        const liquidPreciousMetalsValue = allPreciousAssets
+          .filter((asset: any) => !asset.particulars.toLowerCase().includes('jewellery') && !asset.particulars.toLowerCase().includes('sgb'))
+          .reduce((sum: number, asset: any) => sum + (asset.value || 0), 0);
+
+        // Equity & Mutual Funds
+        const domesticEquityStocks = JSON.parse(localStorage.getItem('domesticEquityStocks') || '[]');
+        const domesticStocksValue = domesticEquityStocks.reduce((sum: number, stock: any) => sum + stock.currentValue, 0);
+        
+        const mutualFundAllocationEntries = JSON.parse(localStorage.getItem('mutualFundAllocationEntries') || '[]');
+        const domesticMutualFundsValue = mutualFundAllocationEntries.reduce((sum: number, entry: any) => sum + entry.currentValue, 0);
+
+        // --- Create the new, synced data object ---
+        const newData = {
+          ...currentData,
+          homeValue: homeValue,
+          otherRealEstate: otherRealEstateValue,
+          jewellery: jewelleryValue,
+          sovereignGoldBonds: sgbValue,
+          preciousMetals: liquidPreciousMetalsValue,
+          domesticStocks: domesticStocksValue,
+          domesticMutualFunds: domesticMutualFundsValue,
+        };
+
+        // --- Update state and localStorage ---
+        setData(newData);
+        localStorage.setItem('netWorthData', JSON.stringify(newData));
+
+      } catch (e) {
+        console.error("Failed to sync data in NetWorthCalculator:", e);
+        // Fallback to loading whatever is in storage
         const savedData = localStorage.getItem('netWorthData');
         if (savedData) {
           setData(JSON.parse(savedData));
         }
-      } catch (e) {
-        console.error("Failed to reload net worth data from localStorage:", e);
       }
     };
 
-    window.addEventListener('storage', handleStorageChange);
-
+    syncAllData();
+    window.addEventListener('storage', syncAllData);
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('storage', syncAllData);
     };
   }, []);
 
   const handleInputChange = (field: keyof NetWorthData, value: string) => {
-    const newData = {
+    const updatedData = {
       ...data,
       [field]: Number(value) || 0
     };
-    setData(newData);
-    localStorage.setItem('netWorthData', JSON.stringify(newData));
+    setData(updatedData);
+    localStorage.setItem('netWorthData', JSON.stringify(updatedData));
   };
 
   const exportData = () => {
@@ -138,7 +164,7 @@ const NetWorthCalculator: React.FC = () => {
         const content = e.target?.result as string;
         const importedData = JSON.parse(content) as NetWorthData;
         setData(importedData);
-        localStorage.setItem('netWorthData', JSON.stringify(importedData)); // Save imported data
+        localStorage.setItem('netWorthData', JSON.stringify(importedData));
       } catch (error) {
         showError('Error parsing file. Please check the file format.');
       }
@@ -148,8 +174,8 @@ const NetWorthCalculator: React.FC = () => {
 
   const handleClearData = () => {
     localStorage.setItem('netWorthData', JSON.stringify(defaultNetWorthData));
+    setData(defaultNetWorthData);
     showSuccess("Net Worth data has been cleared.");
-    setTimeout(() => window.location.reload(), 1000);
   };
 
   // Calculate totals
