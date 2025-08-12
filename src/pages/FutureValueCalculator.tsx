@@ -196,43 +196,60 @@ const FutureValueCalculator: React.FC = () => {
     return ((totalFutureValue / totalCurrentValue) - 1) * 100;
   }, [totalFutureValue, totalCurrentValue]);
 
-  const AssetTable = ({ title, data }: { title: string, data: Asset[] }) => (
-    <Card>
-      <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-800">
-              <tr>
-                <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Asset</th>
-                <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Current Value (₹)</th>
-                <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ROI (%)</th>
-                <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Duration (Yrs)</th>
-                <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Future Value (₹)</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-              {data.map((asset) => (
-                <tr key={asset.name} className="h-10">
-                  <td className="px-2 py-0 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{asset.name}</td>
-                  <td className="px-2 py-0 whitespace-nowrap">
-                    <Input type="number" value={asset.currentValue} onChange={(e) => handleInputChange(asset.name, 'currentValue', e.target.value)} className="w-36 h-7 text-sm" disabled />
-                  </td>
-                  <td className="px-2 py-0 whitespace-nowrap">
-                    <Input type="number" value={asset.roi} onChange={(e) => handleInputChange(asset.name, 'roi', e.target.value)} className="w-16 h-7 text-sm" />
-                  </td>
-                  <td className="px-2 py-0 whitespace-nowrap">
-                    <Input type="number" value={asset.duration} onChange={(e) => handleInputChange(asset.name, 'duration', e.target.value)} className="w-20 h-7 text-sm" />
-                  </td>
-                  <td className="px-2 py-0 whitespace-nowrap text-sm font-medium">₹{asset.futureValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</td>
+  const AssetTable = ({ title, data }: { title: string, data: Asset[] }) => {
+    const totalCurrentValue = data.reduce((sum, asset) => sum + asset.currentValue, 0);
+    const totalFutureValue = data.reduce((sum, asset) => sum + asset.futureValue, 0);
+
+    return (
+      <Card>
+        <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-800">
+                <tr>
+                  <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Asset</th>
+                  <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Current Value (₹)</th>
+                  <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ROI (%)</th>
+                  <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Duration (Yrs)</th>
+                  <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Future Value (₹)</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </CardContent>
-    </Card>
-  );
+              </thead>
+              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                {data.map((asset) => (
+                  <tr key={asset.name} className="h-10">
+                    <td className="px-2 py-0 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{asset.name}</td>
+                    <td className="px-2 py-0 whitespace-nowrap">
+                      <Input type="number" value={asset.currentValue} onChange={(e) => handleInputChange(asset.name, 'currentValue', e.target.value)} className="w-36 h-7 text-sm" disabled />
+                    </td>
+                    <td className="px-2 py-0 whitespace-nowrap">
+                      <Input type="number" value={asset.roi} onChange={(e) => handleInputChange(asset.name, 'roi', e.target.value)} className="w-16 h-7 text-sm" />
+                    </td>
+                    <td className="px-2 py-0 whitespace-nowrap">
+                      <Input type="number" value={asset.duration} onChange={(e) => handleInputChange(asset.name, 'duration', e.target.value)} className="w-20 h-7 text-sm" />
+                    </td>
+                    <td className="px-2 py-0 whitespace-nowrap text-sm font-medium">₹{asset.futureValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot className="bg-gray-50 dark:bg-gray-800">
+                <tr className="font-bold">
+                  <td className="px-2 py-2 text-left text-sm">Total</td>
+                  <td className="px-2 py-2 text-left text-sm">
+                    ₹{totalCurrentValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                  </td>
+                  <td colSpan={2}></td>
+                  <td className="px-2 py-2 text-left text-sm">
+                    ₹{totalFutureValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <div className="space-y-6">
