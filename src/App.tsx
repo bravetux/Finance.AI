@@ -28,6 +28,7 @@ import CashflowSummary from "./pages/CashflowSummary";
 import Silver from "./pages/Silver";
 import Platinum from "./pages/Platinum";
 import Diamond from "./pages/Diamond";
+import PreciousMetalsSummary from "./pages/PreciousMetalsSummary";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ const App = () => (
               <Route path="mutual-fund-sip" element={<MutualFundSIP />} />
               <Route path="us-equity" element={<USEquity />} />
               <Route path="debt" element={<Debt />} />
+              <Route path="precious-metals-summary" element={<PreciousMetalsSummary />} />
               <Route path="gold" element={<Gold />} />
               <Route path="silver" element={<Silver />} />
               <Route path="platinum" element={<Platinum />} />

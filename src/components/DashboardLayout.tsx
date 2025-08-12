@@ -77,6 +77,7 @@ const navItems = [
         icon: Gem,
         type: 'section',
         children: [
+          { name: "Summary", path: "/precious-metals-summary", icon: LayoutDashboard, type: 'link' },
           { name: "Gold", path: "/gold", icon: Gem, type: 'link' },
           { name: "Silver", path: "/silver", icon: Gem, type: 'link' },
           { name: "Platinum", path: "/platinum", icon: Gem, type: 'link' },
