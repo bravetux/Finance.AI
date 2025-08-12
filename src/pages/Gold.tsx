@@ -40,7 +40,6 @@ const initialAssets: GoldAsset[] = [
   { id: '4', particulars: 'Digital Gold', value: 0 },
   { id: '5', particulars: 'Gold ETF - Self', value: 0 },
   { id: '6', particulars: 'Gold ETF - Spouse', value: 0 },
-  { id: '7', particulars: 'Gold ETF', value: 0 },
 ];
 
 const Gold: React.FC = () => {
