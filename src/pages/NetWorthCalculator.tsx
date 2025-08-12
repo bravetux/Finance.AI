@@ -110,6 +110,15 @@ const NetWorthCalculator: React.FC = () => {
         const smallCaseData = JSON.parse(localStorage.getItem('smallCaseData') || '[]');
         const smallCasesValue = smallCaseData.reduce((sum: number, entry: any) => sum + entry.currentValue, 0);
 
+        // Debt Page
+        const debtLiquidAssets = JSON.parse(localStorage.getItem('debtLiquidAssets') || '[]');
+        const debtFixedDeposits = JSON.parse(localStorage.getItem('debtFixedDeposits') || '[]');
+        const debtDebtFunds = JSON.parse(localStorage.getItem('debtDebtFunds') || '[]');
+        
+        const savingsBalanceValue = debtLiquidAssets.reduce((sum: number, asset: any) => sum + asset.currentValue, 0);
+        const fixedDepositsValue = debtFixedDeposits.reduce((sum: number, asset: any) => sum + asset.currentValue, 0);
+        const debtFundsValue = debtDebtFunds.reduce((sum: number, asset: any) => sum + asset.currentValue, 0);
+
         // --- Create the new, synced data object ---
         const newData = {
           ...currentData,
@@ -123,6 +132,9 @@ const NetWorthCalculator: React.FC = () => {
           domesticMutualFunds: domesticMutualFundsValue,
           internationalFunds: internationalFundsValue,
           smallCases: smallCasesValue,
+          savingsBalance: savingsBalanceValue,
+          fixedDeposits: fixedDepositsValue,
+          debtFunds: debtFundsValue,
         };
 
         // --- Update state and localStorage ---
@@ -437,7 +449,9 @@ const NetWorthCalculator: React.FC = () => {
                     type="number"
                     value={data.fixedDeposits}
                     onChange={(e) => handleInputChange('fixedDeposits', e.target.value)}
+                    disabled
                   />
+                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Debt page.</p>
                 </div>
                 <div>
                   <Label htmlFor="debtFunds">Debt Funds</Label>
@@ -446,7 +460,9 @@ const NetWorthCalculator: React.FC = () => {
                     type="number"
                     value={data.debtFunds}
                     onChange={(e) => handleInputChange('debtFunds', e.target.value)}
+                    disabled
                   />
+                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Debt page.</p>
                 </div>
                 <div>
                   <Label htmlFor="domesticStocks">Domestic Stocks</Label>
@@ -499,7 +515,9 @@ const NetWorthCalculator: React.FC = () => {
                     type="number"
                     value={data.savingsBalance}
                     onChange={(e) => handleInputChange('savingsBalance', e.target.value)}
+                    disabled
                   />
+                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Debt page.</p>
                 </div>
                 <div>
                   <Label htmlFor="preciousMetals">Precious Metals</Label>
