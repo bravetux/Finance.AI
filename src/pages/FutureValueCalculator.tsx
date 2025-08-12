@@ -238,45 +238,45 @@ const FutureValueCalculator: React.FC = () => {
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Asset</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Current Value (₹)</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ROI (%)</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Duration (Years)</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Future Value (₹)</th>
+                    <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Asset</th>
+                    <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Current Value (₹)</th>
+                    <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ROI (%)</th>
+                    <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Duration (Years)</th>
+                    <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Future Value (₹)</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                   {assets.map((asset, index) => (
                     <tr key={index}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                      <td className="px-2 py-1 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                         {asset.name}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-2 py-1 whitespace-nowrap">
                         <Input
                           type="number"
                           value={asset.currentValue}
                           onChange={(e) => handleInputChange(index, 'currentValue', e.target.value)}
-                          className="w-full"
+                          className="w-full h-8 text-sm"
                           disabled
                         />
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-2 py-1 whitespace-nowrap">
                         <Input
                           type="number"
                           value={asset.roi}
                           onChange={(e) => handleInputChange(index, 'roi', e.target.value)}
-                          className="w-full"
+                          className="w-full h-8 text-sm"
                         />
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-2 py-1 whitespace-nowrap">
                         <Input
                           type="number"
                           value={asset.duration}
                           onChange={(e) => handleInputChange(index, 'duration', e.target.value)}
-                          className="w-full"
+                          className="w-full h-8 text-sm"
                         />
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap font-medium">
+                      <td className="px-2 py-1 whitespace-nowrap text-sm font-medium">
                         ₹{asset.futureValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
                       </td>
                     </tr>
