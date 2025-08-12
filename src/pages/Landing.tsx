@@ -62,22 +62,17 @@ const Landing: React.FC = () => {
       {/* Main Content */}
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="container flex flex-col items-center justify-center py-20 md:py-32 text-center">
+        <section className="container flex flex-col items-center justify-center py-12 md:py-20 text-center">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tighter">
             Take Control of Your Financial Future
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
             An all-in-one, open-source financial planner to track your net worth, manage cashflow, set goals, and plan for retirement. All your data stays on your device.
           </p>
-          <div className="mt-8">
-            <Button size="lg" asChild>
-              <Link to="/dashboard">Launch Planner</Link>
-            </Button>
-          </div>
         </section>
 
         {/* Features Section */}
-        <section className="container py-16 bg-muted/40 rounded-lg">
+        <section className="container pb-16 bg-muted/40 rounded-lg">
           <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
             <h2 className="text-3xl font-bold leading-[1.1] md:text-4xl">Features</h2>
             <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
