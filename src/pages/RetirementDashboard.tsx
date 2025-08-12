@@ -94,7 +94,6 @@ const RetirementDashboard: React.FC = () => {
   useEffect(() => {
     try {
       const futureValueData = JSON.parse(localStorage.getItem("future-value-data") || "[]");
-      const goalsData = JSON.parse(localStorage.getItem("goalsData") || "[]");
       const projectedCorpus = JSON.parse(localStorage.getItem("projectedAccumulatedCorpus") || "0");
 
       // Calculate Liquid Future Value
@@ -105,10 +104,8 @@ const RetirementDashboard: React.FC = () => {
           .reduce((sum: number, asset: any) => sum + (asset.futureValue || 0), 0);
       const liquidFutureValue = totalFutureValue - illiquidFutureValue;
 
-      const totalGoalsFutureValue = goalsData.reduce((sum: number, goal: any) => sum + (goal.targetFutureValue || 0), 0);
-      
       // Update retirementFund calculation to include projected cash flow
-      setRetirementFund(Math.max(0, liquidFutureValue - totalGoalsFutureValue + projectedCorpus));
+      setRetirementFund(Math.max(0, liquidFutureValue + projectedCorpus));
 
       const { totalAssets, totalLiabilities } = getNetWorthData();
       setNetWorth(totalAssets - totalLiabilities);
@@ -290,7 +287,7 @@ const RetirementDashboard: React.FC = () => {
         <Card>
           <CardHeader><CardTitle>Retirement Projections</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2"><Label>Liquid Future Value - Goals + Projected Cash Flow</Label><div className="text-3xl font-bold text-green-600">₹{retirementFund.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</div></div>
+            <div className="space-y-2"><Label>Liquid Future Value + Projected Cash Flow</Label><div className="text-3xl font-bold text-green-600">₹{retirementFund.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</div></div>
             <div className="space-y-2 border-t pt-4">
               <div className="flex justify-between"><span className="text-muted-foreground">Future Annual Expenses:</span><span className="font-bold">₹{futureAnnualExpenses.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Corpus will last for:</span><span className="font-bold text-blue-600">{corpusSustainability >= (retirementData.lifeExpectancy - retirementData.retirementAge) ? `${retirementData.lifeExpectancy - retirementData.retirementAge}+ Years` : `${corpusSustainability.toFixed(0)} Years`}</span></div>
