@@ -53,18 +53,6 @@ const getProjectedCorpus = () => {
   }
 };
 
-// Helper to get total goals future value
-const getTotalGoalsFutureValue = () => {
-  try {
-    const savedData = localStorage.getItem('goalsData');
-    if (!savedData) return 0;
-    const goals = JSON.parse(savedData);
-    return goals.reduce((sum: number, goal: any) => sum + (goal.targetFutureValue || 0), 0);
-  } catch {
-    return 0;
-  }
-};
-
 interface RetirementInputs {
   currentAge: number;
   lifeExpectancy: number;
@@ -77,7 +65,6 @@ const CanYouRetireNow: React.FC = () => {
   const [liquidAssets, setLiquidAssets] = useState(0);
   const [projectedCorpus, setProjectedCorpus] = useState(0);
   const [annualExpenses, setAnnualExpenses] = useState(0);
-  const [totalGoalsFutureValue, setTotalGoalsFutureValue] = useState(0);
 
   const [inputs, setInputs] = useState<RetirementInputs>(() => {
     const defaultState: RetirementInputs = {
@@ -95,7 +82,6 @@ const CanYouRetireNow: React.FC = () => {
       setLiquidAssets(getLiquidAssets());
       setAnnualExpenses(getAnnualExpenses());
       setProjectedCorpus(getProjectedCorpus());
-      setTotalGoalsFutureValue(getTotalGoalsFutureValue());
     };
     updateData();
     window.addEventListener('storage', updateData);
@@ -114,7 +100,7 @@ const CanYouRetireNow: React.FC = () => {
     handleInputChange("returns", { ...inputs.returns, [category]: Number(value) });
   };
 
-  const totalStartingCorpus = useMemo(() => liquidAssets + projectedCorpus - totalGoalsFutureValue, [liquidAssets, projectedCorpus, totalGoalsFutureValue]);
+  const totalStartingCorpus = useMemo(() => liquidAssets + projectedCorpus, [liquidAssets, projectedCorpus]);
   const totalAllocation = useMemo(() => Object.values(inputs.allocations).reduce((sum, val) => sum + val, 0), [inputs.allocations]);
   
   const weightedAvgReturn = useMemo(() => {
@@ -173,7 +159,7 @@ const CanYouRetireNow: React.FC = () => {
       <Card>
         <CardHeader>
             <CardTitle>Net Corpus for Retirement</CardTitle>
-            <CardDescription>This is the final amount available for your retirement after accounting for future goal expenses.</CardDescription>
+            <CardDescription>This is the final amount available for your retirement.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
             <div className="flex justify-between items-center">
@@ -183,10 +169,6 @@ const CanYouRetireNow: React.FC = () => {
             <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">+ Projected Corpus</span>
                 <span className="font-medium">{formatCurrency(projectedCorpus)}</span>
-            </div>
-            <div className="flex justify-between items-center">
-                <span className="text-muted-foreground text-red-600">- Goal Expenses (Future Value)</span>
-                <span className="font-medium text-red-600">({formatCurrency(totalGoalsFutureValue)})</span>
             </div>
             <div className="border-t pt-2 mt-2 flex justify-between items-center">
                 <span className="text-lg font-bold">Total Starting Corpus</span>
