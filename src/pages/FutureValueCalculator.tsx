@@ -101,7 +101,13 @@ const FutureValueCalculator: React.FC = () => {
   // Handle input changes
   const handleInputChange = (index: number, field: keyof Asset, value: string) => {
     if (field === 'roi' && value.length > 4) {
-      return; // Do not update state if ROI input is too long
+      return;
+    }
+    if (field === 'duration' && value.length > 2) {
+      return;
+    }
+    if (field === 'currentValue' && value.length > 11) {
+      return;
     }
 
     setAssets(prev => {
@@ -242,45 +248,45 @@ const FutureValueCalculator: React.FC = () => {
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
-                    <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Asset</th>
-                    <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Current Value (₹)</th>
-                    <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ROI (%)</th>
-                    <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Duration (Years)</th>
-                    <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Future Value (₹)</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Asset</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Current Value (₹)</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ROI (%)</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Duration (Yrs)</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Future Value (₹)</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                   {assets.map((asset, index) => (
-                    <tr key={index}>
-                      <td className="px-2 py-1 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                    <tr key={index} className="h-10">
+                      <td className="px-2 py-0 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                         {asset.name}
                       </td>
-                      <td className="px-2 py-1 whitespace-nowrap">
+                      <td className="px-2 py-0 whitespace-nowrap">
                         <Input
                           type="number"
                           value={asset.currentValue}
                           onChange={(e) => handleInputChange(index, 'currentValue', e.target.value)}
-                          className="w-full h-8 text-sm"
+                          className="w-36 h-7 text-sm"
                           disabled
                         />
                       </td>
-                      <td className="px-2 py-1 whitespace-nowrap">
+                      <td className="px-2 py-0 whitespace-nowrap">
                         <Input
                           type="number"
                           value={asset.roi}
                           onChange={(e) => handleInputChange(index, 'roi', e.target.value)}
-                          className="w-20 h-8 text-sm"
+                          className="w-16 h-7 text-sm"
                         />
                       </td>
-                      <td className="px-2 py-1 whitespace-nowrap">
+                      <td className="px-2 py-0 whitespace-nowrap">
                         <Input
                           type="number"
                           value={asset.duration}
                           onChange={(e) => handleInputChange(index, 'duration', e.target.value)}
-                          className="w-full h-8 text-sm"
+                          className="w-20 h-7 text-sm"
                         />
                       </td>
-                      <td className="px-2 py-1 whitespace-nowrap text-sm font-medium">
+                      <td className="px-2 py-0 whitespace-nowrap text-sm font-medium">
                         ₹{asset.futureValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
                       </td>
                     </tr>
