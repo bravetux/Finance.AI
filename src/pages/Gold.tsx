@@ -86,6 +86,27 @@ const Gold: React.FC = () => {
     localStorage.setItem('goldData', JSON.stringify(assets));
   }, [assets]);
 
+  useEffect(() => {
+    try {
+      const sgbAsset = assets.find(a => a.particulars === 'SGB');
+      const sgbValue = sgbAsset ? sgbAsset.value : 0;
+
+      const savedNetWorthData = localStorage.getItem('netWorthData');
+      const netWorthData = savedNetWorthData ? JSON.parse(savedNetWorthData) : {};
+
+      if (netWorthData.sovereignGoldBonds !== sgbValue) {
+        const updatedNetWorthData = {
+          ...netWorthData,
+          sovereignGoldBonds: sgbValue,
+        };
+        localStorage.setItem('netWorthData', JSON.stringify(updatedNetWorthData));
+        window.dispatchEvent(new Event('storage'));
+      }
+    } catch (error) {
+      console.error("Failed to sync SGB value to Net Worth:", error);
+    }
+  }, [assets]);
+
   const handleValueChange = (id: string, value: number) => {
     setAssets(prev =>
       prev.map(p => (p.id === id ? { ...p, value: value } : p))
