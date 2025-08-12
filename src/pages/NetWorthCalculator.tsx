@@ -63,10 +63,28 @@ const NetWorthCalculator: React.FC = () => {
   const [isEditing, setIsEditing] = React.useState(false);
   const [data, setData] = React.useState<NetWorthData>(() => {
     try {
-      const savedData = localStorage.getItem('netWorthData');
-      return savedData ? JSON.parse(savedData) : defaultNetWorthData;
+      const savedDataString = localStorage.getItem('netWorthData');
+      if (savedDataString) {
+        let savedData = JSON.parse(savedDataString);
+        
+        // Migration logic for old data format
+        if ((savedData as any).goldEtf !== undefined) {
+          savedData.preciousMetals = savedData.preciousMetals || (savedData as any).goldEtf;
+          delete (savedData as any).goldEtf;
+        }
+
+        const migratedData = { ...defaultNetWorthData, ...savedData };
+        
+        // Persist the migrated data back to localStorage immediately
+        if (savedDataString !== JSON.stringify(migratedData)) {
+            localStorage.setItem('netWorthData', JSON.stringify(migratedData));
+        }
+
+        return migratedData;
+      }
+      return defaultNetWorthData;
     } catch (e) {
-      console.error("Failed to load net worth data from localStorage:", e);
+      console.error("Failed to load or migrate net worth data from localStorage:", e);
       return defaultNetWorthData;
     }
   });
