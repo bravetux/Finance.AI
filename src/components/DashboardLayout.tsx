@@ -29,6 +29,7 @@ import {
   Gem,
   PieChart,
   Repeat,
+  CheckCircle,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -93,6 +94,7 @@ const navItems = [
     icon: Landmark,
     type: 'section',
     children: [
+      { name: "Can you retire now?", path: "/can-you-retire-now", icon: CheckCircle, type: 'link' },
       { name: "FIRE Calculator", path: "/fire-calculator", icon: Flame, type: 'link' },
       { name: "Retirement", path: "/retirement", icon: Landmark, type: 'link' },
       { name: "Projected Cashflow", path: "/projected-cashflow", icon: LineChart, type: 'link' },
