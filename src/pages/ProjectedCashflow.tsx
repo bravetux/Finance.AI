@@ -140,7 +140,7 @@ const ProjectedCashflow: React.FC = () => {
     }
   }, [settings]);
 
-  const { projections, finalAccumulatedCorpus, finalAnnualExpense } = useMemo(() => {
+  const { projections, finalAccumulatedCorpus, finalAnnualExpense, nonDeductedGoalsValue } = useMemo(() => {
     const results = [];
     // Initialize with values from state
     let currentSalary = initialData.postTaxSalaryIncome;
@@ -154,7 +154,7 @@ const ProjectedCashflow: React.FC = () => {
 
     const duration = settings.retirementAge - settings.currentAge;
     if (duration < 0) {
-        return { projections: [], finalAccumulatedCorpus: 0, finalAnnualExpense: currentVariableExpenses + fixedOutflows };
+        return { projections: [], finalAccumulatedCorpus: 0, finalAnnualExpense: currentVariableExpenses + fixedOutflows, nonDeductedGoalsValue: 0 };
     }
 
     for (let i = 0; i <= duration; i++) {
@@ -216,7 +216,10 @@ const ProjectedCashflow: React.FC = () => {
     const finalCorpus = results.length > 0 ? results[results.length - 1].accumulatedCorpus : 0;
     const finalExpense = currentVariableExpenses + fixedOutflows;
 
-    return { projections: results, finalAccumulatedCorpus: finalCorpus, finalAnnualExpense: finalExpense };
+    const nonDeductedGoals = goals.filter(goal => goal.duration > duration + 1);
+    const nonDeductedValue = nonDeductedGoals.reduce((sum, goal) => sum + goal.targetFutureValue, 0);
+
+    return { projections: results, finalAccumulatedCorpus: finalCorpus, finalAnnualExpense: finalExpense, nonDeductedGoalsValue: nonDeductedValue };
   }, [settings, initialData, goals]);
 
   useEffect(() => {
@@ -312,7 +315,7 @@ const ProjectedCashflow: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle>Projected Corpus at Retirement</CardTitle>
@@ -336,6 +339,19 @@ const ProjectedCashflow: React.FC = () => {
             </p>
             <p className="text-sm text-muted-foreground">
               This is your estimated annual expense in the first year of retirement.
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Non-deducted Goal Expense</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-4xl font-bold text-purple-600">
+              ₹{nonDeductedGoalsValue.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Total future value of goals not included in this projection.
             </p>
           </CardContent>
         </Card>
