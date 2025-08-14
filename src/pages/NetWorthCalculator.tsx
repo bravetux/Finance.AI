@@ -121,6 +121,10 @@ const NetWorthCalculator: React.FC = () => {
         const fixedDepositsValue = debtFixedDeposits.reduce((sum: number, asset: any) => sum + asset.currentValue, 0);
         const debtFundsValue = debtDebtFunds.reduce((sum: number, asset: any) => sum + asset.currentValue, 0);
 
+        // Cryptocurrency
+        const cryptoData = JSON.parse(localStorage.getItem('cryptoData') || '[]');
+        const cryptoValue = cryptoData.reduce((sum: number, asset: any) => sum + asset.currentValue, 0);
+
         // --- Create the new, synced data object ---
         const newData = {
           ...currentData,
@@ -138,6 +142,7 @@ const NetWorthCalculator: React.FC = () => {
           fixedDeposits: fixedDepositsValue,
           debtFunds: debtFundsValue,
           epfPpfVpf: epfPpfVpfTotal,
+          cryptocurrency: cryptoValue,
         };
 
         // --- Update state and localStorage ---
@@ -542,7 +547,9 @@ const NetWorthCalculator: React.FC = () => {
                     type="number"
                     value={data.cryptocurrency}
                     onChange={(e) => handleInputChange('cryptocurrency', e.target.value)}
+                    disabled
                   />
+                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Cryptocurrency page.</p>
                 </div>
                 <div>
                   <Label htmlFor="reits">REITs</Label>

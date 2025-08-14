@@ -30,6 +30,9 @@ import {
   PieChart,
   Repeat,
   CheckCircle,
+  HandCoins,
+  ShieldCheck,
+  Bitcoin,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -86,8 +89,11 @@ const navItems = [
           { name: "Diamond", path: "/dashboard/diamond", icon: Gem, type: 'link' },
         ]
       },
+      { name: "Cryptocurrency", path: "/dashboard/cryptocurrency", icon: Bitcoin, type: 'link' },
     ]
   },
+  { name: "Loan Tracker", path: "/dashboard/loan-tracker", icon: HandCoins, type: 'link' },
+  { name: "Insurance Hub", path: "/dashboard/insurance-hub", icon: ShieldCheck, type: 'link' },
   { name: "Goals", path: "/dashboard/goals", icon: Target, type: 'link' },
   { 
     name: "Retirement Planning", 

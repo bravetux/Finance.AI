@@ -33,6 +33,9 @@ import PreciousMetalsSummary from "./pages/PreciousMetalsSummary";
 import SmallCase from "./pages/SmallCase";
 import CanYouRetireNow from "./pages/CanYouRetireNow";
 import PostRetirementStrategy from "./pages/PostRetirementStrategy";
+import LoanTracker from "./pages/LoanTracker";
+import InsuranceHub from "./pages/InsuranceHub";
+import Cryptocurrency from "./pages/Cryptocurrency";
 
 const queryClient = new QueryClient();
 
@@ -64,6 +67,9 @@ const App = () => (
               <Route path="silver" element={<Silver />} />
               <Route path="platinum" element={<Platinum />} />
               <Route path="diamond" element={<Diamond />} />
+              <Route path="cryptocurrency" element={<Cryptocurrency />} />
+              <Route path="loan-tracker" element={<LoanTracker />} />
+              <Route path="insurance-hub" element={<InsuranceHub />} />
               <Route path="future-value" element={<FutureValueCalculator />} />
               <Route path="goals" element={<Goals />} />
               <Route path="retirement" element={<RetirementDashboard />} />
