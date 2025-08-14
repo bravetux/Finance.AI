@@ -8,7 +8,7 @@ const Dashboard: React.FC = () => {
   const [liquidFutureValue, setLiquidFutureValue] = React.useState(0);
   const [cashflowData, setCashflowData] = React.useState({ totalAnnualIncome: 0, totalAnnualOutflows: 0 });
   const [netWorthData, setNetWorthData] = React.useState({ totalAssets: 0, totalLiabilities: 0 });
-  const [futureValueData, setFutureValueData] = React.useState({ totalFutureValue: 0, averageROI: 0 });
+  const [futureValueData, setFutureValueData] = React.useState({ totalFutureValue: 0, averageROI: 0, ageAtGoal: 0 });
   const [goalsData, setGoalsData] = React.useState({ totalGoalsFutureValue: 0, totalSipRequired: 0 });
 
   React.useEffect(() => {
@@ -36,11 +36,9 @@ const Dashboard: React.FC = () => {
         setNetWorthData({ totalAssets, totalLiabilities });
 
         // Future Value Data
-        const savedFvData = localStorage.getItem('future-value-data');
-        const fvData = savedFvData ? JSON.parse(savedFvData) : [];
-        const totalFv = fvData.reduce((sum: number, asset: any) => sum + (asset.futureValue || 0), 0);
-        const avgROI = fvData.length > 0 ? fvData.reduce((sum: number, asset: any) => sum + asset.roi, 0) / fvData.length : 0;
-        setFutureValueData({ totalFutureValue: totalFv, averageROI: avgROI });
+        const savedFvSummary = localStorage.getItem('futureValueSummary');
+        const fvSummary = savedFvSummary ? JSON.parse(savedFvSummary) : { totalFutureValue: 0, averageROI: 0, ageAtGoal: 0 };
+        setFutureValueData(fvSummary);
 
         // Goals Data
         const savedGoals = localStorage.getItem('goalsData');
@@ -135,7 +133,9 @@ const Dashboard: React.FC = () => {
             <div className="text-2xl font-bold text-green-600">
               ₹{futureValueData.totalFutureValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
             </div>
-            <p className="text-xs text-muted-foreground">Average ROI: {futureValueData.averageROI.toFixed(2)}%</p>
+            <p className="text-xs text-muted-foreground">
+              at age {futureValueData.ageAtGoal} (Avg. ROI: {futureValueData.averageROI.toFixed(2)}%)
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -182,7 +182,7 @@ const Dashboard: React.FC = () => {
           <CardContent className="space-y-2">
             <div className="flex justify-between"><span>Total Current Value:</span><span className="font-medium">₹{(netWorthData.totalAssets).toLocaleString("en-IN", { maximumFractionDigits: 2 })}</span></div>
             <div className="flex justify-between"><span>Average ROI:</span><span className="font-medium">{futureValueData.averageROI.toFixed(2)}%</span></div>
-            <div className="flex justify-between border-t pt-2"><span className="font-bold">Total Future Value:</span><span className="font-bold text-green-600">₹{futureValueData.totalFutureValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</span></div>
+            <div className="flex justify-between border-t pt-2"><span className="font-bold">Total Future Value (at age {futureValueData.ageAtGoal}):</span><span className="font-bold text-green-600">₹{futureValueData.totalFutureValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</span></div>
           </CardContent>
         </Card>
 

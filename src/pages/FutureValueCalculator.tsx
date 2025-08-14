@@ -35,18 +35,20 @@ const calculateFutureValue = (pv: number, r: number, t: number) => {
 const FutureValueCalculator: React.FC = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [duration, setDuration] = useState(10);
-  const [maxDuration, setMaxDuration] = useState(10); // State for slider's max value
+  const [maxDuration, setMaxDuration] = useState(10);
+  const [currentAge, setCurrentAge] = useState(0);
 
   useEffect(() => {
     try {
       const savedRetirementData = localStorage.getItem('retirementData');
       if (savedRetirementData) {
         const retirementData = JSON.parse(savedRetirementData);
-        // Calculate max duration based on life expectancy - current age
-        const calculatedDuration = (retirementData.lifeExpectancy || 0) - (retirementData.currentAge || 0);
+        const age = retirementData.currentAge || 0;
+        setCurrentAge(age);
+        const calculatedDuration = (retirementData.lifeExpectancy || 0) - age;
         const finalDuration = Math.max(0, calculatedDuration);
-        setDuration(finalDuration); // Set initial duration to max
-        setMaxDuration(finalDuration); // Set max duration for the slider
+        setDuration(finalDuration);
+        setMaxDuration(finalDuration);
       }
     } catch (error) {
       console.error("Failed to load retirement data for duration calculation:", error);
@@ -133,17 +135,32 @@ const FutureValueCalculator: React.FC = () => {
   const illiquidAssetNames = ["Home Value", "Other Real Estate", "Jewellery"];
   const liquidAssets = useMemo(() => assets.filter(asset => !illiquidAssetNames.includes(asset.name)), [assets]);
   const totalLiquidFutureValue = useMemo(() => liquidAssets.reduce((sum, asset) => sum + asset.futureValue, 0), [liquidAssets]);
+  const totalCurrentValue = useMemo(() => assets.reduce((sum, asset) => sum + asset.currentValue, 0), [assets]);
+  const totalFutureValue = useMemo(() => assets.reduce((sum, asset) => sum + asset.futureValue, 0), [assets]);
+  
+  const averageRoi = useMemo(() => {
+    if (totalCurrentValue === 0) return 0;
+    const weightedSum = assets.reduce((sum, asset) => sum + asset.currentValue * asset.roi, 0);
+    return weightedSum / totalCurrentValue;
+  }, [assets, totalCurrentValue]);
 
   useEffect(() => {
     const dataToSave = assets.map(({ name, roi }) => ({ name, roi }));
     if (dataToSave.length > 0) {
       localStorage.setItem('future-value-data', JSON.stringify(dataToSave));
     }
-    // Save the total liquid future value to localStorage
     localStorage.setItem('liquidFutureValueTotal', JSON.stringify(totalLiquidFutureValue));
-    // Dispatch a storage event to notify other components like the Dashboard
+
+    const ageAtGoal = currentAge + duration;
+    const summaryData = {
+        totalFutureValue: totalFutureValue,
+        averageROI: averageRoi,
+        ageAtGoal: ageAtGoal
+    };
+    localStorage.setItem('futureValueSummary', JSON.stringify(summaryData));
+
     window.dispatchEvent(new Event('storage'));
-  }, [assets, totalLiquidFutureValue]);
+  }, [assets, totalLiquidFutureValue, totalFutureValue, averageRoi, duration, currentAge]);
 
   const exportData = () => {
     const dataToSave = assets.map(({ name, roi }) => ({ name, roi }));
@@ -186,15 +203,6 @@ const FutureValueCalculator: React.FC = () => {
   };
 
   const illiquidAssets = useMemo(() => assets.filter(asset => illiquidAssetNames.includes(asset.name)), [assets]);
-
-  const totalCurrentValue = useMemo(() => assets.reduce((sum, asset) => sum + asset.currentValue, 0), [assets]);
-  const totalFutureValue = useMemo(() => assets.reduce((sum, asset) => sum + asset.futureValue, 0), [assets]);
-  
-  const averageRoi = useMemo(() => {
-    if (totalCurrentValue === 0) return 0;
-    const weightedSum = assets.reduce((sum, asset) => sum + asset.currentValue * asset.roi, 0);
-    return weightedSum / totalCurrentValue;
-  }, [assets, totalCurrentValue]);
 
   const growth = useMemo(() => {
     if (totalCurrentValue === 0) return 0;
