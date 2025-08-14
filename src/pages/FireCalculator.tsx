@@ -41,6 +41,23 @@ const FireCalculator: React.FC = () => {
   });
 
   useEffect(() => {
+    // Auto-populate from Retirement page data on initial load
+    try {
+      const retirementDataString = localStorage.getItem('retirementData');
+      if (retirementDataString) {
+        const retirementData = JSON.parse(retirementDataString);
+        setInputs(prevInputs => ({
+          ...prevInputs,
+          currentAge: retirementData.currentAge || prevInputs.currentAge,
+          retirementAge: retirementData.retirementAge || prevInputs.retirementAge,
+        }));
+      }
+    } catch (error) {
+      console.error("Failed to sync data from retirement page:", error);
+    }
+  }, []);
+
+  useEffect(() => {
     localStorage.setItem('fireCalculatorData', JSON.stringify(inputs));
   }, [inputs]);
 
