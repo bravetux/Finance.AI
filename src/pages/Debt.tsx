@@ -287,7 +287,7 @@ const Debt: React.FC = () => {
                 {liquidAssets.map(item => (
                   <TableRow key={item.id} className="h-9">
                     <TableCell className="p-0"><Input value={item.particulars} onChange={e => handleInputChange(setLiquidAssets, item.id, 'particulars', e.target.value)} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm" /></TableCell>
-                    <TableCell className="p-0"><Input type="number" value={item.currentValue} onChange={e => handleInputChange(setLiquidAssets, item.id, 'currentValue', Number(e.target.value))} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm text-right" /></TableCell>
+                    <TableCell className="p-0"><Input type="text" value={item.currentValue.toLocaleString('en-IN')} onChange={e => { const numericValue = Number(e.target.value.replace(/,/g, '')); if (!isNaN(numericValue)) { handleInputChange(setLiquidAssets, item.id, 'currentValue', numericValue); } }} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm text-right" /></TableCell>
                     <TableCell className="p-0 text-center"><Button variant="ghost" size="icon" onClick={() => handleDeleteRow(setLiquidAssets, item.id)} className="h-7 w-7"><Trash2 className="h-3.5 w-3.5 text-red-500" /></Button></TableCell>
                   </TableRow>
                 ))}
@@ -312,7 +312,7 @@ const Debt: React.FC = () => {
                 {fixedDeposits.map(item => (
                   <TableRow key={item.id} className="h-9">
                     <TableCell className="p-0"><Input value={item.bankName} onChange={e => handleInputChange(setFixedDeposits, item.id, 'bankName', e.target.value)} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm" /></TableCell>
-                    <TableCell className="p-0"><Input type="number" value={item.currentValue} onChange={e => handleInputChange(setFixedDeposits, item.id, 'currentValue', Number(e.target.value))} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm text-right" /></TableCell>
+                    <TableCell className="p-0"><Input type="text" value={item.currentValue.toLocaleString('en-IN')} onChange={e => { const numericValue = Number(e.target.value.replace(/,/g, '')); if (!isNaN(numericValue)) { handleInputChange(setFixedDeposits, item.id, 'currentValue', numericValue); } }} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm text-right" /></TableCell>
                     <TableCell className="p-0 text-center"><Button variant="ghost" size="icon" onClick={() => handleDeleteRow(setFixedDeposits, item.id)} className="h-7 w-7"><Trash2 className="h-3.5 w-3.5 text-red-500" /></Button></TableCell>
                   </TableRow>
                 ))}
@@ -337,7 +337,7 @@ const Debt: React.FC = () => {
                 {debtFunds.map(item => (
                   <TableRow key={item.id} className="h-9">
                     <TableCell className="p-0"><Input value={item.name} onChange={e => handleInputChange(setDebtFunds, item.id, 'name', e.target.value)} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm" /></TableCell>
-                    <TableCell className="p-0"><Input type="number" value={item.currentValue} onChange={e => handleInputChange(setDebtFunds, item.id, 'currentValue', Number(e.target.value))} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm text-right" /></TableCell>
+                    <TableCell className="p-0"><Input type="text" value={item.currentValue.toLocaleString('en-IN')} onChange={e => { const numericValue = Number(e.target.value.replace(/,/g, '')); if (!isNaN(numericValue)) { handleInputChange(setDebtFunds, item.id, 'currentValue', numericValue); } }} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm text-right" /></TableCell>
                     <TableCell className="p-0 text-center"><Button variant="ghost" size="icon" onClick={() => handleDeleteRow(setDebtFunds, item.id)} className="h-7 w-7"><Trash2 className="h-3.5 w-3.5 text-red-500" /></Button></TableCell>
                   </TableRow>
                 ))}
@@ -362,7 +362,7 @@ const Debt: React.FC = () => {
                 {govInvestments.map(item => (
                   <TableRow key={item.id} className="h-9">
                     <TableCell className="p-0"><Input value={item.name} onChange={e => handleInputChange(setGovInvestments, item.id, 'name', e.target.value)} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm" /></TableCell>
-                    <TableCell className="p-0"><Input type="number" value={item.currentValue} onChange={e => handleInputChange(setGovInvestments, item.id, 'currentValue', Number(e.target.value))} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm text-right" /></TableCell>
+                    <TableCell className="p-0"><Input type="text" value={item.currentValue.toLocaleString('en-IN')} onChange={e => { const numericValue = Number(e.target.value.replace(/,/g, '')); if (!isNaN(numericValue)) { handleInputChange(setGovInvestments, item.id, 'currentValue', numericValue); } }} className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm text-right" /></TableCell>
                     <TableCell className="p-0 text-center"><Button variant="ghost" size="icon" onClick={() => handleDeleteRow(setGovInvestments, item.id)} className="h-7 w-7"><Trash2 className="h-3.5 w-3.5 text-red-500" /></Button></TableCell>
                   </TableRow>
                 ))}
