@@ -123,7 +123,14 @@ const Goals: React.FC = () => {
     if (field === 'name') {
       updatedGoal.name = value;
     } else {
-      (updatedGoal[field] as number) = Number(value) || 0;
+      let numericValue: number;
+      if (field === 'currentValue' || field === 'amountAchieved') {
+        // Remove commas and any non-digit characters for parsing
+        numericValue = Number(value.replace(/[^\d]/g, '')) || 0;
+      } else {
+        numericValue = Number(value) || 0;
+      }
+      (updatedGoal[field] as number) = numericValue;
     }
     
     // Recalculate derived values for this goal
@@ -275,8 +282,9 @@ const Goals: React.FC = () => {
                   <Label htmlFor={`currentValue-${index}`}>Goal Cost (Today's ₹)</Label>
                   <Input
                     id={`currentValue-${index}`}
-                    type="number"
-                    value={goal.currentValue}
+                    type="text"
+                    placeholder="e.g., 5,00,000"
+                    value={goal.currentValue === 0 ? '' : goal.currentValue.toLocaleString("en-IN")}
                     onChange={(e) => handleInputChange(index, 'currentValue', e.target.value)}
                     className="mt-1"
                   />
@@ -285,8 +293,9 @@ const Goals: React.FC = () => {
                   <Label htmlFor={`amountAchieved-${index}`}>Amount Achieved (₹)</Label>
                   <Input
                     id={`amountAchieved-${index}`}
-                    type="number"
-                    value={goal.amountAchieved}
+                    type="text"
+                    placeholder="e.g., 50,000"
+                    value={goal.amountAchieved === 0 ? '' : goal.amountAchieved.toLocaleString("en-IN")}
                     onChange={(e) => handleInputChange(index, 'amountAchieved', e.target.value)}
                     className="mt-1"
                   />
