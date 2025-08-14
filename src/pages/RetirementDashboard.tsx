@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Flame, Sailboat, Gem, Upload, Download, Trash2 } from "lucide-react";
+import { Flame, Sailboat, Gem, Upload, Download, Trash2, HelpCircle } from "lucide-react";
 import AllocationPieChart from "@/components/AllocationPieChart";
 import { Button } from "@/components/ui/button";
 import { showSuccess, showError } from "@/utils/toast";
@@ -27,6 +27,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface RetirementState {
   currentAge: number;
@@ -294,7 +299,25 @@ const RetirementDashboard: React.FC = () => {
             </div>
             <div className="border-t pt-4 space-y-2">
               <div className="flex justify-between"><span className="text-muted-foreground">Annual Returns (Non-Equity):</span><span className="font-bold">₹{annualReturnsAfterRetirement.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span></div>
-              {annualReturnsAfterRetirement > 0 && (<div className="text-center pt-2">{annualReturnsAfterRetirement > futureAnnualExpenses ? (<p className="text-green-600 font-semibold">Returns Generated is in excess</p>) : (<p className="text-red-500 font-semibold">Reduce the expenses</p>)}</div>)}
+              {annualReturnsAfterRetirement > 0 && (
+                <div className="text-center pt-2 flex items-center justify-center gap-2">
+                  {annualReturnsAfterRetirement > futureAnnualExpenses ? (
+                    <p className="text-green-600 font-semibold">Returns Generated is in excess</p>
+                  ) : (
+                    <p className="text-red-500 font-semibold">Reduce the expenses</p>
+                  )}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground cursor-pointer" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">
+                        This message appears if your projected annual returns from non-equity assets (FDs, Bonds, Cash) are less than your future annual expenses at retirement. It suggests your safer investments alone may not cover your living costs.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
