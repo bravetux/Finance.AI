@@ -90,9 +90,9 @@ const navItems = [
         ]
       },
       { name: "Cryptocurrency", path: "/dashboard/cryptocurrency", icon: Bitcoin, type: 'link' },
+      { name: "Loan Tracker", path: "/dashboard/loan-tracker", icon: HandCoins, type: 'link' },
     ]
   },
-  { name: "Loan Tracker", path: "/dashboard/loan-tracker", icon: HandCoins, type: 'link' },
   { name: "Insurance Hub", path: "/dashboard/insurance-hub", icon: ShieldCheck, type: 'link' },
   { name: "Goals", path: "/dashboard/goals", icon: Target, type: 'link' },
   { 
