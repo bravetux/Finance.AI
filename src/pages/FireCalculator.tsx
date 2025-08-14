@@ -41,20 +41,28 @@ const FireCalculator: React.FC = () => {
   });
 
   useEffect(() => {
-    // Auto-populate from Retirement page data on initial load
-    try {
-      const retirementDataString = localStorage.getItem('retirementData');
-      if (retirementDataString) {
-        const retirementData = JSON.parse(retirementDataString);
-        setInputs(prevInputs => ({
-          ...prevInputs,
-          currentAge: retirementData.currentAge || prevInputs.currentAge,
-          retirementAge: retirementData.retirementAge || prevInputs.retirementAge,
-        }));
+    const syncAges = () => {
+      try {
+        const retirementDataString = localStorage.getItem('retirementData');
+        if (retirementDataString) {
+          const retirementData = JSON.parse(retirementDataString);
+          setInputs(prevInputs => ({
+            ...prevInputs,
+            currentAge: retirementData.currentAge || prevInputs.currentAge,
+            retirementAge: retirementData.retirementAge || prevInputs.retirementAge,
+          }));
+        }
+      } catch (error) {
+        console.error("Failed to sync data from retirement page:", error);
       }
-    } catch (error) {
-      console.error("Failed to sync data from retirement page:", error);
-    }
+    };
+
+    syncAges(); // Sync on initial load
+    window.addEventListener('storage', syncAges); // Sync on storage change
+
+    return () => {
+      window.removeEventListener('storage', syncAges); // Cleanup listener
+    };
   }, []);
 
   useEffect(() => {
@@ -222,8 +230,9 @@ const FireCalculator: React.FC = () => {
                 id="currentAge"
                 type="number"
                 value={inputs.currentAge}
-                onChange={(e) => handleInputChange('currentAge', e.target.value)}
+                disabled
               />
+               <p className="text-xs text-muted-foreground pt-1">Auto-populated from Retirement page.</p>
             </div>
             <div>
               <Label htmlFor="retirementAge">Desired Retirement Age</Label>
@@ -231,8 +240,9 @@ const FireCalculator: React.FC = () => {
                 id="retirementAge"
                 type="number"
                 value={inputs.retirementAge}
-                onChange={(e) => handleInputChange('retirementAge', e.target.value)}
+                disabled
               />
+               <p className="text-xs text-muted-foreground pt-1">Auto-populated from Retirement page.</p>
             </div>
             <div>
               <Label htmlFor="coastFireAge">Desired Coast FIRE Age</Label>
