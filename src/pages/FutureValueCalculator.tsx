@@ -42,7 +42,8 @@ const FutureValueCalculator: React.FC = () => {
       const savedRetirementData = localStorage.getItem('retirementData');
       if (savedRetirementData) {
         const retirementData = JSON.parse(savedRetirementData);
-        const calculatedDuration = (retirementData.lifeExpectancy || 0) - (retirementData.retirementAge || 0);
+        // Calculate max duration based on life expectancy - current age
+        const calculatedDuration = (retirementData.lifeExpectancy || 0) - (retirementData.currentAge || 0);
         const finalDuration = Math.max(0, calculatedDuration);
         setDuration(finalDuration); // Set initial duration to max
         setMaxDuration(finalDuration); // Set max duration for the slider
@@ -291,7 +292,7 @@ const FutureValueCalculator: React.FC = () => {
             </div>
           </div>
           <p className="text-sm text-muted-foreground mt-2">
-            Adjust the slider to project asset values over different time horizons. The maximum duration ({maxDuration} years) is calculated from the Retirement page (Life Expectancy - Retirement Age).
+            Adjust the slider to project asset values over different time horizons. The maximum duration ({maxDuration} years) is calculated from the Retirement page (Life Expectancy - Current Age).
           </p>
         </CardContent>
       </Card>
