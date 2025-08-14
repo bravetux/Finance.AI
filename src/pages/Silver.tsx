@@ -192,9 +192,9 @@ const Silver: React.FC = () => {
                         <div className="relative flex items-center">
                           <span className="absolute left-3 text-muted-foreground">₹</span>
                           <Input
-                            type="number"
-                            value={p.value}
-                            onChange={e => handleValueChange(p.id, Number(e.target.value))}
+                            type="text"
+                            value={p.value.toLocaleString('en-IN')}
+                            onChange={e => handleValueChange(p.id, Number(e.target.value.replace(/,/g, '')))}
                             className="bg-transparent border-0 focus-visible:ring-1 h-8 text-sm text-right pl-7"
                           />
                         </div>
