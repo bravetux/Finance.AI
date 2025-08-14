@@ -131,7 +131,15 @@ const Debt: React.FC = () => {
   // Save totalGov to localStorage for NetWorthCalculator
   useEffect(() => {
     try {
-      localStorage.setItem('epfPpfVpfTotal', JSON.stringify(totalGov));
+      const savedNetWorthData = localStorage.getItem('netWorthData');
+      const netWorthData = savedNetWorthData ? JSON.parse(savedNetWorthData) : {};
+      
+      const updatedNetWorthData = {
+        ...netWorthData,
+        epfPpfVpf: totalGov,
+      };
+
+      localStorage.setItem('netWorthData', JSON.stringify(updatedNetWorthData));
       window.dispatchEvent(new Event('storage')); // Notify other tabs/components
     } catch (error) {
       console.error("Failed to save EPF/PPF/VPF total to localStorage:", error);
