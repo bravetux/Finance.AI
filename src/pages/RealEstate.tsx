@@ -128,22 +128,28 @@ const RealEstate: React.FC = () => {
 
   // Handlers for input changes
   const handlePropertyValueChange = (id: string, value: string) => {
-    if (value.length > 9) return;
+    const numericValue = Number(value.replace(/,/g, ''));
+    if (isNaN(numericValue)) return;
+    if (numericValue.toString().length > 9) return;
     setPropertyValues(prev =>
-      prev.map(p => (p.id === id ? { ...p, value: Number(value) || 0 } : p))
+      prev.map(p => (p.id === id ? { ...p, value: numericValue } : p))
     );
   };
 
   const handleReitValueChange = (value: string) => {
-    if (value.length > 9) return;
-    setReitValue(Number(value) || 0);
+    const numericValue = Number(value.replace(/,/g, ''));
+    if (isNaN(numericValue)) return;
+    if (numericValue.toString().length > 9) return;
+    setReitValue(numericValue);
   };
 
   const handleRentalPropertyChange = (id: string, field: 'value' | 'rent', value: string) => {
-    if (field === 'value' && value.length > 9) return;
-    if (field === 'rent' && value.length > 7) return;
+    const numericValue = Number(value.replace(/,/g, ''));
+    if (isNaN(numericValue)) return;
+    if (field === 'value' && numericValue.toString().length > 9) return;
+    if (field === 'rent' && numericValue.toString().length > 7) return;
     setRentalProperties(prev =>
-      prev.map(p => (p.id === id ? { ...p, [field]: Number(value) || 0 } : p))
+      prev.map(p => (p.id === id ? { ...p, [field]: numericValue } : p))
     );
   };
 
@@ -279,8 +285,8 @@ const RealEstate: React.FC = () => {
                       <TableCell className="font-medium">{p.name}</TableCell>
                       <TableCell className="p-1">
                         <Input
-                          type="number"
-                          value={p.value}
+                          type="text"
+                          value={p.value.toLocaleString('en-IN')}
                           onChange={e => handlePropertyValueChange(p.id, e.target.value)}
                           className="w-full text-right bg-transparent border-0 focus-visible:ring-1 focus-visible:ring-offset-0 h-auto"
                         />
@@ -321,8 +327,8 @@ const RealEstate: React.FC = () => {
             <div className="w-1/3">
               <Input
                 id="reit-value"
-                type="number"
-                value={reitValue}
+                type="text"
+                value={reitValue.toLocaleString('en-IN')}
                 onChange={e => handleReitValueChange(e.target.value)}
                 className="text-right text-lg font-bold"
               />
@@ -353,16 +359,16 @@ const RealEstate: React.FC = () => {
                     <TableCell className="font-medium">{p.name}</TableCell>
                     <TableCell>
                       <Input
-                        type="number"
-                        value={p.value}
+                        type="text"
+                        value={p.value.toLocaleString('en-IN')}
                         onChange={e => handleRentalPropertyChange(p.id, 'value', e.target.value)}
                         className="w-36"
                       />
                     </TableCell>
                     <TableCell>
                       <Input
-                        type="number"
-                        value={p.rent}
+                        type="text"
+                        value={p.rent.toLocaleString('en-IN')}
                         onChange={e => handleRentalPropertyChange(p.id, 'rent', e.target.value)}
                         className="w-28"
                       />
