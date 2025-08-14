@@ -41,7 +41,7 @@ const FireCalculator: React.FC = () => {
   });
 
   useEffect(() => {
-    const syncAges = () => {
+    const syncData = () => {
       try {
         const retirementDataString = localStorage.getItem('retirementData');
         if (retirementDataString) {
@@ -50,6 +50,8 @@ const FireCalculator: React.FC = () => {
             ...prevInputs,
             currentAge: retirementData.currentAge || prevInputs.currentAge,
             retirementAge: retirementData.retirementAge || prevInputs.retirementAge,
+            monthlyExpenses: (retirementData.currentAnnualExpenses || 0) / 12,
+            inflation: retirementData.inflation || prevInputs.inflation,
           }));
         }
       } catch (error) {
@@ -57,11 +59,11 @@ const FireCalculator: React.FC = () => {
       }
     };
 
-    syncAges(); // Sync on initial load
-    window.addEventListener('storage', syncAges); // Sync on storage change
+    syncData(); // Sync on initial load
+    window.addEventListener('storage', syncData); // Sync on storage change
 
     return () => {
-      window.removeEventListener('storage', syncAges); // Cleanup listener
+      window.removeEventListener('storage', syncData); // Cleanup listener
     };
   }, []);
 
@@ -212,8 +214,9 @@ const FireCalculator: React.FC = () => {
                 id="monthlyExpenses"
                 type="number"
                 value={inputs.monthlyExpenses}
-                onChange={(e) => handleInputChange('monthlyExpenses', e.target.value)}
+                disabled
               />
+              <p className="text-xs text-muted-foreground pt-1">Auto-populated from Retirement page.</p>
             </div>
             <div>
               <Label htmlFor="inflation">Expected Annual Inflation (%)</Label>
@@ -221,8 +224,9 @@ const FireCalculator: React.FC = () => {
                 id="inflation"
                 type="number"
                 value={inputs.inflation}
-                onChange={(e) => handleInputChange('inflation', e.target.value)}
+                disabled
               />
+              <p className="text-xs text-muted-foreground pt-1">Auto-populated from Retirement page.</p>
             </div>
             <div>
               <Label htmlFor="currentAge">Current Age</Label>
