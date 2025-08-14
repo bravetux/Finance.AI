@@ -169,9 +169,9 @@ const USEquity: React.FC = () => {
                       <TableCell className="font-medium">{p.name}</TableCell>
                       <TableCell className="p-1">
                         <Input
-                          type="number"
-                          value={p.value}
-                          onChange={e => handleValueChange(p.id, e.target.value)}
+                          type="text"
+                          value={p.value.toLocaleString('en-IN')}
+                          onChange={e => handleValueChange(p.id, e.target.value.replace(/,/g, ''))}
                           className="w-full text-right bg-transparent border-0 focus-visible:ring-1 focus-visible:ring-offset-0 h-auto"
                         />
                       </TableCell>

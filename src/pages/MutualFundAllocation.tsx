@@ -244,10 +244,15 @@ const MutualFundAllocation: React.FC = () => {
                     </TableCell>
                     <TableCell className="p-0">
                       <Input
-                        type="number"
-                        value={entry.currentValue}
-                        onChange={e => handleEntryChange(entry.id, 'currentValue', Number(e.target.value))}
-                        className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm" /* Reduced height and text size */
+                        type="text"
+                        value={entry.currentValue.toLocaleString('en-IN')}
+                        onChange={e => {
+                          const numericValue = Number(e.target.value.replace(/,/g, ''));
+                          if (!isNaN(numericValue)) {
+                            handleEntryChange(entry.id, 'currentValue', numericValue);
+                          }
+                        }}
+                        className="bg-transparent border-0 focus-visible:ring-0 h-7 text-sm"
                       />
                     </TableCell>
                     <TableCell className="text-right py-0 px-1">
