@@ -130,12 +130,20 @@ const FutureValueCalculator: React.FC = () => {
     });
   };
 
+  const illiquidAssetNames = ["Home Value", "Other Real Estate", "Jewellery"];
+  const liquidAssets = useMemo(() => assets.filter(asset => !illiquidAssetNames.includes(asset.name)), [assets]);
+  const totalLiquidFutureValue = useMemo(() => liquidAssets.reduce((sum, asset) => sum + asset.futureValue, 0), [liquidAssets]);
+
   useEffect(() => {
     const dataToSave = assets.map(({ name, roi }) => ({ name, roi }));
     if (dataToSave.length > 0) {
       localStorage.setItem('future-value-data', JSON.stringify(dataToSave));
     }
-  }, [assets]);
+    // Save the total liquid future value to localStorage
+    localStorage.setItem('liquidFutureValueTotal', JSON.stringify(totalLiquidFutureValue));
+    // Dispatch a storage event to notify other components like the Dashboard
+    window.dispatchEvent(new Event('storage'));
+  }, [assets, totalLiquidFutureValue]);
 
   const exportData = () => {
     const dataToSave = assets.map(({ name, roi }) => ({ name, roi }));
@@ -177,9 +185,7 @@ const FutureValueCalculator: React.FC = () => {
     setTimeout(() => window.location.reload(), 1000);
   };
 
-  const illiquidAssetNames = ["Home Value", "Other Real Estate", "Jewellery"];
   const illiquidAssets = useMemo(() => assets.filter(asset => illiquidAssetNames.includes(asset.name)), [assets]);
-  const liquidAssets = useMemo(() => assets.filter(asset => !illiquidAssetNames.includes(asset.name)), [assets]);
 
   const totalCurrentValue = useMemo(() => assets.reduce((sum, asset) => sum + asset.currentValue, 0), [assets]);
   const totalFutureValue = useMemo(() => assets.reduce((sum, asset) => sum + asset.futureValue, 0), [assets]);
