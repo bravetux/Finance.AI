@@ -110,7 +110,7 @@ const ProjectedCashflow: React.FC = () => {
       currentAge: 0,
       retirementAge: 0,
       surplusIncrement: 3,
-      expenseIncrement: 10,
+      expenseIncrement: 6,
       equityAllocationPre55: 50,
       equityReturns: 12,
       fdReturns: 7,
@@ -413,7 +413,7 @@ const ProjectedCashflow: React.FC = () => {
               value={[settings.surplusIncrement]}
               onValueChange={(val) => setSettings(prev => ({ ...prev, surplusIncrement: val[0] }))}
               min={0}
-              max={5}
+              max={10}
               step={0.5}
             />
             <div className="text-center font-medium">{settings.surplusIncrement.toFixed(1)}%</div>
@@ -435,7 +435,7 @@ const ProjectedCashflow: React.FC = () => {
               value={[settings.equityReturns]}
               onValueChange={(val) => setSettings(prev => ({ ...prev, equityReturns: val[0] }))}
               min={0}
-              max={18}
+              max={28}
               step={0.5}
             />
             <div className="text-center font-medium">{settings.equityReturns.toFixed(1)}%</div>
