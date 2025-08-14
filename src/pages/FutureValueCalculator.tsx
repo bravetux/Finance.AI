@@ -238,7 +238,7 @@ const FutureValueCalculator: React.FC = () => {
                   <tr key={asset.name} className="h-10">
                     <td className="px-2 py-0 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{asset.name}</td>
                     <td className="px-2 py-0 whitespace-nowrap">
-                      <Input type="number" value={asset.currentValue} className="w-36 h-7 text-sm" disabled />
+                      <Input type="text" value={asset.currentValue.toLocaleString('en-IN')} className="w-36 h-7 text-sm" disabled />
                     </td>
                     <td className="px-2 py-0 whitespace-nowrap">
                       <Input type="number" value={asset.roi} onChange={(e) => handleInputChange(asset.name, 'roi', e.target.value)} className="w-16 h-7 text-sm" />
