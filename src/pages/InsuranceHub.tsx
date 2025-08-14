@@ -20,6 +20,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+type PolicyType = 'Term' | 'Health' | 'Vehicle' | 'Other';
 
 interface InsurancePolicy {
   id: string;
@@ -29,6 +32,7 @@ interface InsurancePolicy {
   coverageAmount: number;
   annualPremium: number;
   expiryDate: string;
+  type: PolicyType;
 }
 
 const initialPolicies: InsurancePolicy[] = [];
@@ -56,6 +60,7 @@ const InsuranceHub: React.FC = () => {
       coverageAmount: 0,
       annualPremium: 0,
       expiryDate: '',
+      type: 'Other',
     };
     setPolicies(prev => [...prev, newPolicy]);
   };
@@ -70,8 +75,19 @@ const InsuranceHub: React.FC = () => {
     );
   };
 
-  const totalAnnualPremium = useMemo(() => {
-    return policies.reduce((sum, policy) => sum + policy.annualPremium, 0);
+  const premiumSummary = useMemo(() => {
+    return policies.reduce(
+      (acc, policy) => {
+        acc.total += policy.annualPremium;
+        if (policy.type === 'Term') {
+          acc.term += policy.annualPremium;
+        } else if (policy.type === 'Health') {
+          acc.health += policy.annualPremium;
+        }
+        return acc;
+      },
+      { total: 0, term: 0, health: 0 }
+    );
   }, [policies]);
 
   const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
@@ -91,7 +107,8 @@ const InsuranceHub: React.FC = () => {
         const content = e.target?.result as string;
         const data = JSON.parse(content);
         if (Array.isArray(data) && data.every(item => 'id' in item && 'policyName' in item)) {
-          setPolicies(data);
+          const policiesWithDefaults = data.map(p => ({ ...p, type: p.type || 'Other' }));
+          setPolicies(policiesWithDefaults);
           showSuccess('Insurance data imported successfully!');
         } else {
           showError('Invalid file format.');
@@ -139,6 +156,21 @@ const InsuranceHub: React.FC = () => {
         </div>
       </div>
 
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader><CardTitle>Total Annual Premium</CardTitle></CardHeader>
+          <CardContent><p className="text-2xl font-bold">{formatCurrency(premiumSummary.total)}</p></CardContent>
+        </Card>
+        <Card>
+          <CardHeader><CardTitle>Term Insurance Premium</CardTitle></CardHeader>
+          <CardContent><p className="text-2xl font-bold">{formatCurrency(premiumSummary.term)}</p></CardContent>
+        </Card>
+        <Card>
+          <CardHeader><CardTitle>Health Insurance Premium</CardTitle></CardHeader>
+          <CardContent><p className="text-2xl font-bold">{formatCurrency(premiumSummary.health)}</p></CardContent>
+        </Card>
+      </div>
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
@@ -153,6 +185,7 @@ const InsuranceHub: React.FC = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Policy Name</TableHead>
+                  <TableHead>Policy Type</TableHead>
                   <TableHead>Insurer</TableHead>
                   <TableHead>Policy Number</TableHead>
                   <TableHead>Coverage Amount</TableHead>
@@ -165,6 +198,19 @@ const InsuranceHub: React.FC = () => {
                 {policies.length > 0 ? policies.map(policy => (
                   <TableRow key={policy.id}>
                     <TableCell className="p-1"><Input value={policy.policyName} onChange={e => handlePolicyChange(policy.id, 'policyName', e.target.value)} placeholder="e.g., Term Life" className="bg-transparent border-0 focus-visible:ring-1 h-8" /></TableCell>
+                    <TableCell className="p-1">
+                      <Select value={policy.type} onValueChange={(value: PolicyType) => handlePolicyChange(policy.id, 'type', value)}>
+                        <SelectTrigger className="bg-transparent border-0 focus-visible:ring-1 h-8 w-[120px]">
+                          <SelectValue placeholder="Select type..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Term">Term</SelectItem>
+                          <SelectItem value="Health">Health</SelectItem>
+                          <SelectItem value="Vehicle">Vehicle</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
                     <TableCell className="p-1"><Input value={policy.insurer} onChange={e => handlePolicyChange(policy.id, 'insurer', e.target.value)} placeholder="e.g., LIC" className="bg-transparent border-0 focus-visible:ring-1 h-8" /></TableCell>
                     <TableCell className="p-1"><Input value={policy.policyNumber} onChange={e => handlePolicyChange(policy.id, 'policyNumber', e.target.value)} className="bg-transparent border-0 focus-visible:ring-1 h-8" /></TableCell>
                     <TableCell className="p-1"><Input type="text" value={policy.coverageAmount.toLocaleString('en-IN')} onChange={e => handlePolicyChange(policy.id, 'coverageAmount', Number(e.target.value.replace(/,/g, '')))} className="bg-transparent border-0 focus-visible:ring-1 h-8" /></TableCell>
@@ -173,13 +219,13 @@ const InsuranceHub: React.FC = () => {
                     <TableCell className="text-right p-1"><Button variant="ghost" size="icon" onClick={() => handleDeleteRow(policy.id)} className="h-8 w-8"><Trash2 className="h-4 w-4 text-red-500" /></Button></TableCell>
                   </TableRow>
                 )) : (
-                  <TableRow><TableCell colSpan={7} className="text-center h-24 text-muted-foreground">No policies added yet.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={8} className="text-center h-24 text-muted-foreground">No policies added yet.</TableCell></TableRow>
                 )}
               </TableBody>
               <TableFooter>
                 <TableRow className="bg-muted/50 font-bold">
-                  <TableCell colSpan={4}>Total Annual Premium</TableCell>
-                  <TableCell>{formatCurrency(totalAnnualPremium)}</TableCell>
+                  <TableCell colSpan={5}>Total Annual Premium</TableCell>
+                  <TableCell>{formatCurrency(premiumSummary.total)}</TableCell>
                   <TableCell colSpan={2}></TableCell>
                 </TableRow>
               </TableFooter>
