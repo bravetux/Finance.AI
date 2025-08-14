@@ -35,7 +35,7 @@ const calculateFutureValue = (pv: number, r: number, t: number) => {
 const FutureValueCalculator: React.FC = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [duration, setDuration] = useState(10);
-  const [maxDuration, setMaxDuration] = useState(10);
+  const [maxDuration, setMaxDuration] = useState(50);
   const [currentAge, setCurrentAge] = useState(0);
 
   useEffect(() => {
@@ -44,11 +44,16 @@ const FutureValueCalculator: React.FC = () => {
       if (savedRetirementData) {
         const retirementData = JSON.parse(savedRetirementData);
         const age = retirementData.currentAge || 0;
+        const retirementAge = retirementData.retirementAge || 0;
+        const lifeExpectancy = retirementData.lifeExpectancy || 0;
+        
         setCurrentAge(age);
-        const calculatedDuration = (retirementData.lifeExpectancy || 0) - age;
-        const finalDuration = Math.max(0, calculatedDuration);
-        setDuration(finalDuration);
-        setMaxDuration(finalDuration);
+        
+        const initialDuration = Math.max(0, retirementAge - age);
+        const maxSliderDuration = Math.max(0, lifeExpectancy - age);
+
+        setDuration(initialDuration);
+        setMaxDuration(maxSliderDuration > 0 ? maxSliderDuration : 50);
       }
     } catch (error) {
       console.error("Failed to load retirement data for duration calculation:", error);
@@ -155,7 +160,8 @@ const FutureValueCalculator: React.FC = () => {
     const summaryData = {
         totalFutureValue: totalFutureValue,
         averageROI: averageRoi,
-        ageAtGoal: ageAtGoal
+        ageAtGoal: ageAtGoal,
+        duration: duration,
     };
     localStorage.setItem('futureValueSummary', JSON.stringify(summaryData));
 
