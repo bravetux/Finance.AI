@@ -76,7 +76,7 @@ const NetWorthCalculator: React.FC = () => {
         const home1 = realEstatePropertyValues.find((p: any) => p.name === 'Home 1');
         const homeValue = home1 ? home1.value : 0;
         const totalPropertyValue = realEstatePropertyValues.reduce((sum: number, p: any) => sum + p.value, 0);
-        const otherRealEstateValue = totalPropertyValue - homeValue;
+        const otherRealEstateValue = totalPropertyValue - home1Value;
 
         // Precious Metals
         const goldData = JSON.parse(localStorage.getItem('goldData') || '[]');
@@ -114,7 +114,8 @@ const NetWorthCalculator: React.FC = () => {
         const debtLiquidAssets = JSON.parse(localStorage.getItem('debtLiquidAssets') || '[]');
         const debtFixedDeposits = JSON.parse(localStorage.getItem('debtFixedDeposits') || '[]');
         const debtDebtFunds = JSON.parse(localStorage.getItem('debtDebtFunds') || '[]');
-        
+        const epfPpfVpfTotal = JSON.parse(localStorage.getItem('epfPpfVpfTotal') || '0'); // New: Read from Debt page
+
         const savingsBalanceValue = debtLiquidAssets.reduce((sum: number, asset: any) => sum + asset.currentValue, 0);
         const fixedDepositsValue = debtFixedDeposits.reduce((sum: number, asset: any) => sum + asset.currentValue, 0);
         const debtFundsValue = debtDebtFunds.reduce((sum: number, asset: any) => sum + asset.currentValue, 0);
@@ -135,6 +136,7 @@ const NetWorthCalculator: React.FC = () => {
           savingsBalance: savingsBalanceValue,
           fixedDeposits: fixedDepositsValue,
           debtFunds: debtFundsValue,
+          epfPpfVpf: epfPpfVpfTotal, // New: Update EPF/PPF/VPF
         };
 
         // --- Update state and localStorage ---
@@ -400,7 +402,9 @@ const NetWorthCalculator: React.FC = () => {
                     type="number"
                     value={data.epfPpfVpf}
                     onChange={(e) => handleInputChange('epfPpfVpf', e.target.value)}
+                    disabled
                   />
+                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Debt page.</p>
                 </div>
               </>
             ) : (
