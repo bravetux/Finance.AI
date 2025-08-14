@@ -40,11 +40,9 @@ const PostRetirementStrategy: React.FC = () => {
     const loadData = () => {
       try {
         const canRetireData = JSON.parse(localStorage.getItem('canRetireNowData') || '{}');
-        const projectedCashflowSettings = JSON.parse(localStorage.getItem('projectedCashflowSettings') || '{}');
-        
         setInitialCorpus(canRetireData.corpus || 0);
         setInitialAnnualExpenses(canRetireData.annualExpenses || 0);
-        setCurrentAge(projectedCashflowSettings.retirementAge || 0);
+        setCurrentAge(canRetireData.currentAge || 0);
       } catch (e) {
         console.error("Failed to load data for post-retirement strategy", e);
       }

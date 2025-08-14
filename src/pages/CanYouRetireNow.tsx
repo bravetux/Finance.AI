@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { CheckCircle, XCircle, Wallet, LineChart } from "lucide-react";
+import AllocationPieChart from "@/components/AllocationPieChart";
 
 // Helper to get total liquid assets from Net Worth data
 const getLiquidAssets = () => {
@@ -89,6 +90,14 @@ const CanYouRetireNow: React.FC = () => {
 
   const handleInputChange = (field: keyof RetirementInputs, value: any) => {
     setInputs((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleAllocationChange = (category: keyof RetirementInputs["allocations"], value: number) => {
+    handleInputChange("allocations", { ...inputs.allocations, [category]: value });
+  };
+
+  const handleReturnChange = (category: keyof RetirementInputs["returns"], value: number) => {
+    handleInputChange("returns", { ...inputs.returns, [category]: Number(value) });
   };
 
   const totalStartingCorpus = useMemo(() => liquidAssets + projectedCorpus, [liquidAssets, projectedCorpus]);
@@ -201,6 +210,41 @@ const CanYouRetireNow: React.FC = () => {
           <div className="border-t pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex justify-between md:col-span-2"><span className="text-muted-foreground">Current Annual Expenses for Retirement:</span><span className="font-bold">{formatCurrency(annualExpenses)}</span></div>
           </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+            <CardTitle>Post-Retirement Investment Strategy</CardTitle>
+            <CardDescription>Define how your corpus will be allocated and the expected returns for each asset class.</CardDescription>
+            <p className={`text-sm pt-2 ${totalAllocation !== 100 ? 'text-red-500 font-bold' : 'text-muted-foreground'}`}>Total Allocation: {totalAllocation}% {totalAllocation !== 100 && "(Must be 100%)"}</p>
+        </CardHeader>
+        <CardContent className="grid gap-8 md:grid-cols-2">
+            <div className="flex items-center justify-center">
+              <AllocationPieChart data={inputs.allocations} />
+            </div>
+            <div className="space-y-6">
+              {Object.keys(inputs.allocations).map((key) => {
+                const category = key as keyof RetirementInputs["allocations"];
+                const allocatedValue = totalStartingCorpus * (inputs.allocations[category] / 100);
+                return (
+                  <div key={category} className="grid grid-cols-2 gap-4 items-end">
+                    <div className="space-y-2">
+                      <Label className="capitalize text-md">{category}</Label>
+                      <Slider value={[inputs.allocations[category]]} onValueChange={(val) => handleAllocationChange(category, val[0])} min={0} max={100} step={5} />
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">{inputs.allocations[category]}%</span>
+                        <span className="text-sm text-muted-foreground">{formatCurrency(allocatedValue)}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor={`return-${category}`} className="text-xs">Return (%)</Label>
+                      <Input id={`return-${category}`} type="number" value={inputs.returns[category]} onChange={(e) => handleReturnChange(category, Number(e.target.value))} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
         </CardContent>
       </Card>
     </div>

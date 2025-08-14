@@ -60,20 +60,6 @@ const calculateSIPRequired = (
 };
 
 const Goals: React.FC = () => {
-  const [currentAge, setCurrentAge] = React.useState<number>(0);
-
-  React.useEffect(() => {
-    try {
-      const savedRetirementData = localStorage.getItem('retirementData');
-      if (savedRetirementData) {
-        const retirementData = JSON.parse(savedRetirementData);
-        setCurrentAge(retirementData.currentAge || 0);
-      }
-    } catch (e) {
-      console.error("Failed to load retirement data from localStorage:", e);
-    }
-  }, []);
-
   const [goals, setGoals] = React.useState<Goal[]>(() => {
     const initialGoals: Goal[] = Array.from({ length: 10 }, (_, i) => ({
       id: `goal-${i + 1}`,
@@ -123,14 +109,7 @@ const Goals: React.FC = () => {
     if (field === 'name') {
       updatedGoal.name = value;
     } else {
-      let numericValue: number;
-      if (field === 'currentValue' || field === 'amountAchieved') {
-        // Remove commas and any non-digit characters for parsing
-        numericValue = Number(value.replace(/[^\d]/g, '')) || 0;
-      } else {
-        numericValue = Number(value) || 0;
-      }
-      (updatedGoal[field] as number) = numericValue;
+      (updatedGoal[field] as number) = Number(value) || 0;
     }
     
     // Recalculate derived values for this goal
@@ -263,103 +242,86 @@ const Goals: React.FC = () => {
       </Card>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {goals.map((goal, index) => {
-          const ageAtGoal = currentAge + goal.duration;
-          return (
-            <Card key={goal.id}>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <Input
-                    type="text"
-                    value={goal.name}
-                    onChange={(e) => handleInputChange(index, 'name', e.target.value)}
-                    className="text-lg font-semibold border-none focus-visible:ring-0 focus-visible:ring-offset-0 p-0 h-auto"
-                  />
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <Label htmlFor={`currentValue-${index}`}>Goal Cost (Today's ₹)</Label>
-                  <Input
-                    id={`currentValue-${index}`}
-                    type="text"
-                    placeholder="e.g., 5,00,000"
-                    value={goal.currentValue === 0 ? '' : goal.currentValue.toLocaleString("en-IN")}
-                    onChange={(e) => handleInputChange(index, 'currentValue', e.target.value)}
-                    className="mt-1"
-                  />
+        {goals.map((goal, index) => (
+          <Card key={goal.id}>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <Input
+                  type="text"
+                  value={goal.name}
+                  onChange={(e) => handleInputChange(index, 'name', e.target.value)}
+                  className="text-lg font-semibold border-none focus-visible:ring-0 focus-visible:ring-offset-0 p-0 h-auto"
+                />
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div>
+                <Label htmlFor={`currentValue-${index}`}>Goal Cost (Today's ₹)</Label>
+                <Input
+                  id={`currentValue-${index}`}
+                  type="number"
+                  value={goal.currentValue}
+                  onChange={(e) => handleInputChange(index, 'currentValue', e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor={`amountAchieved-${index}`}>Amount Achieved (₹)</Label>
+                <Input
+                  id={`amountAchieved-${index}`}
+                  type="number"
+                  value={goal.amountAchieved}
+                  onChange={(e) => handleInputChange(index, 'amountAchieved', e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor={`inflation-${index}`}>Inflation (%)</Label>
+                <Input
+                  id={`inflation-${index}`}
+                  type="number"
+                  value={goal.inflation}
+                  onChange={(e) => handleInputChange(index, 'inflation', e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor={`duration-${index}`}>Duration (Years)</Label>
+                <Input
+                  id={`duration-${index}`}
+                  type="number"
+                  value={goal.duration}
+                  onChange={(e) => handleInputChange(index, 'duration', e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor={`rateOfGrowth-${index}`}>Rate of Growth (%)</Label>
+                <Input
+                  id={`rateOfGrowth-${index}`}
+                  type="number"
+                  value={goal.rateOfGrowth}
+                  onChange={(e) => handleInputChange(index, 'rateOfGrowth', e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div className="border-t pt-3 mt-3 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">Target Future Value:</span>
+                  <span className="font-bold text-green-600">
+                    ₹{goal.targetFutureValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                  </span>
                 </div>
-                <div>
-                  <Label htmlFor={`amountAchieved-${index}`}>Amount Achieved (₹)</Label>
-                  <Input
-                    id={`amountAchieved-${index}`}
-                    type="text"
-                    placeholder="e.g., 50,000"
-                    value={goal.amountAchieved === 0 ? '' : goal.amountAchieved.toLocaleString("en-IN")}
-                    onChange={(e) => handleInputChange(index, 'amountAchieved', e.target.value)}
-                    className="mt-1"
-                  />
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">Monthly SIP Required:</span>
+                  <span className="font-bold text-blue-600">
+                    ₹{goal.sipRequired.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                  </span>
                 </div>
-                <div>
-                  <Label htmlFor={`inflation-${index}`}>Inflation (%)</Label>
-                  <Input
-                    id={`inflation-${index}`}
-                    type="number"
-                    value={goal.inflation}
-                    onChange={(e) => handleInputChange(index, 'inflation', e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor={`duration-${index}`}>Duration (Years)</Label>
-                    <Input
-                      id={`duration-${index}`}
-                      type="number"
-                      value={goal.duration}
-                      onChange={(e) => handleInputChange(index, 'duration', e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor={`ageAtGoal-${index}`}>Age at Goal</Label>
-                    <Input
-                      id={`ageAtGoal-${index}`}
-                      type="number"
-                      value={ageAtGoal}
-                      readOnly
-                      className="mt-1 bg-muted"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor={`rateOfGrowth-${index}`}>Rate of Growth (%)</Label>
-                  <Input
-                    id={`rateOfGrowth-${index}`}
-                    type="number"
-                    value={goal.rateOfGrowth}
-                    onChange={(e) => handleInputChange(index, 'rateOfGrowth', e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                <div className="border-t pt-3 mt-3 space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Target Future Value:</span>
-                    <span className="font-bold text-green-600">
-                      ₹{goal.targetFutureValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Monthly SIP Required:</span>
-                    <span className="font-bold text-blue-600">
-                      ₹{goal.sipRequired.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   );
