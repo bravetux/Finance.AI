@@ -121,6 +121,31 @@ const ProjectedCashflow: React.FC = () => {
   const [goals, setGoals] = useState<Goal[]>([]);
 
   useEffect(() => {
+    const syncAges = () => {
+      try {
+        const retirementDataString = localStorage.getItem('retirementData');
+        if (retirementDataString) {
+          const retirementData = JSON.parse(retirementDataString);
+          setSettings(prevSettings => ({
+            ...prevSettings,
+            currentAge: retirementData.currentAge || prevSettings.currentAge,
+            retirementAge: retirementData.retirementAge || prevSettings.retirementAge,
+          }));
+        }
+      } catch (error) {
+        console.error("Failed to sync ages from retirement page:", error);
+      }
+    };
+
+    syncAges();
+    window.addEventListener('storage', syncAges);
+
+    return () => {
+      window.removeEventListener('storage', syncAges);
+    };
+  }, []);
+
+  useEffect(() => {
     setInitialData(getInitialFinanceData());
     try {
         const savedGoals = localStorage.getItem('goalsData');
@@ -368,8 +393,9 @@ const ProjectedCashflow: React.FC = () => {
               id="currentAge"
               type="number"
               value={settings.currentAge}
-              onChange={(e) => setSettings(prev => ({ ...prev, currentAge: Number(e.target.value) }))}
+              disabled
             />
+            <p className="text-xs text-muted-foreground pt-1">Auto-populated from Retirement page.</p>
           </div>
           <div>
             <Label htmlFor="retirementAge">Retirement Age</Label>
@@ -377,8 +403,9 @@ const ProjectedCashflow: React.FC = () => {
               id="retirementAge"
               type="number"
               value={settings.retirementAge}
-              onChange={(e) => setSettings(prev => ({ ...prev, retirementAge: Number(e.target.value) }))}
+              disabled
             />
+            <p className="text-xs text-muted-foreground pt-1">Auto-populated from Retirement page.</p>
           </div>
           <div>
             <Label>Surplus Increment (%)</Label>

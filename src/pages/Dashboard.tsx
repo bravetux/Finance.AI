@@ -130,15 +130,6 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const getLiquidFutureValue = () => {
-    try {
-      const savedData = localStorage.getItem('liquidFutureValueTotal');
-      return savedData ? JSON.parse(savedData) : 0;
-    } catch {
-      return 0;
-    }
-  };
-
   const getGoalsData = () => {
     try {
       const savedData = localStorage.getItem('goalsData');
@@ -192,8 +183,12 @@ const Dashboard: React.FC = () => {
     ? futureValueData.reduce((sum: number, asset: any) => sum + asset.roi, 0) / futureValueData.length
     : 0;
 
-  // Get Liquid Future Value directly
-  const liquidFutureValue = getLiquidFutureValue();
+  // Calculate Liquid Future Value
+  const illiquidAssetNames = ["Home Value", "Other Real Estate", "Jewellery"];
+  const illiquidFutureValue = futureValueData
+      .filter((asset: any) => illiquidAssetNames.includes(asset.name))
+      .reduce((sum: number, asset: any) => sum + asset.futureValue, 0);
+  const liquidFutureValue = totalFutureValue - illiquidFutureValue;
 
   // Calculate goals data
   const goalsData = getGoalsData();

@@ -94,10 +94,10 @@ const navItems = [
     icon: Landmark,
     type: 'section',
     children: [
-      { name: "Can you retire now?", path: "/dashboard/can-you-retire-now", icon: CheckCircle, type: 'link' },
-      { name: "FIRE Calculator", path: "/dashboard/fire-calculator", icon: Flame, type: 'link' },
       { name: "Retirement", path: "/dashboard/retirement", icon: Landmark, type: 'link' },
+      { name: "FIRE Calculator", path: "/dashboard/fire-calculator", icon: Flame, type: 'link' },
       { name: "Projected Cashflow", path: "/dashboard/projected-cashflow", icon: LineChart, type: 'link' },
+      { name: "Can you retire now?", path: "/dashboard/can-you-retire-now", icon: CheckCircle, type: 'link' },
       { name: "Post-Retirement Strategy", path: "/dashboard/post-retirement-strategy", icon: LineChart, type: 'link' },
       { name: "Future Value", path: "/dashboard/future-value", icon: TrendingUp, type: 'link' },
     ]

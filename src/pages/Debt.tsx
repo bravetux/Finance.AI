@@ -128,6 +128,24 @@ const Debt: React.FC = () => {
   const totalDebtFunds = useMemo(() => debtFunds.reduce((sum, a) => sum + a.currentValue, 0), [debtFunds]);
   const totalGov = useMemo(() => govInvestments.reduce((sum, a) => sum + a.currentValue, 0), [govInvestments]);
 
+  // Save totalGov to localStorage for NetWorthCalculator
+  useEffect(() => {
+    try {
+      const savedNetWorthData = localStorage.getItem('netWorthData');
+      const netWorthData = savedNetWorthData ? JSON.parse(savedNetWorthData) : {};
+      
+      const updatedNetWorthData = {
+        ...netWorthData,
+        epfPpfVpf: totalGov,
+      };
+
+      localStorage.setItem('netWorthData', JSON.stringify(updatedNetWorthData));
+      window.dispatchEvent(new Event('storage')); // Notify other tabs/components
+    } catch (error) {
+      console.error("Failed to save EPF/PPF/VPF total to localStorage:", error);
+    }
+  }, [totalGov]);
+
   const totalDebtValue = useMemo(() => totalLiquid + totalFD + totalDebtFunds + totalGov, [totalLiquid, totalFD, totalDebtFunds, totalGov]);
 
   const pieChartData = useMemo(() => [
