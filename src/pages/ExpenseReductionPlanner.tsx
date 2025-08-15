@@ -256,41 +256,27 @@ const ExpenseReductionPlanner: React.FC = () => {
               </TableHeader>
               <TableBody>
                 {expenses.map((expense) => {
-                  const sliderConfig = sliderConfigs[expense.category];
+                  const sliderConfig = sliderConfigs[expense.category] || { max: 50000, step: 1000 };
                   return (
                     <TableRow key={expense.id}>
                       <TableCell className="font-medium p-2">{expense.category}</TableCell>
-                      {sliderConfig ? (
-                        <TableCell className="p-2">
-                          <div className="flex items-center gap-4">
-                            <Slider
-                              value={[expense.monthlyCost]}
-                              onValueChange={(val) => handleCostChange(expense.id, String(val[0]))}
-                              max={sliderConfig.max}
-                              step={sliderConfig.step}
-                              className="flex-1"
-                            />
-                            <Input
-                              type="number"
-                              value={expense.monthlyCost}
-                              onChange={(e) => handleCostChange(expense.id, e.target.value)}
-                              className="w-28 h-8 text-right"
-                            />
-                          </div>
-                        </TableCell>
-                      ) : (
-                        <TableCell className="p-0">
-                          <div className="relative flex items-center">
-                            <span className="absolute left-3 text-muted-foreground">₹</span>
-                            <Input
-                              type="number"
-                              value={expense.monthlyCost}
-                              onChange={(e) => handleCostChange(expense.id, e.target.value)}
-                              className="w-28 border-0 rounded-none focus-visible:ring-1 focus-visible:ring-offset-0 p-2 pl-6 h-auto bg-transparent text-right"
-                            />
-                          </div>
-                        </TableCell>
-                      )}
+                      <TableCell className="p-2">
+                        <div className="flex items-center gap-4">
+                          <Slider
+                            value={[expense.monthlyCost]}
+                            onValueChange={(val) => handleCostChange(expense.id, String(val[0]))}
+                            max={sliderConfig.max}
+                            step={sliderConfig.step}
+                            className="flex-1"
+                          />
+                          <Input
+                            type="number"
+                            value={expense.monthlyCost}
+                            onChange={(e) => handleCostChange(expense.id, e.target.value)}
+                            className="w-28 h-8 text-right"
+                          />
+                        </div>
+                      </TableCell>
                       <TableCell className="p-0">
                         <Select
                           value={expense.action}
