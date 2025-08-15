@@ -18,6 +18,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 type ReportFormat = "json" | "txt";
 
@@ -140,6 +142,63 @@ const Reports: React.FC = () => {
     downloadFile(txtString, filename, "text/plain");
   };
 
+  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        const data = JSON.parse(content);
+
+        if (typeof data !== 'object' || data === null || !data.cashflow) {
+          throw new Error("Invalid or corrupted data file.");
+        }
+
+        // Clear existing data before importing to prevent merge issues
+        localStorage.clear();
+
+        // Restore data from the imported file
+        if (data.cashflow) localStorage.setItem('finance-data', JSON.stringify(data.cashflow));
+        if (data.netWorth) localStorage.setItem('netWorthData', JSON.stringify(data.netWorth));
+        if (data.goals) localStorage.setItem('goalsData', JSON.stringify(data.goals));
+        if (data.expensePlanner) localStorage.setItem('expenseTrackerData', JSON.stringify(data.expensePlanner));
+        if (data.retirementDashboard) localStorage.setItem('retirementData', JSON.stringify(data.retirementDashboard));
+        if (data.fireCalculator) localStorage.setItem('fireCalculatorData', JSON.stringify(data.fireCalculator));
+        if (data.canYouRetireNow) localStorage.setItem('canRetireNowData', JSON.stringify(data.canYouRetireNow));
+        if (data.projectedCashflow?.settings) localStorage.setItem('projectedCashflowSettings', JSON.stringify(data.projectedCashflow.settings));
+        if (data.projectedCashflow?.corpus) localStorage.setItem('projectedAccumulatedCorpus', JSON.stringify(data.projectedCashflow.corpus));
+        if (data.postRetirementStrategy?.settings) localStorage.setItem('postRetirementStrategyPageSettings', JSON.stringify(data.postRetirementStrategy.settings));
+        if (data.futureValueCalculator) localStorage.setItem('future-value-data', JSON.stringify(data.futureValueCalculator));
+        if (data.assets?.realEstate?.properties) localStorage.setItem('realEstatePropertyValues', JSON.stringify(data.assets.realEstate.properties));
+        if (data.assets?.realEstate?.rentals) localStorage.setItem('realEstateRentalProperties', JSON.stringify(data.assets.realEstate.rentals));
+        if (data.assets?.realEstate?.reit) localStorage.setItem('realEstateReitValue', JSON.stringify(data.assets.realEstate.reit));
+        if (data.assets?.equity?.domesticStocks) localStorage.setItem('domesticEquityStocks', JSON.stringify(data.assets.equity.domesticStocks));
+        if (data.assets?.equity?.usEquity) localStorage.setItem('usEquityData', JSON.stringify(data.assets.equity.usEquity));
+        if (data.assets?.funds?.mutualFundAllocation) localStorage.setItem('mutualFundAllocationEntries', JSON.stringify(data.assets.funds.mutualFundAllocation));
+        if (data.assets?.funds?.mutualFundSips) localStorage.setItem('mutualFundSIPEntries', JSON.stringify(data.assets.funds.mutualFundSips));
+        if (data.assets?.funds?.sipOutflow) localStorage.setItem('sipOutflowData', JSON.stringify(data.assets.funds.sipOutflow));
+        if (data.assets?.funds?.smallCases) localStorage.setItem('smallCaseData', JSON.stringify(data.assets.funds.smallCases));
+        if (data.assets?.debt?.liquid) localStorage.setItem('debtLiquidAssets', JSON.stringify(data.assets.debt.liquid));
+        if (data.assets?.debt?.fixedDeposits) localStorage.setItem('debtFixedDeposits', JSON.stringify(data.assets.debt.fixedDeposits));
+        if (data.assets?.debt?.debtFunds) localStorage.setItem('debtDebtFunds', JSON.stringify(data.assets.debt.debtFunds));
+        if (data.assets?.debt?.govInvestments) localStorage.setItem('debtGovInvestments', JSON.stringify(data.assets.debt.govInvestments));
+        if (data.assets?.preciousMetals?.gold) localStorage.setItem('goldData', JSON.stringify(data.assets.preciousMetals.gold));
+        if (data.assets?.preciousMetals?.silver) localStorage.setItem('silverData', JSON.stringify(data.assets.preciousMetals.silver));
+        if (data.assets?.preciousMetals?.platinum) localStorage.setItem('platinumData', JSON.stringify(data.assets.preciousMetals.platinum));
+        if (data.assets?.preciousMetals?.diamond) localStorage.setItem('diamondData', JSON.stringify(data.assets.preciousMetals.diamond));
+
+        showSuccess("Data imported successfully! The application will now reload.");
+        setTimeout(() => window.location.reload(), 1500);
+      } catch (error: any) {
+        showError(`Failed to import data: ${error.message}`);
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  };
+
   const handleReset = () => {
     const keysToClear = [
       // Planning
@@ -236,6 +295,18 @@ const Reports: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col sm:flex-row items-center gap-4">
+          <Button variant="outline" asChild>
+            <Label htmlFor="import-file" className="cursor-pointer">
+              <Download className="mr-2 h-4 w-4" /> Import Data
+              <Input 
+                id="import-file" 
+                type="file" 
+                accept=".json" 
+                className="hidden" 
+                onChange={handleImport}
+              />
+            </Label>
+          </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive">
