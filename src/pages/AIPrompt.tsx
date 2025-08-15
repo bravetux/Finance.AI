@@ -11,7 +11,7 @@ import { Bot, Sparkles, Terminal, Download, X } from "lucide-react";
 import { showError, showSuccess } from "@/utils/toast";
 import { saveAs } from "file-saver";
 
-type AIProvider = "openai" | "google" | "openrouter" | "ollama";
+type AIProvider = "openai" | "google" | "openrouter" | "ollama" | "perplexity";
 
 const modelsByProvider: Record<AIProvider, string[]> = {
   openai: ["gpt-4-turbo", "gpt-4o", "gpt-3.5-turbo"],
@@ -23,6 +23,7 @@ const modelsByProvider: Record<AIProvider, string[]> = {
     "meta-llama/llama-3-8b-instruct",
   ],
   ollama: ["llama3", "mistral", "gemma"],
+  perplexity: ["llama-3-sonar-small-32k-online", "llama-3-sonar-large-32k-online", "llama-3-8b-instruct", "mixtral-8x7b-instruct"],
 };
 
 const AIPrompt: React.FC = () => {
@@ -154,6 +155,12 @@ const AIPrompt: React.FC = () => {
           body = { model: modelName, messages: [{ role: "user", content: fullPrompt }] };
           break;
 
+        case "perplexity":
+          url = "https://api.perplexity.ai/chat/completions";
+          headers["Authorization"] = `Bearer ${apiKey}`;
+          body = { model: modelName, messages: [{ role: "user", content: fullPrompt }] };
+          break;
+
         case "google":
           url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
           body = { contents: [{ parts: [{ text: fullPrompt }] }] };
@@ -183,6 +190,7 @@ const AIPrompt: React.FC = () => {
       switch (provider) {
         case "openai":
         case "openrouter":
+        case "perplexity":
           apiResponse = data.choices[0]?.message?.content;
           break;
         case "google":
@@ -232,6 +240,7 @@ const AIPrompt: React.FC = () => {
                   <SelectItem value="openai">OpenAI / Other</SelectItem>
                   <SelectItem value="google">Google</SelectItem>
                   <SelectItem value="openrouter">Open Router</SelectItem>
+                  <SelectItem value="perplexity">Perplexity</SelectItem>
                   <SelectItem value="ollama">Ollama (Local)</SelectItem>
                 </SelectContent>
               </Select>
