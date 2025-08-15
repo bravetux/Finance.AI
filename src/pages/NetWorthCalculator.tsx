@@ -641,36 +641,64 @@ const NetWorthCalculator: React.FC = () => {
             <CardTitle>Liabilities</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="homeLoan">Home Loan</Label>
-              <Input id="homeLoan" type="number" value={data.homeLoan} disabled />
-              <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Loan Tracker page.</p>
-            </div>
-            <div>
-              <Label htmlFor="educationLoan">Education Loan</Label>
-              <Input id="educationLoan" type="number" value={data.educationLoan} disabled />
-              <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Loan Tracker page.</p>
-            </div>
-            <div>
-              <Label htmlFor="carLoan">Car Loan</Label>
-              <Input id="carLoan" type="number" value={data.carLoan} disabled />
-              <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Loan Tracker page.</p>
-            </div>
-            <div>
-              <Label htmlFor="personalLoan">Personal Loan</Label>
-              <Input id="personalLoan" type="number" value={data.personalLoan} disabled />
-              <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Loan Tracker page.</p>
-            </div>
-            <div>
-              <Label htmlFor="creditCardDues">Credit Card Dues</Label>
-              <Input id="creditCardDues" type="number" value={data.creditCardDues} disabled />
-              <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Loan Tracker page.</p>
-            </div>
-            <div>
-              <Label htmlFor="otherLiabilities">Other Liabilities</Label>
-              <Input id="otherLiabilities" type="number" value={data.otherLiabilities} disabled />
-              <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Loan Tracker page.</p>
-            </div>
+            {isEditing ? (
+              <>
+                <div>
+                  <Label htmlFor="homeLoan">Home Loan</Label>
+                  <Input id="homeLoan" type="number" value={data.homeLoan} disabled />
+                </div>
+                <div>
+                  <Label htmlFor="educationLoan">Education Loan</Label>
+                  <Input id="educationLoan" type="number" value={data.educationLoan} disabled />
+                </div>
+                <div>
+                  <Label htmlFor="carLoan">Car Loan</Label>
+                  <Input id="carLoan" type="number" value={data.carLoan} disabled />
+                </div>
+                <div>
+                  <Label htmlFor="personalLoan">Personal Loan</Label>
+                  <Input id="personalLoan" type="number" value={data.personalLoan} disabled />
+                </div>
+                <div>
+                  <Label htmlFor="creditCardDues">Credit Card Dues</Label>
+                  <Input id="creditCardDues" type="number" value={data.creditCardDues} disabled />
+                </div>
+                <div>
+                  <Label htmlFor="otherLiabilities">Other Liabilities</Label>
+                  <Input id="otherLiabilities" type="number" value={data.otherLiabilities} disabled />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex justify-between">
+                  <span>Home Loan:</span>
+                  <span className="font-medium">₹{data.homeLoan.toLocaleString("en-IN")}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Education Loan:</span>
+                  <span className="font-medium">₹{data.educationLoan.toLocaleString("en-IN")}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Car Loan:</span>
+                  <span className="font-medium">₹{data.carLoan.toLocaleString("en-IN")}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Personal Loan:</span>
+                  <span className="font-medium">₹{data.personalLoan.toLocaleString("en-IN")}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Credit Card Dues:</span>
+                  <span className="font-medium">₹{data.creditCardDues.toLocaleString("en-IN")}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Other Liabilities:</span>
+                  <span className="font-medium">₹{data.otherLiabilities.toLocaleString("en-IN")}</span>
+                </div>
+              </>
+            )}
+            <p className="text-xs text-muted-foreground pt-2">
+              All liability values are auto-populated from the Loan Tracker page.
+            </p>
           </CardContent>
         </Card>
       </div>
