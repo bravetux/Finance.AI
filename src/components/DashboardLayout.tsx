@@ -118,7 +118,7 @@ const DashboardLayout: React.FC = () => {
 
   const SidebarContent = () => (
     <div className="flex h-full flex-col p-4 bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
-      <Link to="/dashboard" className="text-2xl font-bold mb-6 text-sidebar-primary-foreground">
+      <Link to="/" className="text-2xl font-bold mb-6 text-sidebar-primary-foreground">
         Financial Planner
       </Link>
       <ScrollArea className="flex-1">
