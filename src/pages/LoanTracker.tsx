@@ -20,10 +20,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+type LoanCategory = 'Home' | 'Education' | 'Car' | 'Personal' | 'Credit Card' | 'Other';
 
 interface Loan {
   id: string;
   name: string;
+  category: LoanCategory;
   totalAmount: number;
   amountPaid: number;
   interestRate: number;
@@ -44,12 +48,14 @@ const LoanTracker: React.FC = () => {
 
   useEffect(() => {
     localStorage.setItem('loanTrackerData', JSON.stringify(loans));
+    window.dispatchEvent(new Event('storage')); // Notify other components of the change
   }, [loans]);
 
   const handleAddRow = () => {
     const newLoan: Loan = {
       id: Date.now().toString(),
       name: '',
+      category: 'Other',
       totalAmount: 0,
       amountPaid: 0,
       interestRate: 0,
@@ -98,7 +104,8 @@ const LoanTracker: React.FC = () => {
         const content = e.target?.result as string;
         const data = JSON.parse(content);
         if (Array.isArray(data) && data.every(item => 'id' in item && 'name' in item && 'totalAmount' in item)) {
-          setLoans(data);
+          const importedLoans = data.map(loan => ({ ...loan, category: loan.category || 'Other' }));
+          setLoans(importedLoans);
           showSuccess('Loan data imported successfully!');
         } else {
           showError('Invalid file format.');
@@ -150,7 +157,7 @@ const LoanTracker: React.FC = () => {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>Your Loans</CardTitle>
-            <CardDescription>Track all your outstanding loans and liabilities.</CardDescription>
+            <CardDescription>Track all your outstanding loans and liabilities. This data will automatically update the Net Worth page.</CardDescription>
           </div>
           <Button onClick={handleAddRow}><PlusCircle className="mr-2 h-4 w-4" /> Add Loan</Button>
         </CardHeader>
@@ -160,6 +167,7 @@ const LoanTracker: React.FC = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Loan Name</TableHead>
+                  <TableHead>Category</TableHead>
                   <TableHead>Total Amount</TableHead>
                   <TableHead>Amount Paid</TableHead>
                   <TableHead>Remaining</TableHead>
@@ -171,7 +179,22 @@ const LoanTracker: React.FC = () => {
               <TableBody>
                 {loans.length > 0 ? loans.map(loan => (
                   <TableRow key={loan.id}>
-                    <TableCell className="p-1"><Input value={loan.name} onChange={e => handleLoanChange(loan.id, 'name', e.target.value)} placeholder="e.g., Home Loan" className="bg-transparent border-0 focus-visible:ring-1 h-8" /></TableCell>
+                    <TableCell className="p-1"><Input value={loan.name} onChange={e => handleLoanChange(loan.id, 'name', e.target.value)} placeholder="e.g., HDFC Home Loan" className="bg-transparent border-0 focus-visible:ring-1 h-8" /></TableCell>
+                    <TableCell className="p-1">
+                      <Select value={loan.category} onValueChange={(value: LoanCategory) => handleLoanChange(loan.id, 'category', value)}>
+                        <SelectTrigger className="bg-transparent border-0 focus-visible:ring-1 h-8 w-[140px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Home">Home</SelectItem>
+                          <SelectItem value="Education">Education</SelectItem>
+                          <SelectItem value="Car">Car</SelectItem>
+                          <SelectItem value="Personal">Personal</SelectItem>
+                          <SelectItem value="Credit Card">Credit Card</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
                     <TableCell className="p-1"><Input type="text" value={loan.totalAmount.toLocaleString('en-IN')} onChange={e => handleLoanChange(loan.id, 'totalAmount', Number(e.target.value.replace(/,/g, '')))} className="bg-transparent border-0 focus-visible:ring-1 h-8" /></TableCell>
                     <TableCell className="p-1"><Input type="text" value={loan.amountPaid.toLocaleString('en-IN')} onChange={e => handleLoanChange(loan.id, 'amountPaid', Number(e.target.value.replace(/,/g, '')))} className="bg-transparent border-0 focus-visible:ring-1 h-8" /></TableCell>
                     <TableCell>{formatCurrency(loan.totalAmount - loan.amountPaid)}</TableCell>
@@ -180,12 +203,12 @@ const LoanTracker: React.FC = () => {
                     <TableCell className="text-right p-1"><Button variant="ghost" size="icon" onClick={() => handleDeleteRow(loan.id)} className="h-8 w-8"><Trash2 className="h-4 w-4 text-red-500" /></Button></TableCell>
                   </TableRow>
                 )) : (
-                  <TableRow><TableCell colSpan={7} className="text-center h-24 text-muted-foreground">No loans added yet.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={8} className="text-center h-24 text-muted-foreground">No loans added yet.</TableCell></TableRow>
                 )}
               </TableBody>
               <TableFooter>
                 <TableRow className="bg-muted/50 font-bold">
-                  <TableCell>Total</TableCell>
+                  <TableCell colSpan={2}>Total</TableCell>
                   <TableCell>{formatCurrency(totals.totalAmount)}</TableCell>
                   <TableCell>{formatCurrency(totals.amountPaid)}</TableCell>
                   <TableCell>{formatCurrency(totals.remainingPrincipal)}</TableCell>
