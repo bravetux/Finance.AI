@@ -176,7 +176,14 @@ const RealEstate: React.FC = () => {
   }, [propertyValues]);
 
   // Helper for formatting currency
-  const formatCurrency = (value: number) => `₹${value.toLocaleString('en-IN')}`;
+  const formatCurrency = (value: number) => {
+    if (Math.abs(value) >= 100000) {
+      const lakhs = value / 100000;
+      const formattedLakhs = parseFloat(lakhs.toFixed(2));
+      return `₹ ${formattedLakhs.toLocaleString('en-IN')} Lakhs`;
+    }
+    return `₹ ${value.toLocaleString('en-IN')}`;
+  };
 
   // Data management functions
   const exportData = () => {
