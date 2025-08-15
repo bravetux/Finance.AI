@@ -399,7 +399,9 @@ const NetWorthCalculator: React.FC = () => {
                     type="number"
                     value={data.ulipsSurrenderValue}
                     onChange={(e) => handleInputChange('ulipsSurrenderValue', e.target.value)}
+                    disabled
                   />
+                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Insurance Hub page.</p>
                 </div>
                 <div>
                   <Label htmlFor="epfPpfVpf">EPF/PPF/VPF</Label>

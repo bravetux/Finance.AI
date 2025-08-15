@@ -47,6 +47,44 @@ const InsuranceHub: React.FC = () => {
     }
   });
 
+  const [ulipsSurrenderValue, setUlipsSurrenderValue] = useState<number>(0);
+
+  useEffect(() => {
+    try {
+      const savedNetWorth = localStorage.getItem('netWorthData');
+      if (savedNetWorth) {
+        const netWorthData = JSON.parse(savedNetWorth);
+        setUlipsSurrenderValue(netWorthData.ulipsSurrenderValue || 0);
+      }
+    } catch (error) {
+      console.error("Failed to load ULIPs surrender value:", error);
+    }
+  }, []);
+
+  const handleUlipsChange = (value: string) => {
+    const numericValue = Number(value.replace(/,/g, ''));
+    if (isNaN(numericValue)) return;
+    setUlipsSurrenderValue(numericValue);
+  };
+
+  useEffect(() => {
+    try {
+      const savedNetWorth = localStorage.getItem('netWorthData');
+      const netWorthData = savedNetWorth ? JSON.parse(savedNetWorth) : {};
+      
+      if (netWorthData.ulipsSurrenderValue !== ulipsSurrenderValue) {
+        const updatedNetWorthData = {
+          ...netWorthData,
+          ulipsSurrenderValue: ulipsSurrenderValue,
+        };
+        localStorage.setItem('netWorthData', JSON.stringify(updatedNetWorthData));
+        window.dispatchEvent(new Event('storage'));
+      }
+    } catch (error) {
+      console.error("Failed to save ULIPs surrender value:", error);
+    }
+  }, [ulipsSurrenderValue]);
+
   useEffect(() => {
     localStorage.setItem('insuranceHubData', JSON.stringify(policies));
   }, [policies]);
@@ -230,6 +268,27 @@ const InsuranceHub: React.FC = () => {
                 </TableRow>
               </TableFooter>
             </Table>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>ULIPs Surrender Value</CardTitle>
+          <CardDescription>
+            Enter the total current surrender value of all your Unit Linked Insurance Plans (ULIPs). This value will be automatically updated in the Net Worth calculator.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="w-full md:w-1/3">
+            <Label htmlFor="ulips-surrender-value">Total Surrender Value (INR)</Label>
+            <Input
+              id="ulips-surrender-value"
+              type="text"
+              value={ulipsSurrenderValue.toLocaleString('en-IN')}
+              onChange={(e) => handleUlipsChange(e.target.value)}
+              className="mt-1 text-lg font-bold"
+            />
           </div>
         </CardContent>
       </Card>
