@@ -22,6 +22,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Slider } from "@/components/ui/slider";
 
 type Action = "Same" | "Reduce" | "Increase";
 
@@ -52,6 +53,11 @@ const initialExpenses: ExpenseItem[] = [
   { id: '17', category: '1 International/Domestic Trip', monthlyCost: 0, action: 'Same' },
   { id: '18', category: 'Broker + Shifting + Home deposit interest', monthlyCost: 0, action: 'Same' },
 ];
+
+const sliderConfigs: { [key: string]: { max: number; step: number } } = {
+  'Rent/ EMI for home': { max: 500000, step: 10000 },
+  'Car/2W EMI + Maintenance + Insurance': { max: 2000000, step: 5000 },
+};
 
 const ExpenseReductionPlanner: React.FC = () => {
   const [expenses, setExpenses] = useState<ExpenseItem[]>(() => {
@@ -241,7 +247,7 @@ const ExpenseReductionPlanner: React.FC = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="min-w-[250px] p-2">Category</TableHead>
-                  <TableHead className="p-2">Cost</TableHead>
+                  <TableHead className="p-2 min-w-[300px]">Cost</TableHead>
                   <TableHead className="p-2">Action</TableHead>
                   <TableHead className="p-2 text-right">±1%</TableHead>
                   <TableHead className="p-2 text-right">±5%</TableHead>
@@ -249,40 +255,63 @@ const ExpenseReductionPlanner: React.FC = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {expenses.map((expense) => (
-                  <TableRow key={expense.id}>
-                    <TableCell className="font-medium p-2">{expense.category}</TableCell>
-                    <TableCell className="p-0">
-                      <div className="relative flex items-center">
-                        <span className="absolute left-3 text-muted-foreground">₹</span>
-                        <Input
-                          type="number"
-                          value={expense.monthlyCost}
-                          onChange={(e) => handleCostChange(expense.id, e.target.value)}
-                          className="w-28 border-0 rounded-none focus-visible:ring-1 focus-visible:ring-offset-0 p-2 pl-6 h-auto bg-transparent text-right"
-                        />
-                      </div>
-                    </TableCell>
-                    <TableCell className="p-0">
-                      <Select
-                        value={expense.action}
-                        onValueChange={(value: Action) => handleActionChange(expense.id, value)}
-                      >
-                        <SelectTrigger className="w-[120px] border-0 rounded-none focus:ring-1 focus:ring-offset-0 p-2 h-auto bg-transparent">
-                          <SelectValue placeholder="Select action" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Same">Same</SelectItem>
-                          <SelectItem value="Reduce">Reduce</SelectItem>
-                          <SelectItem value="Increase">Increase</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell className="p-2 text-right">{formatCurrency(calculateChange(expense.monthlyCost, expense.action, 1))}</TableCell>
-                    <TableCell className="p-2 text-right">{formatCurrency(calculateChange(expense.monthlyCost, expense.action, 5))}</TableCell>
-                    <TableCell className="p-2 text-right">{formatCurrency(calculateChange(expense.monthlyCost, expense.action, 10))}</TableCell>
-                  </TableRow>
-                ))}
+                {expenses.map((expense) => {
+                  const sliderConfig = sliderConfigs[expense.category];
+                  return (
+                    <TableRow key={expense.id}>
+                      <TableCell className="font-medium p-2">{expense.category}</TableCell>
+                      {sliderConfig ? (
+                        <TableCell className="p-2">
+                          <div className="flex items-center gap-4">
+                            <Slider
+                              value={[expense.monthlyCost]}
+                              onValueChange={(val) => handleCostChange(expense.id, String(val[0]))}
+                              max={sliderConfig.max}
+                              step={sliderConfig.step}
+                              className="flex-1"
+                            />
+                            <Input
+                              type="number"
+                              value={expense.monthlyCost}
+                              onChange={(e) => handleCostChange(expense.id, e.target.value)}
+                              className="w-28 h-8 text-right"
+                            />
+                          </div>
+                        </TableCell>
+                      ) : (
+                        <TableCell className="p-0">
+                          <div className="relative flex items-center">
+                            <span className="absolute left-3 text-muted-foreground">₹</span>
+                            <Input
+                              type="number"
+                              value={expense.monthlyCost}
+                              onChange={(e) => handleCostChange(expense.id, e.target.value)}
+                              className="w-28 border-0 rounded-none focus-visible:ring-1 focus-visible:ring-offset-0 p-2 pl-6 h-auto bg-transparent text-right"
+                            />
+                          </div>
+                        </TableCell>
+                      )}
+                      <TableCell className="p-0">
+                        <Select
+                          value={expense.action}
+                          onValueChange={(value: Action) => handleActionChange(expense.id, value)}
+                        >
+                          <SelectTrigger className="w-[120px] border-0 rounded-none focus:ring-1 focus:ring-offset-0 p-2 h-auto bg-transparent">
+                            <SelectValue placeholder="Select action" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Same">Same</SelectItem>
+                            <SelectItem value="Reduce">Reduce</SelectItem>
+                            <SelectItem value="Increase">Increase</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell className="p-2 text-right">{formatCurrency(calculateChange(expense.monthlyCost, expense.action, 1))}</TableCell>
+                      <TableCell className="p-2 text-right">{formatCurrency(calculateChange(expense.monthlyCost, expense.action, 5))}</TableCell>
+                      <TableCell className="p-2 text-right">{formatCurrency(calculateChange(expense.monthlyCost, expense.action, 10))}</TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
               <TableFooter>
                 <TableRow className="bg-muted/50 font-bold">
