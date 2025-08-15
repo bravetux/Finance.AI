@@ -33,6 +33,7 @@ import {
   HandCoins,
   ShieldCheck,
   Bitcoin,
+  HeartHandshake,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -94,6 +95,7 @@ const navItems = [
     ]
   },
   { name: "Insurance Hub", path: "/dashboard/insurance-hub", icon: ShieldCheck, type: 'link' },
+  { name: "FIDOK", path: "/dashboard/fidok", icon: HeartHandshake, type: 'link' },
   { name: "Goals", path: "/dashboard/goals", icon: Target, type: 'link' },
   { 
     name: "Retirement Planning", 

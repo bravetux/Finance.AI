@@ -36,6 +36,7 @@ import PostRetirementStrategy from "./pages/PostRetirementStrategy";
 import LoanTracker from "./pages/LoanTracker";
 import InsuranceHub from "./pages/InsuranceHub";
 import Cryptocurrency from "./pages/Cryptocurrency";
+import FIDOK from "./pages/FIDOK";
 
 const queryClient = new QueryClient();
 
@@ -70,6 +71,7 @@ const App = () => (
               <Route path="cryptocurrency" element={<Cryptocurrency />} />
               <Route path="loan-tracker" element={<LoanTracker />} />
               <Route path="insurance-hub" element={<InsuranceHub />} />
+              <Route path="fidok" element={<FIDOK />} />
               <Route path="future-value" element={<FutureValueCalculator />} />
               <Route path="goals" element={<Goals />} />
               <Route path="retirement" element={<RetirementDashboard />} />
