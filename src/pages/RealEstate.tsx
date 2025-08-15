@@ -177,7 +177,12 @@ const RealEstate: React.FC = () => {
 
   // Helper for formatting currency
   const formatCurrency = (value: number) => {
-    if (Math.abs(value) >= 100000) {
+    if (Math.abs(value) >= 10000000) { // 1 Crore
+      const crores = value / 10000000;
+      const formattedCrores = parseFloat(crores.toFixed(2));
+      return `₹ ${formattedCrores.toLocaleString('en-IN')} Crores`;
+    }
+    if (Math.abs(value) >= 100000) { // 1 Lakh
       const lakhs = value / 100000;
       const formattedLakhs = parseFloat(lakhs.toFixed(2));
       return `₹ ${formattedLakhs.toLocaleString('en-IN')} Lakhs`;
