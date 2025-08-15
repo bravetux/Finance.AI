@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Download, Upload, Edit, Save, Trash2 } from "lucide-react";
+import { Download, Upload, Trash2 } from "lucide-react";
 import { showError, showSuccess } from "@/utils/toast";
 import GenericPieChart from "@/components/GenericPieChart";
 import {
@@ -60,7 +60,6 @@ const defaultNetWorthData: NetWorthData = {
 };
 
 const NetWorthCalculator: React.FC = () => {
-  const [isEditing, setIsEditing] = React.useState(false);
   const [data, setData] = React.useState<NetWorthData>(defaultNetWorthData);
 
   useEffect(() => {
@@ -189,15 +188,6 @@ const NetWorthCalculator: React.FC = () => {
     };
   }, []);
 
-  const handleInputChange = (field: keyof NetWorthData, value: string) => {
-    const updatedData = {
-      ...data,
-      [field]: Number(value) || 0
-    };
-    setData(updatedData);
-    localStorage.setItem('netWorthData', JSON.stringify(updatedData));
-  };
-
   const exportData = () => {
     const dataStr = JSON.stringify(data, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
@@ -299,17 +289,6 @@ const NetWorthCalculator: React.FC = () => {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <Button variant="outline" onClick={() => setIsEditing(!isEditing)}>
-            {isEditing ? (
-              <>
-                <Save className="mr-2 h-4 w-4" /> Save
-              </>
-            ) : (
-              <>
-                <Edit className="mr-2 h-4 w-4" /> Edit
-              </>
-            )}
-          </Button>
           <Button variant="outline" onClick={exportData}>
             <Upload className="mr-2 h-4 w-4" /> Export
           </Button>
@@ -369,103 +348,30 @@ const NetWorthCalculator: React.FC = () => {
             <CardTitle>Illiquid Assets</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {isEditing ? (
-              <>
-                <div>
-                  <Label htmlFor="homeValue">Home Value</Label>
-                  <Input
-                    id="homeValue"
-                    type="number"
-                    value={data.homeValue}
-                    onChange={(e) => handleInputChange('homeValue', e.target.value)}
-                    disabled
-                  />
-                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Real Estate page.</p>
-                </div>
-                <div>
-                  <Label htmlFor="otherRealEstate">Other Real Estate</Label>
-                  <Input
-                    id="otherRealEstate"
-                    type="number"
-                    value={data.otherRealEstate}
-                    onChange={(e) => handleInputChange('otherRealEstate', e.target.value)}
-                    disabled
-                  />
-                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Real Estate page.</p>
-                </div>
-                <div>
-                  <Label htmlFor="jewellery">Jewellery</Label>
-                  <Input
-                    id="jewellery"
-                    type="number"
-                    value={data.jewellery}
-                    onChange={(e) => handleInputChange('jewellery', e.target.value)}
-                    disabled
-                  />
-                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Precious Metals pages.</p>
-                </div>
-                <div>
-                  <Label htmlFor="sovereignGoldBonds">Sovereign Gold Bonds</Label>
-                  <Input
-                    id="sovereignGoldBonds"
-                    type="number"
-                    value={data.sovereignGoldBonds}
-                    onChange={(e) => handleInputChange('sovereignGoldBonds', e.target.value)}
-                    disabled
-                  />
-                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Gold page.</p>
-                </div>
-                <div>
-                  <Label htmlFor="ulipsSurrenderValue">ULIPs Surrender Value</Label>
-                  <Input
-                    id="ulipsSurrenderValue"
-                    type="number"
-                    value={data.ulipsSurrenderValue}
-                    onChange={(e) => handleInputChange('ulipsSurrenderValue', e.target.value)}
-                    disabled
-                  />
-                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Insurance Hub page.</p>
-                </div>
-                <div>
-                  <Label htmlFor="epfPpfVpf">EPF/PPF/VPF</Label>
-                  <Input
-                    id="epfPpfVpf"
-                    type="number"
-                    value={data.epfPpfVpf}
-                    onChange={(e) => handleInputChange('epfPpfVpf', e.target.value)}
-                    disabled
-                  />
-                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Debt page.</p>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex justify-between">
-                  <span>Home Value:</span>
-                  <span className="font-medium">₹{data.homeValue.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Other Real Estate:</span>
-                  <span className="font-medium">₹{data.otherRealEstate.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Jewellery:</span>
-                  <span className="font-medium">₹{data.jewellery.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Sovereign Gold Bonds:</span>
-                  <span className="font-medium">₹{data.sovereignGoldBonds.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>ULIPs Surrender Value:</span>
-                  <span className="font-medium">₹{data.ulipsSurrenderValue.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>EPF/PPF/VPF:</span>
-                  <span className="font-medium">₹{data.epfPpfVpf.toLocaleString("en-IN")}</span>
-                </div>
-              </>
-            )}
+            <div className="flex justify-between">
+              <span>Home Value:</span>
+              <span className="font-medium">₹{data.homeValue.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Other Real Estate:</span>
+              <span className="font-medium">₹{data.otherRealEstate.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Jewellery:</span>
+              <span className="font-medium">₹{data.jewellery.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Sovereign Gold Bonds:</span>
+              <span className="font-medium">₹{data.sovereignGoldBonds.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>ULIPs Surrender Value:</span>
+              <span className="font-medium">₹{data.ulipsSurrenderValue.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>EPF/PPF/VPF:</span>
+              <span className="font-medium">₹{data.epfPpfVpf.toLocaleString("en-IN")}</span>
+            </div>
           </CardContent>
         </Card>
 
@@ -475,163 +381,46 @@ const NetWorthCalculator: React.FC = () => {
             <CardTitle>Liquid Assets</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {isEditing ? (
-              <>
-                <div>
-                  <Label htmlFor="fixedDeposits">Fixed Deposits</Label>
-                  <Input
-                    id="fixedDeposits"
-                    type="number"
-                    value={data.fixedDeposits}
-                    onChange={(e) => handleInputChange('fixedDeposits', e.target.value)}
-                    disabled
-                  />
-                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Debt page.</p>
-                </div>
-                <div>
-                  <Label htmlFor="debtFunds">Debt Funds</Label>
-                  <Input
-                    id="debtFunds"
-                    type="number"
-                    value={data.debtFunds}
-                    onChange={(e) => handleInputChange('debtFunds', e.target.value)}
-                    disabled
-                  />
-                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Debt page.</p>
-                </div>
-                <div>
-                  <Label htmlFor="domesticStocks">Domestic Stocks</Label>
-                  <Input
-                    id="domesticStocks"
-                    type="number"
-                    value={data.domesticStocks}
-                    onChange={(e) => handleInputChange('domesticStocks', e.target.value)}
-                    disabled
-                  />
-                   <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Domestic Equity page.</p>
-                </div>
-                <div>
-                  <Label htmlFor="domesticMutualFunds">Domestic Mutual Funds</Label>
-                  <Input
-                    id="domesticMutualFunds"
-                    type="number"
-                    value={data.domesticMutualFunds}
-                    onChange={(e) => handleInputChange('domesticMutualFunds', e.target.value)}
-                    disabled
-                  />
-                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Mutual Fund Allocation page.</p>
-                </div>
-                <div>
-                  <Label htmlFor="internationalFunds">International Funds</Label>
-                  <Input
-                    id="internationalFunds"
-                    type="number"
-                    value={data.internationalFunds}
-                    onChange={(e) => handleInputChange('internationalFunds', e.target.value)}
-                    disabled
-                  />
-                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the US Equity page.</p>
-                </div>
-                <div>
-                  <Label htmlFor="smallCases">Small Cases</Label>
-                  <Input
-                    id="smallCases"
-                    type="number"
-                    value={data.smallCases}
-                    onChange={(e) => handleInputChange('smallCases', e.target.value)}
-                    disabled
-                  />
-                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Small Case page.</p>
-                </div>
-                <div>
-                  <Label htmlFor="savingsBalance">Savings Balance</Label>
-                  <Input
-                    id="savingsBalance"
-                    type="number"
-                    value={data.savingsBalance}
-                    onChange={(e) => handleInputChange('savingsBalance', e.target.value)}
-                    disabled
-                  />
-                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Debt page.</p>
-                </div>
-                <div>
-                  <Label htmlFor="preciousMetals">Precious Metals</Label>
-                  <Input
-                    id="preciousMetals"
-                    type="number"
-                    value={data.preciousMetals}
-                    onChange={(e) => handleInputChange('preciousMetals', e.target.value)}
-                    disabled
-                  />
-                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Precious Metals pages.</p>
-                </div>
-                <div>
-                  <Label htmlFor="cryptocurrency">Cryptocurrency</Label>
-                  <Input
-                    id="cryptocurrency"
-                    type="number"
-                    value={data.cryptocurrency}
-                    onChange={(e) => handleInputChange('cryptocurrency', e.target.value)}
-                    disabled
-                  />
-                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Cryptocurrency page.</p>
-                </div>
-                <div>
-                  <Label htmlFor="reits">REITs</Label>
-                  <Input
-                    id="reits"
-                    type="number"
-                    value={data.reits}
-                    onChange={(e) => handleInputChange('reits', e.target.value)}
-                    disabled
-                  />
-                  <p className="text-xs text-muted-foreground pt-1">This value is auto-populated from the Real Estate page.</p>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex justify-between">
-                  <span>Fixed Deposits:</span>
-                  <span className="font-medium">₹{data.fixedDeposits.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Debt Funds:</span>
-                  <span className="font-medium">₹{data.debtFunds.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Domestic Stocks:</span>
-                  <span className="font-medium">₹{data.domesticStocks.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Domestic Mutual Funds:</span>
-                  <span className="font-medium">₹{data.domesticMutualFunds.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>International Funds:</span>
-                  <span className="font-medium">₹{data.internationalFunds.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Small Cases:</span>
-                  <span className="font-medium">₹{data.smallCases.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Savings Balance:</span>
-                  <span className="font-medium">₹{data.savingsBalance.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Precious Metals:</span>
-                  <span className="font-medium">₹{data.preciousMetals.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Cryptocurrency:</span>
-                  <span className="font-medium">₹{data.cryptocurrency.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>REITs:</span>
-                  <span className="font-medium">₹{data.reits.toLocaleString("en-IN")}</span>
-                </div>
-              </>
-            )}
+            <div className="flex justify-between">
+              <span>Fixed Deposits:</span>
+              <span className="font-medium">₹{data.fixedDeposits.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Debt Funds:</span>
+              <span className="font-medium">₹{data.debtFunds.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Domestic Stocks:</span>
+              <span className="font-medium">₹{data.domesticStocks.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Domestic Mutual Funds:</span>
+              <span className="font-medium">₹{data.domesticMutualFunds.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>International Funds:</span>
+              <span className="font-medium">₹{data.internationalFunds.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Small Cases:</span>
+              <span className="font-medium">₹{data.smallCases.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Savings Balance:</span>
+              <span className="font-medium">₹{data.savingsBalance.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Precious Metals:</span>
+              <span className="font-medium">₹{data.preciousMetals.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Cryptocurrency:</span>
+              <span className="font-medium">₹{data.cryptocurrency.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>REITs:</span>
+              <span className="font-medium">₹{data.reits.toLocaleString("en-IN")}</span>
+            </div>
           </CardContent>
         </Card>
 
@@ -641,61 +430,30 @@ const NetWorthCalculator: React.FC = () => {
             <CardTitle>Liabilities</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {isEditing ? (
-              <>
-                <div>
-                  <Label htmlFor="homeLoan">Home Loan</Label>
-                  <Input id="homeLoan" type="number" value={data.homeLoan} disabled />
-                </div>
-                <div>
-                  <Label htmlFor="educationLoan">Education Loan</Label>
-                  <Input id="educationLoan" type="number" value={data.educationLoan} disabled />
-                </div>
-                <div>
-                  <Label htmlFor="carLoan">Car Loan</Label>
-                  <Input id="carLoan" type="number" value={data.carLoan} disabled />
-                </div>
-                <div>
-                  <Label htmlFor="personalLoan">Personal Loan</Label>
-                  <Input id="personalLoan" type="number" value={data.personalLoan} disabled />
-                </div>
-                <div>
-                  <Label htmlFor="creditCardDues">Credit Card Dues</Label>
-                  <Input id="creditCardDues" type="number" value={data.creditCardDues} disabled />
-                </div>
-                <div>
-                  <Label htmlFor="otherLiabilities">Other Liabilities</Label>
-                  <Input id="otherLiabilities" type="number" value={data.otherLiabilities} disabled />
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex justify-between">
-                  <span>Home Loan:</span>
-                  <span className="font-medium">₹{data.homeLoan.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Education Loan:</span>
-                  <span className="font-medium">₹{data.educationLoan.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Car Loan:</span>
-                  <span className="font-medium">₹{data.carLoan.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Personal Loan:</span>
-                  <span className="font-medium">₹{data.personalLoan.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Credit Card Dues:</span>
-                  <span className="font-medium">₹{data.creditCardDues.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Other Liabilities:</span>
-                  <span className="font-medium">₹{data.otherLiabilities.toLocaleString("en-IN")}</span>
-                </div>
-              </>
-            )}
+            <div className="flex justify-between">
+              <span>Home Loan:</span>
+              <span className="font-medium">₹{data.homeLoan.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Education Loan:</span>
+              <span className="font-medium">₹{data.educationLoan.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Car Loan:</span>
+              <span className="font-medium">₹{data.carLoan.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Personal Loan:</span>
+              <span className="font-medium">₹{data.personalLoan.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Credit Card Dues:</span>
+              <span className="font-medium">₹{data.creditCardDues.toLocaleString("en-IN")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Other Liabilities:</span>
+              <span className="font-medium">₹{data.otherLiabilities.toLocaleString("en-IN")}</span>
+            </div>
             <p className="text-xs text-muted-foreground pt-2">
               All liability values are auto-populated from the Loan Tracker page.
             </p>
