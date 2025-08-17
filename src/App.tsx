@@ -41,6 +41,7 @@ import SIPCalculator from "./pages/SIPCalculator";
 import SWPCalculator from "./pages/SWPCalculator";
 import PPFCalculator from "./pages/PPFCalculator";
 import EPFCalculator from "./pages/EPFCalculator";
+import GoalCalculator from "./pages/GoalCalculator";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +89,7 @@ const App = () => (
               <Route path="swp-calculator" element={<SWPCalculator />} />
               <Route path="ppf-calculator" element={<PPFCalculator />} />
               <Route path="epf-calculator" element={<EPFCalculator />} />
+              <Route path="goal-calculator" element={<GoalCalculator />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
