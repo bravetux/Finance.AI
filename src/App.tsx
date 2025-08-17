@@ -39,6 +39,7 @@ import Cryptocurrency from "./pages/Cryptocurrency";
 import FIDOK from "./pages/FIDOK";
 import SIPCalculator from "./pages/SIPCalculator";
 import SWPCalculator from "./pages/SWPCalculator";
+import PPFCalculator from "./pages/PPFCalculator";
 
 const queryClient = new QueryClient();
 
@@ -84,6 +85,7 @@ const App = () => (
               <Route path="ai-prompt" element={<AIPrompt />} />
               <Route path="sip-calculator" element={<SIPCalculator />} />
               <Route path="swp-calculator" element={<SWPCalculator />} />
+              <Route path="ppf-calculator" element={<PPFCalculator />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
