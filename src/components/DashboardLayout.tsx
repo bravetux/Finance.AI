@@ -229,14 +229,16 @@ const DashboardLayout: React.FC = () => {
           )}
         </nav>
       </ScrollArea>
-      <div className="mt-6 text-sm text-sidebar-foreground/80 px-2">
-        <p className="font-semibold">Designed and Developed by B.Vignesh Kumar</p>
-        <a href="mailto:vigneshkumarb@bravetux.com" className="hover:underline">
-          vigneshkumarb@bravetux.com
-        </a>
-      </div>
-      <div className="mt-auto flex items-center justify-end">
-        <ThemeToggle />
+      <div className="mt-auto pt-4">
+        <div className="text-sm text-sidebar-foreground/80 px-2 mb-2">
+          <p className="font-semibold">Designed and Developed by B.Vignesh Kumar</p>
+          <a href="mailto:vigneshkumarb@bravetux.com" className="hover:underline">
+            vigneshkumarb@bravetux.com
+          </a>
+        </div>
+        <div className="flex items-center justify-end">
+          <ThemeToggle />
+        </div>
       </div>
     </div>
   );
