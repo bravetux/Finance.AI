@@ -112,6 +112,14 @@ const navItems = [
   { name: "Reports", path: "/dashboard/reports", icon: FileText, type: 'link' },
   { name: "FIDOK", path: "/dashboard/fidok", icon: HeartHandshake, type: 'link' },
   { name: "AI Prompt", path: "/dashboard/ai-prompt", icon: Bot, type: 'link' },
+  { 
+    name: "Calculators", 
+    icon: Calculator,
+    type: 'section',
+    children: [
+      { name: "SIP Calculator", path: "/dashboard/sip-calculator", icon: Calculator, type: 'link' },
+    ]
+  },
 ];
 
 const DashboardLayout: React.FC = () => {

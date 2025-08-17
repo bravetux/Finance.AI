@@ -37,6 +37,7 @@ import LoanTracker from "./pages/LoanTracker";
 import InsuranceHub from "./pages/InsuranceHub";
 import Cryptocurrency from "./pages/Cryptocurrency";
 import FIDOK from "./pages/FIDOK";
+import SIPCalculator from "./pages/SIPCalculator";
 
 const queryClient = new QueryClient();
 
@@ -80,6 +81,7 @@ const App = () => (
               <Route path="post-retirement-strategy" element={<PostRetirementStrategy />} />
               <Route path="reports" element={<Reports />} />
               <Route path="ai-prompt" element={<AIPrompt />} />
+              <Route path="sip-calculator" element={<SIPCalculator />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
