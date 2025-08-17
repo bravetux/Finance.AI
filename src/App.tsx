@@ -40,6 +40,7 @@ import FIDOK from "./pages/FIDOK";
 import SIPCalculator from "./pages/SIPCalculator";
 import SWPCalculator from "./pages/SWPCalculator";
 import PPFCalculator from "./pages/PPFCalculator";
+import EPFCalculator from "./pages/EPFCalculator";
 
 const queryClient = new QueryClient();
 
@@ -86,6 +87,7 @@ const App = () => (
               <Route path="sip-calculator" element={<SIPCalculator />} />
               <Route path="swp-calculator" element={<SWPCalculator />} />
               <Route path="ppf-calculator" element={<PPFCalculator />} />
+              <Route path="epf-calculator" element={<EPFCalculator />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

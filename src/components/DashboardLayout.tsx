@@ -120,6 +120,7 @@ const navItems = [
       { name: "SIP Calculator", path: "/dashboard/sip-calculator", icon: Calculator, type: 'link' },
       { name: "SWP Calculator", path: "/dashboard/swp-calculator", icon: Calculator, type: 'link' },
       { name: "PPF Calculator", path: "/dashboard/ppf-calculator", icon: Calculator, type: 'link' },
+      { name: "EPF Calculator", path: "/dashboard/epf-calculator", icon: Calculator, type: 'link' },
     ]
   },
 ];
