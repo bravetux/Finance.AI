@@ -18,7 +18,7 @@ const PPFCalculator: React.FC = () => {
     const i = interestRate / 100;
     const n = timePeriod;
 
-    if (i === 0) {
+    if (i === 0 || n === 0) {
       const maturityValue = P * n;
       const investedAmount = P * n;
       return { investedAmount, totalInterest: 0, maturityValue };
@@ -79,8 +79,8 @@ const PPFCalculator: React.FC = () => {
               <Slider
                 value={[timePeriod]}
                 onValueChange={(val) => setTimePeriod(val[0])}
-                min={15}
-                max={50}
+                min={0}
+                max={100}
                 step={1}
               />
             </div>
