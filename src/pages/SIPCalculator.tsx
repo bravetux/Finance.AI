@@ -74,7 +74,7 @@ const SIPCalculator: React.FC = () => {
                       value={[monthlyInvestment]}
                       onValueChange={(val) => setMonthlyInvestment(val[0])}
                       min={500}
-                      max={100000}
+                      max={500000}
                       step={500}
                     />
                   </div>
