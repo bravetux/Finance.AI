@@ -38,6 +38,7 @@ import InsuranceHub from "./pages/InsuranceHub";
 import Cryptocurrency from "./pages/Cryptocurrency";
 import FIDOK from "./pages/FIDOK";
 import SIPCalculator from "./pages/SIPCalculator";
+import SWPCalculator from "./pages/SWPCalculator";
 
 const queryClient = new QueryClient();
 
@@ -82,6 +83,7 @@ const App = () => (
               <Route path="reports" element={<Reports />} />
               <Route path="ai-prompt" element={<AIPrompt />} />
               <Route path="sip-calculator" element={<SIPCalculator />} />
+              <Route path="swp-calculator" element={<SWPCalculator />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

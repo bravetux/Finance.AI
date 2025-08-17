@@ -118,6 +118,7 @@ const navItems = [
     type: 'section',
     children: [
       { name: "SIP Calculator", path: "/dashboard/sip-calculator", icon: Calculator, type: 'link' },
+      { name: "SWP Calculator", path: "/dashboard/swp-calculator", icon: Calculator, type: 'link' },
     ]
   },
 ];
