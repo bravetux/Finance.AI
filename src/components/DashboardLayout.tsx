@@ -129,6 +129,18 @@ const DashboardLayout: React.FC = () => {
   const isMobile = useIsMobile();
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
 
+  const handleAccordionClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const trigger = e.currentTarget;
+    if (trigger.getAttribute('data-state') === 'closed') {
+      const accordionItem = trigger.closest('[data-radix-accordion-item]');
+      if (accordionItem) {
+        setTimeout(() => {
+          accordionItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 200);
+      }
+    }
+  };
+
   const SidebarContent = () => (
     <div className="flex h-full flex-col p-4 bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
       <Link to="/" className="text-2xl font-bold mb-6 text-sidebar-primary-foreground">
@@ -140,7 +152,10 @@ const DashboardLayout: React.FC = () => {
             item.type === 'section' && item.children ? (
               <Accordion key={item.name} type="single" collapsible className="w-full">
                 <AccordionItem value={item.name} className="border-none">
-                  <AccordionTrigger className="justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:no-underline rounded-md px-3 py-2 w-full font-medium">
+                  <AccordionTrigger
+                    onClick={handleAccordionClick}
+                    className="justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:no-underline rounded-md px-3 py-2 w-full font-medium"
+                  >
                     <div className="flex items-center">
                       <item.icon className="mr-2 h-4 w-4" />
                       {item.name}
@@ -152,7 +167,10 @@ const DashboardLayout: React.FC = () => {
                         child.type === 'section' && child.children ? (
                           <Accordion key={child.name} type="single" collapsible className="w-full">
                             <AccordionItem value={child.name} className="border-none">
-                              <AccordionTrigger className="justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:no-underline rounded-md px-3 py-2 w-full">
+                              <AccordionTrigger
+                                onClick={handleAccordionClick}
+                                className="justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:no-underline rounded-md px-3 py-2 w-full"
+                              >
                                 <div className="flex items-center">
                                   <child.icon className="mr-2 h-4 w-4" />
                                   {child.name}
