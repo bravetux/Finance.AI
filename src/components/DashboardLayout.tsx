@@ -128,7 +128,16 @@ const navItems = [
 
 const AppFooter = () => (
   <footer className="text-center p-4 text-sm text-muted-foreground border-t">
-    Designed by Bravetux. The Website Source Code is Published in{' '}
+    Designed by{' '}
+    <a
+      href="https://github.com/bravetux"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="font-medium underline underline-offset-4"
+    >
+      Bravetux
+    </a>
+    . The Website Source Code is Published in{' '}
     <a
       href="https://github.com/bravetux/Finance.AI"
       target="_blank"
