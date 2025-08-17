@@ -42,6 +42,14 @@ const SWPCalculator: React.FC = () => {
     };
   }, [totalInvestment, monthlyWithdrawal, returnRate, timePeriod]);
 
+  const withdrawalRate = useMemo(() => {
+    if (totalInvestment === 0) {
+      return 0;
+    }
+    const annualWithdrawal = monthlyWithdrawal * 12;
+    return (annualWithdrawal / totalInvestment) * 100;
+  }, [totalInvestment, monthlyWithdrawal]);
+
   const formatCurrency = (value: number) => {
     return `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
   };
@@ -130,6 +138,10 @@ const SWPCalculator: React.FC = () => {
               <div className="flex justify-between border-t pt-4 mt-4">
                 <span className="font-bold">Final value</span>
                 <span className="font-bold text-2xl text-primary">{formatCurrency(calculations.finalValue)}</span>
+              </div>
+              <div className="flex justify-between pt-2">
+                <span className="text-muted-foreground">Withdrawal Rate (p.a.)</span>
+                <span className="font-medium">{withdrawalRate.toFixed(2)}%</span>
               </div>
             </div>
           </div>
