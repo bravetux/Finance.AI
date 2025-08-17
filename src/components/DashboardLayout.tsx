@@ -134,8 +134,8 @@ const DashboardLayout: React.FC = () => {
       <Link to="/" className="text-2xl font-bold mb-6 text-sidebar-primary-foreground">
         Financial Planner
       </Link>
-      <ScrollArea className="flex-1">
-        <nav className="flex flex-col gap-1 pr-4">
+      <ScrollArea className="flex-1 pr-4">
+        <nav className="flex flex-col gap-1">
           {navItems.map((item) =>
             item.type === 'section' && item.children ? (
               <Accordion key={item.name} type="single" collapsible className="w-full">
