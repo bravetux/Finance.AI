@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Bot, Sparkles, Terminal, Download, X } from "lucide-react";
+import { Bot, Sparkles, Terminal, Download, X, Upload } from "lucide-react";
 import { showError, showSuccess } from "@/utils/toast";
 import { saveAs } from "file-saver";
 
@@ -111,9 +111,45 @@ const AIPrompt: React.FC = () => {
 
   const handleAnalyseResponse = () => {
     addLog("Analyzing response to update AI Insights...");
-    // In a real scenario, you would parse the response and update localStorage for AIInsights page.
-    // For now, we'll just show a success message.
     showSuccess("Analysis complete. AI Insights page will be updated based on this response.");
+  };
+
+  const handleExportSettings = () => {
+    const settings = { provider, apiKey, modelName, ollamaUrl };
+    const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+    saveAs(blob, 'ai-provider-settings.json');
+    showSuccess('AI settings exported successfully!');
+    addLog('Exported AI provider settings.');
+  };
+
+  const handleImportSettings = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    addLog(`Importing settings from ${file.name}...`);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        const settings = JSON.parse(content);
+
+        if (settings.provider && settings.modelName) {
+          setProvider(settings.provider);
+          setApiKey(settings.apiKey || "");
+          setModelName(settings.modelName);
+          setOllamaUrl(settings.ollamaUrl || "http://localhost:11434");
+          showSuccess("AI settings imported successfully!");
+          addLog("Successfully imported AI settings.");
+        } else {
+          throw new Error("Invalid settings file format.");
+        }
+      } catch (error: any) {
+        showError(`Failed to import settings: ${error.message}`);
+        addLog(`ERROR: Failed to import settings from ${file.name}.`);
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
   };
 
   const handleChat = async () => {
@@ -296,6 +332,24 @@ const AIPrompt: React.FC = () => {
           </div>
           <Button onClick={handleChat} disabled={isLoading}>
             {isLoading ? (<><Sparkles className="mr-2 h-4 w-4 animate-spin" />Thinking...</>) : (<><Sparkles className="mr-2 h-4 w-4" />Chat with AI</>)}
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Settings Management</CardTitle>
+          <CardDescription>Export your current AI provider settings for easy backup and import them later.</CardDescription>
+        </CardHeader>
+        <CardContent className="flex gap-4">
+          <Button variant="outline" onClick={handleExportSettings}>
+            <Upload className="mr-2 h-4 w-4" /> Export Settings
+          </Button>
+          <Button variant="outline" asChild>
+            <Label htmlFor="import-settings-file" className="cursor-pointer">
+              <Download className="mr-2 h-4 w-4" /> Import Settings
+              <Input id="import-settings-file" type="file" accept=".json" className="hidden" onChange={handleImportSettings} />
+            </Label>
           </Button>
         </CardContent>
       </Card>
