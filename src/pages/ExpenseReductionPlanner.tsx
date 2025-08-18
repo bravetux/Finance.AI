@@ -237,7 +237,7 @@ const ExpenseReductionPlanner: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
+          <div>
             <Table>
               <TableHeader>
                 <TableRow>
