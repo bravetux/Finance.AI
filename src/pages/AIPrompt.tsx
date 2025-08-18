@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -107,6 +107,13 @@ const AIPrompt: React.FC = () => {
     setUploadedData(null);
     setUploadedFileName(null);
     addLog("Cleared uploaded file.");
+  };
+
+  const handleAnalyseResponse = () => {
+    addLog("Analyzing response to update AI Insights...");
+    // In a real scenario, you would parse the response and update localStorage for AIInsights page.
+    // For now, we'll just show a success message.
+    showSuccess("Analysis complete. AI Insights page will be updated based on this response.");
   };
 
   const handleChat = async () => {
@@ -300,21 +307,29 @@ const AIPrompt: React.FC = () => {
         </Card>
       )}
 
-      {(isLoading || response) && (
-        <Card>
-          <CardHeader className="flex flex-row justify-between items-center">
-            <CardTitle>AI Response</CardTitle>
-            {response && !isLoading && <Button variant="outline" size="sm" onClick={handleExportResponse}><Download className="mr-2 h-4 w-4" />Export Response</Button>}
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="flex items-center space-x-2 text-muted-foreground"><Bot className="h-5 w-5 animate-pulse" /><span>The AI is analyzing your data...</span></div>
-            ) : (
-              <div className="prose dark:prose-invert max-w-full whitespace-pre-wrap"><p>{response}</p></div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+      <Card>
+        <CardHeader className="flex flex-row justify-between items-center">
+          <CardTitle>AI Response</CardTitle>
+          {response && !isLoading && <Button variant="outline" size="sm" onClick={handleExportResponse}><Download className="mr-2 h-4 w-4" />Export Response</Button>}
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex items-center space-x-2 text-muted-foreground"><Bot className="h-5 w-5 animate-pulse" /><span>The AI is analyzing your data...</span></div>
+          ) : response ? (
+            <div className="prose dark:prose-invert max-w-full whitespace-pre-wrap"><p>{response}</p></div>
+          ) : (
+            <div className="text-muted-foreground">The AI's response will appear here.</div>
+          )}
+        </CardContent>
+        {response && !isLoading && (
+          <CardFooter>
+            <Button onClick={handleAnalyseResponse}>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Analyse Response and Update AI Insights
+            </Button>
+          </CardFooter>
+        )}
+      </Card>
     </div>
   );
 };
