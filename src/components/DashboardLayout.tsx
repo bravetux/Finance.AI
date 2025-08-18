@@ -278,15 +278,17 @@ const DashboardLayout: React.FC = () => {
   }
 
   return (
-    <ResizablePanelGroup direction="horizontal" className="min-h-screen">
+    <ResizablePanelGroup direction="horizontal" className="h-screen w-full">
       <ResizablePanel defaultSize={20} minSize={15} maxSize={25}>
         <SidebarContent />
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={80}>
-        <main className="h-screen overflow-y-auto p-6">
-          <Outlet />
-        </main>
+        <ScrollArea className="h-full">
+          <main className="p-6">
+            <Outlet />
+          </main>
+        </ScrollArea>
       </ResizablePanel>
     </ResizablePanelGroup>
   );
