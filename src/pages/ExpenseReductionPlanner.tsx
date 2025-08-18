@@ -231,18 +231,6 @@ const ExpenseReductionPlanner: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Expense Breakdown</CardTitle>
-          <CardDescription>
-            A visual representation of your monthly expenses by category.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <GenericPieChart data={chartData} showLegend={false} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
           <CardTitle>Monthly Expense Reduction Planner</CardTitle>
           <CardDescription>
             Reduce your monthly expenses and see how small changes can impact your budget.
@@ -317,6 +305,18 @@ const ExpenseReductionPlanner: React.FC = () => {
               </TableFooter>
             </Table>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Expense Breakdown</CardTitle>
+          <CardDescription>
+            A visual representation of your monthly expenses by category.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <GenericPieChart data={chartData} showLegend={false} />
         </CardContent>
       </Card>
     </div>
