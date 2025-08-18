@@ -246,12 +246,12 @@ const ExpenseReductionPlanner: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="min-w-[250px] p-2">Category</TableHead>
-                  <TableHead className="p-2 min-w-[300px]">Cost</TableHead>
-                  <TableHead className="p-2">Action</TableHead>
-                  <TableHead className="p-2 text-right">±1%</TableHead>
-                  <TableHead className="p-2 text-right">±5%</TableHead>
-                  <TableHead className="p-2 text-right">±10%</TableHead>
+                  <TableHead className="w-[300px]">Category</TableHead>
+                  <TableHead>Cost</TableHead>
+                  <TableHead>Action</TableHead>
+                  <TableHead className="text-right">±1%</TableHead>
+                  <TableHead className="text-right">±5%</TableHead>
+                  <TableHead className="text-right">±10%</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -259,15 +259,14 @@ const ExpenseReductionPlanner: React.FC = () => {
                   const sliderConfig = sliderConfigs[expense.category] || { max: 50000, step: 1000 };
                   return (
                     <TableRow key={expense.id}>
-                      <TableCell className="font-medium p-2">{expense.category}</TableCell>
-                      <TableCell className="p-2">
-                        <div className="flex items-center gap-4">
+                      <TableCell className="font-medium">{expense.category}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2 w-full max-w-sm">
                           <Slider
                             value={[expense.monthlyCost]}
                             onValueChange={(val) => handleCostChange(expense.id, String(val[0]))}
                             max={sliderConfig.max}
                             step={sliderConfig.step}
-                            className="flex-1"
                           />
                           <Input
                             type="number"
@@ -277,12 +276,12 @@ const ExpenseReductionPlanner: React.FC = () => {
                           />
                         </div>
                       </TableCell>
-                      <TableCell className="p-0">
+                      <TableCell>
                         <Select
                           value={expense.action}
                           onValueChange={(value: Action) => handleActionChange(expense.id, value)}
                         >
-                          <SelectTrigger className="w-[120px] border-0 rounded-none focus:ring-1 focus:ring-offset-0 p-2 h-auto bg-transparent">
+                          <SelectTrigger className="w-[120px]">
                             <SelectValue placeholder="Select action" />
                           </SelectTrigger>
                           <SelectContent>
@@ -292,21 +291,21 @@ const ExpenseReductionPlanner: React.FC = () => {
                           </SelectContent>
                         </Select>
                       </TableCell>
-                      <TableCell className="p-2 text-right">{formatCurrency(calculateChange(expense.monthlyCost, expense.action, 1))}</TableCell>
-                      <TableCell className="p-2 text-right">{formatCurrency(calculateChange(expense.monthlyCost, expense.action, 5))}</TableCell>
-                      <TableCell className="p-2 text-right">{formatCurrency(calculateChange(expense.monthlyCost, expense.action, 10))}</TableCell>
+                      <TableCell className="text-right">{formatCurrency(calculateChange(expense.monthlyCost, expense.action, 1))}</TableCell>
+                      <TableCell className="text-right">{formatCurrency(calculateChange(expense.monthlyCost, expense.action, 5))}</TableCell>
+                      <TableCell className="text-right">{formatCurrency(calculateChange(expense.monthlyCost, expense.action, 10))}</TableCell>
                     </TableRow>
                   );
                 })}
               </TableBody>
               <TableFooter>
                 <TableRow className="bg-muted/50 font-bold">
-                  <TableCell className="p-2">Total Expenses</TableCell>
-                  <TableCell className="p-2 text-right">{formatCurrency(totals.monthlyCost)}</TableCell>
-                  <TableCell className="p-2"></TableCell>
-                  <TableCell className="p-2 text-right">{formatCurrency(totals.change1)}</TableCell>
-                  <TableCell className="p-2 text-right">{formatCurrency(totals.change5)}</TableCell>
-                  <TableCell className="p-2 text-right">{formatCurrency(totals.change10)}</TableCell>
+                  <TableCell>Total Expenses</TableCell>
+                  <TableCell className="text-right">{formatCurrency(totals.monthlyCost)}</TableCell>
+                  <TableCell></TableCell>
+                  <TableCell className="text-right">{formatCurrency(totals.change1)}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(totals.change5)}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(totals.change10)}</TableCell>
                 </TableRow>
               </TableFooter>
             </Table>
