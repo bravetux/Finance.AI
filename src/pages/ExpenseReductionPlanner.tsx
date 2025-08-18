@@ -64,7 +64,14 @@ const ExpenseReductionPlanner: React.FC = () => {
     try {
       const savedData = localStorage.getItem('expenseTrackerData');
       if (savedData) {
-        return JSON.parse(savedData);
+        const parsedData = JSON.parse(savedData);
+        if (Array.isArray(parsedData)) {
+          // Merge saved data with initial structure to ensure all fields are present
+          return initialExpenses.map(initialItem => {
+            const savedItem = parsedData.find(p => p.id === initialItem.id);
+            return savedItem ? { ...initialItem, ...savedItem } : initialItem;
+          });
+        }
       }
     } catch (error) {
       console.error("Failed to load expense data from localStorage:", error);
@@ -247,7 +254,7 @@ const ExpenseReductionPlanner: React.FC = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[300px]">Category</TableHead>
-                  <TableHead>Cost</TableHead>
+                  <TableHead className="w-[400px]">Cost</TableHead>
                   <TableHead>Action</TableHead>
                   <TableHead className="text-right">±1%</TableHead>
                   <TableHead className="text-right">±5%</TableHead>
@@ -261,7 +268,7 @@ const ExpenseReductionPlanner: React.FC = () => {
                     <TableRow key={expense.id}>
                       <TableCell className="font-medium">{expense.category}</TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2 w-full max-w-sm">
+                        <div className="flex items-center gap-2 w-full">
                           <Slider
                             value={[expense.monthlyCost]}
                             onValueChange={(val) => handleCostChange(expense.id, String(val[0]))}
@@ -301,7 +308,7 @@ const ExpenseReductionPlanner: React.FC = () => {
               <TableFooter>
                 <TableRow className="bg-muted/50 font-bold">
                   <TableCell>Total Expenses</TableCell>
-                  <TableCell className="text-right">{formatCurrency(totals.monthlyCost)}</TableCell>
+                  <TableCell>{formatCurrency(totals.monthlyCost)}</TableCell>
                   <TableCell></TableCell>
                   <TableCell className="text-right">{formatCurrency(totals.change1)}</TableCell>
                   <TableCell className="text-right">{formatCurrency(totals.change5)}</TableCell>
