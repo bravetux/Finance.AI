@@ -117,7 +117,6 @@ const navItems = [
     icon: Bot,
     type: 'section',
     children: [
-      { name: "AI Insights", path: "/dashboard/ai-insights", icon: Sparkles, type: 'link' },
       { name: "AI Prompt", path: "/dashboard/ai-prompt", icon: Bot, type: 'link' },
     ]
   },
