@@ -15,7 +15,7 @@ type AIProvider = "openai" | "google" | "openrouter" | "ollama" | "perplexity";
 
 const modelsByProvider: Record<AIProvider, string[]> = {
   openai: ["gpt-4-turbo", "gpt-4o", "gpt-3.5-turbo"],
-  google: ["gemini-1.5-pro-latest", "gemini-1.5-flash-latest", "gemini-pro"],
+  google: ["gemini-2.5-pro", "gemini-2.5-flash", "gemini-1.5-pro-latest", "gemini-1.5-flash-latest", "gemini-pro"],
   openrouter: [
     "openai/gpt-4o",
     "google/gemini-flash-1.5",
