@@ -284,13 +284,11 @@ const DashboardLayout: React.FC = () => {
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={80}>
-        <div className="flex flex-col h-screen">
-          <ScrollArea className="flex-1">
-            <main className="p-6">
-              <Outlet />
-            </main>
-          </ScrollArea>
-        </div>
+        <ScrollArea className="h-screen">
+          <main className="p-6">
+            <Outlet />
+          </main>
+        </ScrollArea>
       </ResizablePanel>
     </ResizablePanelGroup>
   );
