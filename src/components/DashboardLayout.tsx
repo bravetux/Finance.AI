@@ -135,30 +135,6 @@ const navItems = [
   },
 ];
 
-const AppFooter = () => (
-  <footer className="text-center p-4 text-sm text-muted-foreground border-t">
-    Designed by{' '}
-    <a
-      href="https://github.com/bravetux"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="font-medium underline underline-offset-4"
-    >
-      Bravetux
-    </a>
-    . The Website Source Code is Published in{' '}
-    <a
-      href="https://github.com/bravetux/Finance.AI"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="font-medium underline underline-offset-4"
-    >
-      Github
-    </a>
-    .
-  </footer>
-);
-
 const DashboardLayout: React.FC = () => {
   const isMobile = useIsMobile();
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
@@ -297,7 +273,6 @@ const DashboardLayout: React.FC = () => {
         <main className="flex-grow p-4">
           <Outlet />
         </main>
-        <AppFooter />
       </div>
     );
   }
@@ -315,7 +290,6 @@ const DashboardLayout: React.FC = () => {
               <Outlet />
             </main>
           </ScrollArea>
-          <AppFooter />
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>
