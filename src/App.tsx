@@ -42,6 +42,7 @@ import SWPCalculator from "./pages/SWPCalculator";
 import PPFCalculator from "./pages/PPFCalculator";
 import EPFCalculator from "./pages/EPFCalculator";
 import GoalCalculator from "./pages/GoalCalculator";
+import AIInsights from "./pages/AIInsights";
 
 const queryClient = new QueryClient();
 
@@ -84,6 +85,7 @@ const App = () => (
               <Route path="fire-calculator" element={<FireCalculator />} />
               <Route path="post-retirement-strategy" element={<PostRetirementStrategy />} />
               <Route path="reports" element={<Reports />} />
+              <Route path="ai-insights" element={<AIInsights />} />
               <Route path="ai-prompt" element={<AIPrompt />} />
               <Route path="sip-calculator" element={<SIPCalculator />} />
               <Route path="swp-calculator" element={<SWPCalculator />} />

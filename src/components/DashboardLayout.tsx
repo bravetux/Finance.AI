@@ -34,6 +34,7 @@ import {
   ShieldCheck,
   Bitcoin,
   HeartHandshake,
+  Sparkles,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -112,10 +113,11 @@ const navItems = [
   { name: "Reports", path: "/dashboard/reports", icon: FileText, type: 'link' },
   { name: "FIDOK", path: "/dashboard/fidok", icon: HeartHandshake, type: 'link' },
   { 
-    name: "AI Insights", 
+    name: "AI", 
     icon: Bot,
     type: 'section',
     children: [
+      { name: "AI Insights", path: "/dashboard/ai-insights", icon: Sparkles, type: 'link' },
       { name: "AI Prompt", path: "/dashboard/ai-prompt", icon: Bot, type: 'link' },
     ]
   },
