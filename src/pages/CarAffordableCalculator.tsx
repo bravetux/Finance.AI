@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Car, Upload, Download, Trash2 } from "lucide-react";
+import { Car, Upload, Download, Trash2, Fuel, Shield, Wrench, Wallet } from "lucide-react";
 import { saveAs } from "file-saver";
 import { showSuccess, showError } from "@/utils/toast";
 import {
@@ -106,10 +106,17 @@ const CarAffordableCalculator: React.FC = () => {
     
     const isAffordable = annualNetIncome > 0 ? totalAnnualCost <= (annualNetIncome * 0.15) : false;
 
+    // Monthly calculations for cards
+    const fuelCostPerMonth = (monthlyDriving / Math.max(1, mileage)) * fuelPrice;
+    const insuranceCostPerMonth = insurancePremium / 12;
+    const additionalCostPerMonth = (maintenanceCost + parkingExpenses + tollExpenses) / 12;
+    const monthlyTotalExpenses = emiAmount + fuelCostPerMonth + insuranceCostPerMonth + additionalCostPerMonth;
+
     return {
       annualNetIncome, onRoadPrice, loanAmount, emiAmount, fuelCostPerYear,
       totalBuyingCostWithEMI, totalRunningCost, totalInsuranceMaintenanceCost,
-      totalAdditionalCosts, totalOwnershipCost, totalAnnualCost, isAffordable
+      totalAdditionalCosts, totalOwnershipCost, totalAnnualCost, isAffordable,
+      fuelCostPerMonth, insuranceCostPerMonth, additionalCostPerMonth, monthlyTotalExpenses
     };
   }, [inputs]);
 
@@ -167,6 +174,47 @@ const CarAffordableCalculator: React.FC = () => {
           <Button variant="outline" onClick={exportData}><Upload className="mr-2 h-4 w-4" /> Export</Button>
           <Button variant="outline" asChild><Label htmlFor="import-file" className="cursor-pointer"><Download className="mr-2 h-4 w-4" /> Import<Input id="import-file" type="file" accept=".json" className="hidden" onChange={importData} /></Label></Button>
         </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Fuel Cost Per Month</CardTitle>
+            <Fuel className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(calculations.fuelCostPerMonth)}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Insurance Cost Per Month</CardTitle>
+            <Shield className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(calculations.insuranceCostPerMonth)}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Additional Cost Per Month</CardTitle>
+            <Wrench className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(calculations.additionalCostPerMonth)}</div>
+            <p className="text-xs text-muted-foreground">Maintenance, Parking, Tolls</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Monthly Total Expenses</CardTitle>
+            <Wallet className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(calculations.monthlyTotalExpenses)}</div>
+            <p className="text-xs text-muted-foreground">EMI + All Monthly Costs</p>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
