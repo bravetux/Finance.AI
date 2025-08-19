@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Label } => "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { CheckCircle, XCircle, Wallet, LineChart } from "lucide-react";
@@ -43,11 +43,23 @@ const getAnnualExpenses = () => {
   }
 };
 
-// Helper to get projected corpus
+// Helper to get projected corpus from ProjectedCashflow data
 const getProjectedCorpus = () => {
   try {
     const savedData = localStorage.getItem('projectedAccumulatedCorpus');
     return savedData ? JSON.parse(savedData) : 0;
+  } catch {
+    return 0;
+  }
+};
+
+// Helper to get total future value from FutureValueCalculator data
+const getTotalFutureValue = () => {
+  try {
+    const savedData = localStorage.getItem('futureValueSummary');
+    if (!savedData) return 0;
+    const data = JSON.parse(savedData);
+    return data.totalFutureValue || 0;
   } catch {
     return 0;
   }
@@ -64,8 +76,16 @@ interface RetirementInputs {
 const CanYouRetireNow: React.FC = () => {
   const [liquidAssets, setLiquidAssets] = useState(0);
   const [projectedCorpus, setProjectedCorpus] = useState(0);
+  const [totalFutureValueFromFutureValuePage, setTotalFutureValueFromFutureValuePage] = useState(0);
   const [annualExpenses, setAnnualExpenses] = useState(0);
-  const [includeProjectedCorpus, setIncludeProjectedCorpus] = useState(true);
+  const [corpusMode, setCorpusMode] = useState<'now' | 'future'>(() => {
+    try {
+      const savedMode = localStorage.getItem('retirementCorpusMode');
+      return savedMode === 'future' ? 'future' : 'now';
+    } catch {
+      return 'now';
+    }
+  });
 
   const [inputs, setInputs] = useState<RetirementInputs>(() => {
     const defaultState: RetirementInputs = {
@@ -83,9 +103,10 @@ const CanYouRetireNow: React.FC = () => {
       setLiquidAssets(getLiquidAssets());
       setAnnualExpenses(getAnnualExpenses());
       setProjectedCorpus(getProjectedCorpus());
-      const savedToggleState = localStorage.getItem('includeProjectedCorpusToggle');
-      if (savedToggleState !== null) {
-        setIncludeProjectedCorpus(JSON.parse(savedToggleState));
+      setTotalFutureValueFromFutureValuePage(getTotalFutureValue());
+      const savedMode = localStorage.getItem('retirementCorpusMode');
+      if (savedMode !== null) {
+        setCorpusMode(savedMode === 'future' ? 'future' : 'now');
       }
     };
     updateData();
@@ -98,8 +119,12 @@ const CanYouRetireNow: React.FC = () => {
   };
 
   const totalStartingCorpus = useMemo(() => {
-    return liquidAssets + (includeProjectedCorpus ? projectedCorpus : 0);
-  }, [liquidAssets, projectedCorpus, includeProjectedCorpus]);
+    if (corpusMode === 'now') {
+      return liquidAssets;
+    } else { // corpusMode === 'future'
+      return liquidAssets + projectedCorpus + totalFutureValueFromFutureValuePage;
+    }
+  }, [liquidAssets, projectedCorpus, totalFutureValueFromFutureValuePage, corpusMode]);
 
   const totalAllocation = useMemo(() => Object.values(inputs.allocations).reduce((sum, val) => sum + val, 0), [inputs.allocations]);
   
@@ -145,11 +170,11 @@ const CanYouRetireNow: React.FC = () => {
             annualExpenses: annualExpenses,
             currentAge: inputs.currentAge,
         }));
-        localStorage.setItem('includeProjectedCorpusToggle', JSON.stringify(includeProjectedCorpus));
+        localStorage.setItem('retirementCorpusMode', corpusMode);
     } catch (error) {
         console.error("Failed to save data for post-retirement page:", error);
     }
-  }, [totalStartingCorpus, annualExpenses, inputs.currentAge, includeProjectedCorpus]);
+  }, [totalStartingCorpus, annualExpenses, inputs.currentAge, corpusMode]);
 
   const formatCurrency = (value: number) => `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 
@@ -170,26 +195,35 @@ const CanYouRetireNow: React.FC = () => {
                 </div>
                 <p className="text-xs text-muted-foreground text-right">From Net Worth page</p>
             </div>
-            <div>
-                <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                        <Switch
-                            id="include-projected-corpus"
-                            checked={includeProjectedCorpus}
-                            onCheckedChange={setIncludeProjectedCorpus}
-                        />
-                        <Label htmlFor="include-projected-corpus" className="text-muted-foreground">
-                            + Projected Corpus
-                        </Label>
+            {corpusMode === 'future' && (
+                <>
+                    <div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-muted-foreground">+ Projected Corpus</span>
+                            <span className="font-medium">{formatCurrency(projectedCorpus)}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground text-right">From Projected Cashflow page</p>
                     </div>
-                    <span className={`font-medium ${!includeProjectedCorpus && 'line-through text-muted-foreground'}`}>
-                        {formatCurrency(projectedCorpus)}
-                    </span>
-                </div>
-                <p className="text-xs text-muted-foreground text-right">From Projected Cashflow page</p>
-            </div>
+                    <div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-muted-foreground">+ Total Future Value</span>
+                            <span className="font-medium">{formatCurrency(totalFutureValueFromFutureValuePage)}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground text-right">From Future Value Calculator page</p>
+                    </div>
+                </>
+            )}
             <div className="border-t pt-2 mt-2 flex justify-between items-center">
-                <span className="text-lg font-bold">Total Starting Corpus</span>
+                <div className="flex items-center gap-2">
+                    <Switch
+                        id="corpus-mode-toggle"
+                        checked={corpusMode === 'future'}
+                        onCheckedChange={(checked) => setCorpusMode(checked ? 'future' : 'now')}
+                    />
+                    <Label htmlFor="corpus-mode-toggle" className="text-muted-foreground">
+                        Now or Future
+                    </Label>
+                </div>
                 <span className="text-2xl font-bold text-green-600">{formatCurrency(totalStartingCorpus)}</span>
             </div>
         </CardContent>
@@ -201,6 +235,9 @@ const CanYouRetireNow: React.FC = () => {
             {canRetire ? <CheckCircle className="h-8 w-8 text-green-600" /> : <XCircle className="h-8 w-8 text-red-600" />}
             Verdict: {canRetire ? "Yes, you can likely retire now." : "No, not yet."}
           </CardTitle>
+          <CardDescription>
+            The verdict is based on whether your 'Total Starting Corpus' is projected to last until your 'Life Expectancy' (age {inputs.lifeExpectancy}) given your 'Current Annual Expenses', 'Inflation', and 'Expected Returns'. It uses a standard financial independence rule (25x annual expenses) to determine the required corpus.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-2 text-lg">
           <p>Your net corpus of <strong>{formatCurrency(totalStartingCorpus)}</strong> will last for approximately <strong>{yearsCorpusWillLast} years</strong> (until age {inputs.currentAge + yearsCorpusWillLast}).</p>
