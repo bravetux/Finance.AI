@@ -11,7 +11,7 @@ import {
   getLiquidAssetsFromNetWorth,
   getAnnualExpensesFromFinance,
   getProjectedAccumulatedCorpus,
-  getFutureValueSummaryData,
+  getLiquidFutureValueTotal,
   getRetirementCorpusMode,
   setRetirementCorpusMode,
 } from "@/utils/localStorageUtils";
@@ -27,7 +27,7 @@ interface RetirementInputs {
 const CanYouRetireNow: React.FC = () => {
   const [liquidAssets, setLiquidAssets] = useState(0);
   const [projectedCorpus, setProjectedCorpus] = useState(0);
-  const [totalFutureValueFromFutureValuePage, setTotalFutureValueFromFutureValuePage] = useState(0);
+  const [liquidFutureValue, setLiquidFutureValue] = useState(0);
   const [annualExpenses, setAnnualExpenses] = useState(0);
   const [corpusMode, setCorpusMode] = useState<'now' | 'future'>(getRetirementCorpusMode());
 
@@ -47,7 +47,7 @@ const CanYouRetireNow: React.FC = () => {
       setLiquidAssets(getLiquidAssetsFromNetWorth());
       setAnnualExpenses(getAnnualExpensesFromFinance());
       setProjectedCorpus(getProjectedAccumulatedCorpus());
-      setTotalFutureValueFromFutureValuePage(getFutureValueSummaryData().totalFutureValue);
+      setLiquidFutureValue(getLiquidFutureValueTotal());
       setCorpusMode(getRetirementCorpusMode());
     };
     updateData();
@@ -63,9 +63,9 @@ const CanYouRetireNow: React.FC = () => {
     if (corpusMode === 'now') {
       return liquidAssets;
     } else { // corpusMode === 'future'
-      return liquidAssets + projectedCorpus + totalFutureValueFromFutureValuePage;
+      return liquidFutureValue + projectedCorpus;
     }
-  }, [liquidAssets, projectedCorpus, totalFutureValueFromFutureValuePage, corpusMode]);
+  }, [liquidAssets, liquidFutureValue, projectedCorpus, corpusMode]);
 
   const totalAllocation = useMemo(() => Object.values(inputs.allocations).reduce((sum, val) => sum + val, 0), [inputs.allocations]);
   
@@ -129,28 +129,30 @@ const CanYouRetireNow: React.FC = () => {
             <CardDescription>This is the final amount available for your retirement.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
-            <div>
-                <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Current Liquid Corpus</span>
-                    <span className="font-medium">{formatCurrency(liquidAssets)}</span>
-                </div>
-                <p className="text-xs text-muted-foreground text-right">From Net Worth page</p>
-            </div>
+            {corpusMode === 'now' && (
+              <div>
+                  <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">Current Liquid Corpus</span>
+                      <span className="font-medium">{formatCurrency(liquidAssets)}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground text-right">From Net Worth page</p>
+              </div>
+            )}
             {corpusMode === 'future' && (
                 <>
+                    <div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-muted-foreground">Future Value of Liquid Assets</span>
+                            <span className="font-medium">{formatCurrency(liquidFutureValue)}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground text-right">From Future Value Calculator page</p>
+                    </div>
                     <div>
                         <div className="flex justify-between items-center">
                             <span className="text-muted-foreground">+ Projected Corpus</span>
                             <span className="font-medium">{formatCurrency(projectedCorpus)}</span>
                         </div>
                         <p className="text-xs text-muted-foreground text-right">From Projected Cashflow page</p>
-                    </div>
-                    <div>
-                        <div className="flex justify-between items-center">
-                            <span className="text-muted-foreground">+ Total Future Value</span>
-                            <span className="font-medium">{formatCurrency(totalFutureValueFromFutureValuePage)}</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground text-right">From Future Value Calculator page</p>
                     </div>
                 </>
             )}
