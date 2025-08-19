@@ -281,10 +281,20 @@ const RetirementDashboard: React.FC = () => {
         <Card>
           <CardHeader><CardTitle>Retirement Inputs</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-4 gap-4">
               <div><Label htmlFor="currentAge">Current Age</Label><Input id="currentAge" type="number" value={retirementData.currentAge} onChange={(e) => handleStateChange("currentAge", Number(e.target.value))} /></div>
               <div><Label htmlFor="retirementAge">Retirement Age</Label><Input id="retirementAge" type="number" value={retirementData.retirementAge} onChange={(e) => handleStateChange("retirementAge", Number(e.target.value))} /></div>
               <div><Label htmlFor="lifeExpectancy">Life Expectancy</Label><Input id="lifeExpectancy" type="number" value={retirementData.lifeExpectancy} onChange={(e) => handleStateChange("lifeExpectancy", Number(e.target.value))} /></div>
+              <div>
+                <Label htmlFor="yearsAfterRetirement">Years After Retirement</Label>
+                <Input 
+                  id="yearsAfterRetirement" 
+                  type="number" 
+                  value={Math.max(0, retirementData.lifeExpectancy - retirementData.retirementAge)} 
+                  readOnly 
+                  className="bg-muted" 
+                />
+              </div>
             </div>
             <div><Label htmlFor="currentAnnualExpenses">Current Annual Expenses (₹)</Label><Input id="currentAnnualExpenses" type="number" value={retirementData.currentAnnualExpenses} onChange={(e) => handleStateChange("currentAnnualExpenses", Number(e.target.value))} /></div>
             <div><Label>Expected Inflation</Label><Slider value={[retirementData.inflation]} onValueChange={(val) => handleStateChange("inflation", val[0])} min={5} max={10} step={0.5} /><div className="text-center font-medium">{retirementData.inflation.toFixed(1)}%</div></div>
