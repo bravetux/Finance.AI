@@ -153,13 +153,19 @@ const CanYouRetireNow: React.FC = () => {
             <CardDescription>This is the final amount available for your retirement.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
-            <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Current Liquid Corpus</span>
-                <span className="font-medium">{formatCurrency(liquidAssets)}</span>
+            <div>
+                <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Current Liquid Corpus</span>
+                    <span className="font-medium">{formatCurrency(liquidAssets)}</span>
+                </div>
+                <p className="text-xs text-muted-foreground text-right">From Net Worth page</p>
             </div>
-            <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">+ Projected Corpus</span>
-                <span className="font-medium">{formatCurrency(projectedCorpus)}</span>
+            <div>
+                <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">+ Projected Corpus</span>
+                    <span className="font-medium">{formatCurrency(projectedCorpus)}</span>
+                </div>
+                <p className="text-xs text-muted-foreground text-right">From Projected Cashflow page</p>
             </div>
             <div className="border-t pt-2 mt-2 flex justify-between items-center">
                 <span className="text-lg font-bold">Total Starting Corpus</span>
