@@ -30,6 +30,7 @@ import {
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
@@ -295,6 +296,7 @@ const RetirementDashboard: React.FC = () => {
             <div className="space-y-2"><Label>Liquid Future Value + Projected Cash Flow</Label><div className="text-3xl font-bold text-green-600">₹{retirementFund.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</div></div>
             <div className="space-y-2 border-t pt-4">
               <div className="flex justify-between"><span className="text-muted-foreground">Future Annual Expenses:</span><span className="font-bold">₹{futureAnnualExpenses.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Future Monthly Expenses:</span><span className="font-bold">₹{(futureAnnualExpenses / 12).toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Corpus will last for:</span><span className="font-bold text-blue-600">{corpusSustainability >= (retirementData.lifeExpectancy - retirementData.retirementAge) ? `${retirementData.lifeExpectancy - retirementData.retirementAge}+ Years` : `${corpusSustainability.toFixed(0)} Years`}</span></div>
             </div>
             <div className="border-t pt-4 space-y-2">
@@ -306,16 +308,18 @@ const RetirementDashboard: React.FC = () => {
                   ) : (
                     <p className="text-red-500 font-semibold">Reduce the expenses</p>
                   )}
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <HelpCircle className="h-4 w-4 text-muted-foreground cursor-pointer" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="max-w-xs">
-                        This message appears if your projected annual returns from non-equity assets (FDs, Bonds, Cash) are less than your future annual expenses at retirement. It suggests your safer investments alone may not cover your living costs.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <HelpCircle className="h-4 w-4 text-muted-foreground cursor-pointer" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs">
+                          This message appears if your projected annual returns from non-equity assets (FDs, Bonds, Cash) are less than your future annual expenses at retirement. It suggests your safer investments alone may not cover your living costs.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               )}
             </div>
