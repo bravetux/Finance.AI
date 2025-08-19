@@ -189,7 +189,15 @@ const RetirementDashboard: React.FC = () => {
 
   const totalAllocation = useMemo(() => Object.values(retirementData.allocations).reduce((sum, val) => sum + val, 0), [retirementData.allocations]);
   const yearsToRetirement = useMemo(() => Math.max(0, retirementData.retirementAge - retirementData.currentAge), [retirementData.retirementAge, retirementData.currentAge]);
-  const futureAnnualExpenses = useMemo(() => yearsToRetirement <= 0 ? retirementData.currentAnnualExpenses : retirementData.currentAnnualExpenses * Math.pow(1 + retirementData.inflation / 100, yearsToRetirement), [yearsToRetirement, retirementData.currentAnnualExpenses, retirementData.inflation]);
+  
+  const futureAnnualExpenses = useMemo(() => {
+    if (corpusMode === 'now') {
+      return retirementData.currentAnnualExpenses;
+    }
+    return yearsToRetirement <= 0 
+      ? retirementData.currentAnnualExpenses 
+      : retirementData.currentAnnualExpenses * Math.pow(1 + retirementData.inflation / 100, yearsToRetirement);
+  }, [corpusMode, yearsToRetirement, retirementData.currentAnnualExpenses, retirementData.inflation]);
   
   const weightedAvgReturn = useMemo(() => Object.keys(retirementData.allocations).reduce((acc, key) => acc + (retirementData.allocations[key as keyof typeof retirementData.allocations] / 100) * retirementData.returns[key as keyof typeof retirementData.returns], 0), [retirementData.allocations, retirementData.returns]);
   
