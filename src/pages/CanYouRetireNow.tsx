@@ -248,7 +248,7 @@ const CanYouRetireNow: React.FC = () => {
             </div>
             <div className="flex justify-between pt-2 border-t">
               <span className="text-muted-foreground">Corpus will last for:</span>
-              <span className="font-bold">{withdrawalSimulationYears} years</span>
+              <span className="font-bold">{withdrawalSimulationYears} years (until age {sharedData.currentAge + withdrawalSimulationYears})</span>
             </div>
           </div>
         </CardFooter>
