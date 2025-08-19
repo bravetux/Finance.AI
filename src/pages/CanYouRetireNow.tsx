@@ -117,6 +117,27 @@ const CanYouRetireNow: React.FC = () => {
     return annualWithdrawal / 12;
   }, [annualWithdrawal]);
 
+  const withdrawalSimulationYears = useMemo(() => {
+    if (totalStartingCorpus <= 0 || annualWithdrawal <= 0 || totalAllocation !== 100) {
+      return 0;
+    }
+
+    let currentFund = totalStartingCorpus;
+    let currentWithdrawalAmount = annualWithdrawal;
+    let years = 0;
+    const maxYears = sharedData.lifeExpectancy - sharedData.currentAge;
+
+    while (currentFund > 0 && years < maxYears) {
+      currentFund -= currentWithdrawalAmount;
+      if (currentFund <= 0) break;
+      currentFund *= (1 + weightedAvgReturn / 100);
+      currentWithdrawalAmount *= (1 + sharedData.inflation / 100);
+      years++;
+    }
+    
+    return years;
+  }, [totalStartingCorpus, annualWithdrawal, sharedData, weightedAvgReturn, totalAllocation]);
+
   useEffect(() => {
     try {
         localStorage.setItem('canRetireNowData', JSON.stringify({
@@ -224,6 +245,10 @@ const CanYouRetireNow: React.FC = () => {
             <div className="flex justify-between">
               <span className="text-muted-foreground">Monthly Withdrawal:</span>
               <span className="font-bold">{formatCurrency(monthlyWithdrawal)}</span>
+            </div>
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-muted-foreground">Corpus will last for:</span>
+              <span className="font-bold">{withdrawalSimulationYears} years</span>
             </div>
           </div>
         </CardFooter>
