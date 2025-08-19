@@ -247,13 +247,15 @@ const ProjectedCashflow: React.FC = () => {
     return { projections: results, finalAccumulatedCorpus: finalCorpus, finalAnnualExpense: finalExpense, nonDeductedGoalsValue: nonDeductedValue };
   }, [settings, initialData, goals]);
 
+  const netCorpusAtRetirement = finalAccumulatedCorpus - nonDeductedGoalsValue;
+
   useEffect(() => {
     try {
-      localStorage.setItem('projectedAccumulatedCorpus', JSON.stringify(finalAccumulatedCorpus));
+      localStorage.setItem('projectedAccumulatedCorpus', JSON.stringify(netCorpusAtRetirement));
     } catch (error) {
       console.error("Failed to save projected corpus to localStorage:", error);
     }
-  }, [finalAccumulatedCorpus]);
+  }, [netCorpusAtRetirement]);
 
   const exportData = () => {
     const dataStr = JSON.stringify(settings, null, 2);
@@ -340,7 +342,7 @@ const ProjectedCashflow: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader>
             <CardTitle>Projected Corpus at Retirement</CardTitle>
@@ -350,20 +352,33 @@ const ProjectedCashflow: React.FC = () => {
               ₹{finalAccumulatedCorpus.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
             </p>
             <p className="text-sm text-muted-foreground">
-              This is the estimated value of your savings at age {settings.retirementAge}.
+              Gross estimated value of your savings at age {settings.retirementAge}.
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Projected Annual Expense at Retirement</CardTitle>
+            <CardTitle>Net Corpus at Retirement</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-4xl font-bold text-green-600">
+              ₹{netCorpusAtRetirement.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Corpus after deducting future goals.
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Projected Annual Expense</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-4xl font-bold text-orange-600">
               ₹{finalAnnualExpense.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
             </p>
             <p className="text-sm text-muted-foreground">
-              This is your estimated annual expense in the first year of retirement.
+              Estimated annual expense in the first year of retirement.
             </p>
           </CardContent>
         </Card>
