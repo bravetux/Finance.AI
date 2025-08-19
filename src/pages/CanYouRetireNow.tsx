@@ -87,7 +87,7 @@ const CanYouRetireNow: React.FC = () => {
     }
 
     let currentFund = totalStartingCorpus;
-    let currentWithdrawal = annualExpenses;
+    let currentWithdrawal = totalStartingCorpus * 0.04; // Use 4% of the corpus as the initial withdrawal
     let years = 0;
     const maxYears = sharedData.lifeExpectancy - sharedData.currentAge;
 
@@ -95,7 +95,7 @@ const CanYouRetireNow: React.FC = () => {
       currentFund -= currentWithdrawal;
       if (currentFund <= 0) break;
       currentFund *= (1 + weightedAvgReturn / 100);
-      currentWithdrawal *= (1 + sharedData.inflation / 100);
+      currentWithdrawal *= (1 + sharedData.inflation / 100); // Inflate the withdrawal amount each year
       years++;
     }
 
@@ -213,7 +213,7 @@ const CanYouRetireNow: React.FC = () => {
             Verdict: {canRetire ? "Yes, you can likely retire now." : "No, not yet."}
           </CardTitle>
           <CardDescription>
-            The verdict is based on whether your 'Total Starting Corpus' is projected to last until your 'Life Expectancy' (age {sharedData.lifeExpectancy}) given your 'Current Annual Expenses', 'Inflation', and 'Expected Returns'. It uses a standard financial independence rule (25x annual expenses) to determine the required corpus.
+            The verdict is based on the standard 4% withdrawal rule. It simulates whether your 'Total Starting Corpus' can sustain an initial withdrawal of 4% (adjusted for inflation annually) until your 'Life Expectancy'.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-2 text-lg">
