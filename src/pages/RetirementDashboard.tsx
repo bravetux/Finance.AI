@@ -33,6 +33,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Switch } from "@/components/ui/switch";
+import {
+  getNetWorthData,
+  getLiquidAssetsFromNetWorth,
+  getLiquidFutureValueTotal,
+  getProjectedAccumulatedCorpus,
+  getRetirementCorpusMode,
+  setRetirementCorpusMode,
+} from "@/utils/localStorageUtils";
 
 interface RetirementState {
   currentAge: number;
@@ -54,27 +63,10 @@ interface RetirementState {
   };
 }
 
-const getNetWorthData = () => {
-    try {
-      const savedData = localStorage.getItem('netWorthData');
-      if (!savedData) return { totalAssets: 0, totalLiabilities: 0 };
-      const data = JSON.parse(savedData);
-      const totalAssets = (data.homeValue || 0) + (data.otherRealEstate || 0) + (data.jewellery || 0) + 
-                            (data.sovereignGoldBonds || 0) + (data.ulipsSurrenderValue || 0) + (data.epfPpfVpf || 0) +
-                            (data.fixedDeposits || 0) + (data.debtFunds || 0) + (data.domesticStocks || 0) + 
-                            (data.domesticMutualFunds || 0) + (data.internationalFunds || 0) + (data.smallCases || 0) + 
-                            (data.savingsBalance || 0) + (data.preciousMetals || 0) + (data.cryptocurrency || 0) + (data.reits || 0);
-      const totalLiabilities = (data.homeLoan || 0) + (data.educationLoan || 0) + (data.carLoan || 0) + 
-                               (data.personalLoan || 0) + (data.creditCardDues || 0) + (data.otherLiabilities || 0);
-      return { totalAssets, totalLiabilities };
-    } catch {
-      return { totalAssets: 0, totalLiabilities: 0 };
-    }
-};
-
 const RetirementDashboard: React.FC = () => {
   const [retirementFund, setRetirementFund] = useState(0);
   const [netWorth, setNetWorth] = useState(0);
+  const [corpusMode, setCorpusMode] = useState<'now' | 'future'>(getRetirementCorpusMode());
   const [retirementData, setRetirementData] = useState<RetirementState>(() => {
     const defaultState: RetirementState = {
       currentAge: 0,
@@ -98,33 +90,45 @@ const RetirementDashboard: React.FC = () => {
   });
 
   useEffect(() => {
-    try {
-      const futureValueData = JSON.parse(localStorage.getItem("future-value-data") || "[]");
-      const projectedCorpus = JSON.parse(localStorage.getItem("projectedAccumulatedCorpus") || "0");
+    const updateData = () => {
+        try {
+            const netWorthData = getNetWorthData();
+            const totalIlliquidAssets = (netWorthData.homeValue || 0) + (netWorthData.otherRealEstate || 0) + (netWorthData.jewellery || 0) + (netWorthData.sovereignGoldBonds || 0) + (netWorthData.ulipsSurrenderValue || 0) + (netWorthData.epfPpfVpf || 0);
+            const totalLiquidAssets = (netWorthData.fixedDeposits || 0) + (netWorthData.debtFunds || 0) + (netWorthData.domesticStocks || 0) + (netWorthData.domesticMutualFunds || 0) + (netWorthData.internationalFunds || 0) + (netWorthData.smallCases || 0) + (netWorthData.savingsBalance || 0) + (netWorthData.preciousMetals || 0) + (netWorthData.cryptocurrency || 0) + (netWorthData.reits || 0);
+            const totalAssets = totalIlliquidAssets + totalLiquidAssets;
+            const totalLiabilities = (netWorthData.homeLoan || 0) + (netWorthData.educationLoan || 0) + (netWorthData.carLoan || 0) + (netWorthData.personalLoan || 0) + (netWorthData.creditCardDues || 0) + (netWorthData.otherLiabilities || 0);
+            setNetWorth(totalAssets - totalLiabilities);
 
-      // Calculate Liquid Future Value
-      const totalFutureValue = futureValueData.reduce((sum: number, asset: any) => sum + (asset.futureValue || 0), 0);
-      const illiquidAssetNames = ["Home Value", "Other Real Estate", "Jewellery"];
-      const illiquidFutureValue = futureValueData
-          .filter((asset: any) => illiquidAssetNames.includes(asset.name))
-          .reduce((sum: number, asset: any) => sum + (asset.futureValue || 0), 0);
-      const liquidFutureValue = totalFutureValue - illiquidFutureValue;
+            setCorpusMode(getRetirementCorpusMode());
 
-      // Update retirementFund calculation to include projected cash flow
-      setRetirementFund(Math.max(0, liquidFutureValue + projectedCorpus));
+            if (getRetirementCorpusMode() === 'now') {
+                setRetirementFund(getLiquidAssetsFromNetWorth());
+            } else {
+                const liquidFutureValue = getLiquidFutureValueTotal();
+                const projectedCorpus = getProjectedAccumulatedCorpus();
+                setRetirementFund(Math.max(0, liquidFutureValue + projectedCorpus));
+            }
+        } catch (error) {
+            console.error("Failed to parse data from localStorage:", error);
+            setRetirementFund(0);
+            setNetWorth(0);
+        }
+    };
 
-      const { totalAssets, totalLiabilities } = getNetWorthData();
-      setNetWorth(totalAssets - totalLiabilities);
-    } catch (error) {
-      console.error("Failed to parse data from localStorage:", error);
-      setRetirementFund(0);
-      setNetWorth(0);
-    }
-  }, []);
+    updateData();
+    window.addEventListener('storage', updateData);
+    return () => window.removeEventListener('storage', updateData);
+  }, [corpusMode]);
 
   useEffect(() => {
     localStorage.setItem("retirementData", JSON.stringify(retirementData));
   }, [retirementData]);
+
+  const handleCorpusModeChange = (checked: boolean) => {
+    const newMode = checked ? 'future' : 'now';
+    setCorpusMode(newMode);
+    setRetirementCorpusMode(newMode);
+  };
 
   const exportData = () => {
     const dataStr = JSON.stringify(retirementData, null, 2);
@@ -303,7 +307,29 @@ const RetirementDashboard: React.FC = () => {
         <Card>
           <CardHeader><CardTitle>Retirement Projections</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2"><Label>Liquid Future Value + Projected Cash Flow</Label><div className="text-3xl font-bold text-green-600">₹{retirementFund.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</div></div>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Label>Net Corpus for Retirement</Label>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="corpus-mode-toggle"
+                    checked={corpusMode === 'future'}
+                    onCheckedChange={handleCorpusModeChange}
+                  />
+                  <Label htmlFor="corpus-mode-toggle" className="text-muted-foreground text-sm">
+                    {corpusMode === 'now' ? 'Now' : 'Future'}
+                  </Label>
+                </div>
+              </div>
+              <div className="text-3xl font-bold text-green-600">
+                ₹{retirementFund.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {corpusMode === 'now' 
+                    ? "Based on your current liquid assets." 
+                    : "Based on projected future value of assets and cashflow."}
+              </p>
+            </div>
             <div className="space-y-2 border-t pt-4">
               <div className="flex justify-between"><span className="text-muted-foreground">Future Annual Expenses:</span><span className="font-bold">₹{futureAnnualExpenses.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Future Monthly Expenses:</span><span className="font-bold">₹{(futureAnnualExpenses / 12).toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span></div>
