@@ -344,53 +344,53 @@ const ProjectedCashflow: React.FC = () => {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardHeader>
-            <CardTitle>Projected Corpus at Retirement</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Projected Corpus at Retirement</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-blue-600">
               ₹{finalAccumulatedCorpus.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
-            </p>
-            <p className="text-sm text-muted-foreground">
+            </div>
+            <p className="text-xs text-muted-foreground">
               Gross estimated value of your savings at age {settings.retirementAge}.
             </p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader>
-            <CardTitle>Net Corpus at Retirement</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Net Corpus at Retirement</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-green-600">
               ₹{netCorpusAtRetirement.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
-            </p>
-            <p className="text-sm text-muted-foreground">
+            </div>
+            <p className="text-xs text-muted-foreground">
               Corpus after deducting future goals.
             </p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader>
-            <CardTitle>Projected Annual Expense</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Projected Annual Expense</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-bold text-orange-600">
+            <div className="text-2xl font-bold text-orange-600">
               ₹{finalAnnualExpense.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
-            </p>
-            <p className="text-sm text-muted-foreground">
+            </div>
+            <p className="text-xs text-muted-foreground">
               Estimated annual expense in the first year of retirement.
             </p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader>
-            <CardTitle>Non-deducted Goal Expense</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Non-deducted Goal Expense</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-bold text-purple-600">
+            <div className="text-2xl font-bold text-purple-600">
               ₹{nonDeductedGoalsValue.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
-            </p>
-            <p className="text-sm text-muted-foreground">
+            </div>
+            <p className="text-xs text-muted-foreground">
               Total future value of goals not included in this projection.
             </p>
           </CardContent>
