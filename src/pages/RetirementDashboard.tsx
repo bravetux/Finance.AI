@@ -294,7 +294,7 @@ const RetirementDashboard: React.FC = () => {
           <CardHeader><CardTitle>Retirement Inputs</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-4 gap-4">
-              <div><Label htmlFor="currentAge">Current Age</Label><Input id="currentAge" type="number" value={retirementData.currentAge} onChange={(e) => handleStateChange("currentAge", Number(e.target.value))} /></div>
+              <div><Label htmlFor="currentAge">Current<br />Age</Label><Input id="currentAge" type="number" value={retirementData.currentAge} onChange={(e) => handleStateChange("currentAge", Number(e.target.value))} /></div>
               <div><Label htmlFor="retirementAge">Retirement Age</Label><Input id="retirementAge" type="number" value={retirementData.retirementAge} onChange={(e) => handleStateChange("retirementAge", Number(e.target.value))} /></div>
               <div><Label htmlFor="lifeExpectancy">Life Expectancy</Label><Input id="lifeExpectancy" type="number" value={retirementData.lifeExpectancy} onChange={(e) => handleStateChange("lifeExpectancy", Number(e.target.value))} /></div>
               <div>
