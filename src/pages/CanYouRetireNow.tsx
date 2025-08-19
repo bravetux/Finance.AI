@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import { CheckCircle, XCircle, Wallet, LineChart } from "lucide-react";
 
 // Helper to get total liquid assets from Net Worth data
@@ -64,6 +65,7 @@ const CanYouRetireNow: React.FC = () => {
   const [liquidAssets, setLiquidAssets] = useState(0);
   const [projectedCorpus, setProjectedCorpus] = useState(0);
   const [annualExpenses, setAnnualExpenses] = useState(0);
+  const [includeProjectedCorpus, setIncludeProjectedCorpus] = useState(true);
 
   const [inputs, setInputs] = useState<RetirementInputs>(() => {
     const defaultState: RetirementInputs = {
@@ -81,6 +83,10 @@ const CanYouRetireNow: React.FC = () => {
       setLiquidAssets(getLiquidAssets());
       setAnnualExpenses(getAnnualExpenses());
       setProjectedCorpus(getProjectedCorpus());
+      const savedToggleState = localStorage.getItem('includeProjectedCorpusToggle');
+      if (savedToggleState !== null) {
+        setIncludeProjectedCorpus(JSON.parse(savedToggleState));
+      }
     };
     updateData();
     window.addEventListener('storage', updateData);
@@ -91,7 +97,10 @@ const CanYouRetireNow: React.FC = () => {
     setInputs((prev) => ({ ...prev, [field]: value }));
   };
 
-  const totalStartingCorpus = useMemo(() => liquidAssets + projectedCorpus, [liquidAssets, projectedCorpus]);
+  const totalStartingCorpus = useMemo(() => {
+    return liquidAssets + (includeProjectedCorpus ? projectedCorpus : 0);
+  }, [liquidAssets, projectedCorpus, includeProjectedCorpus]);
+
   const totalAllocation = useMemo(() => Object.values(inputs.allocations).reduce((sum, val) => sum + val, 0), [inputs.allocations]);
   
   const weightedAvgReturn = useMemo(() => {
@@ -136,10 +145,11 @@ const CanYouRetireNow: React.FC = () => {
             annualExpenses: annualExpenses,
             currentAge: inputs.currentAge,
         }));
+        localStorage.setItem('includeProjectedCorpusToggle', JSON.stringify(includeProjectedCorpus));
     } catch (error) {
         console.error("Failed to save data for post-retirement page:", error);
     }
-  }, [totalStartingCorpus, annualExpenses, inputs.currentAge]);
+  }, [totalStartingCorpus, annualExpenses, inputs.currentAge, includeProjectedCorpus]);
 
   const formatCurrency = (value: number) => `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 
@@ -162,8 +172,19 @@ const CanYouRetireNow: React.FC = () => {
             </div>
             <div>
                 <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">+ Projected Corpus</span>
-                    <span className="font-medium">{formatCurrency(projectedCorpus)}</span>
+                    <div className="flex items-center gap-2">
+                        <Switch
+                            id="include-projected-corpus"
+                            checked={includeProjectedCorpus}
+                            onCheckedChange={setIncludeProjectedCorpus}
+                        />
+                        <Label htmlFor="include-projected-corpus" className="text-muted-foreground">
+                            + Projected Corpus
+                        </Label>
+                    </div>
+                    <span className={`font-medium ${!includeProjectedCorpus && 'line-through text-muted-foreground'}`}>
+                        {formatCurrency(projectedCorpus)}
+                    </span>
                 </div>
                 <p className="text-xs text-muted-foreground text-right">From Projected Cashflow page</p>
             </div>
