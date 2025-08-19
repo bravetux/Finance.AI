@@ -100,37 +100,37 @@ const Dashboard: React.FC = () => {
       </div>
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className={surplusCashFlow >= 0 ? "bg-green-50 dark:bg-green-950" : "bg-red-50 dark:bg-red-950"}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Surplus Cash Flow</CardTitle>
             <IndianRupee className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${surplusCashFlow < 0 ? "text-red-500" : "text-green-500"}`}>
+            <div className={`text-2xl font-bold ${surplusCashFlow < 0 ? "text-red-500" : "text-green-600"}`}>
               ₹{surplusCashFlow.toLocaleString("en-IN")}
             </div>
             <p className="text-xs text-muted-foreground">From Cashflow</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-blue-50 dark:bg-blue-950">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Net Worth</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${netWorthValue < 0 ? "text-red-500" : "text-green-500"}`}>
+            <div className={`text-2xl font-bold ${netWorthValue < 0 ? "text-red-500" : "text-blue-600 dark:text-blue-400"}`}>
               ₹{netWorthValue.toLocaleString("en-IN")}
             </div>
             <p className="text-xs text-muted-foreground">From Net Worth</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-purple-50 dark:bg-purple-950">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Future Value</CardTitle>
             <Wallet className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
               ₹{futureValueData.totalFutureValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -138,13 +138,13 @@ const Dashboard: React.FC = () => {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-indigo-50 dark:bg-indigo-950">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Liquid Future Value</CardTitle>
             <Landmark className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
               ₹{liquidFutureValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
             </div>
             <p className="text-xs text-muted-foreground">Excludes real estate & jewellery</p>
@@ -153,9 +153,9 @@ const Dashboard: React.FC = () => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
-        <Card>
+        <Card className="border-l-4 border-cyan-500">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><BarChart2 className="h-5 w-5" />Cashflow Summary</CardTitle>
+            <CardTitle className="flex items-center gap-2"><BarChart2 className="h-5 w-5 text-cyan-500" />Cashflow Summary</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="flex justify-between"><span>Total Annual Income:</span><span className="font-medium">₹{cashflowData.totalAnnualIncome.toLocaleString("en-IN")}</span></div>
@@ -164,9 +164,9 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-l-4 border-amber-500">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><PieChart className="h-5 w-5" />Net Worth Summary</CardTitle>
+            <CardTitle className="flex items-center gap-2"><PieChart className="h-5 w-5 text-amber-500" />Net Worth Summary</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="flex justify-between"><span>Total Assets:</span><span className="font-medium">₹{netWorthData.totalAssets.toLocaleString("en-IN")}</span></div>
@@ -175,9 +175,9 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-l-4 border-violet-500">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><TrendingUp className="h-5 w-5" />Future Value Summary</CardTitle>
+            <CardTitle className="flex items-center gap-2"><TrendingUp className="h-5 w-5 text-violet-500" />Future Value Summary</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="flex justify-between"><span>Total Current Value:</span><span className="font-medium">₹{(netWorthData.totalAssets).toLocaleString("en-IN", { maximumFractionDigits: 2 })}</span></div>
@@ -186,9 +186,9 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-l-4 border-rose-500">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><Target className="h-5 w-5" />Goals Summary</CardTitle>
+            <CardTitle className="flex items-center gap-2"><Target className="h-5 w-5 text-rose-500" />Goals Summary</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="flex justify-between"><span>Total Target Future Value:</span><span className="font-medium text-green-600">₹{goalsData.totalGoalsFutureValue.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</span></div>
