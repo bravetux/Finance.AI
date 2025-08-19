@@ -3,6 +3,14 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { IndianRupee, TrendingUp, Wallet, BarChart2, PieChart, Target, Landmark } from "lucide-react";
+import {
+  getLiquidFutureValueTotal,
+  getFinanceData,
+  getNetWorthData,
+  getFutureValueSummaryData,
+  getGoalsData,
+  safeParseJSON, // Import safeParseJSON for specific cases
+} from "@/utils/localStorageUtils";
 
 const Dashboard: React.FC = () => {
   const [liquidFutureValue, setLiquidFutureValue] = React.useState(0);
@@ -15,20 +23,17 @@ const Dashboard: React.FC = () => {
     const updateAllValues = () => {
       try {
         // Liquid Future Value
-        const savedLiquidFv = localStorage.getItem('liquidFutureValueTotal');
-        setLiquidFutureValue(savedLiquidFv ? JSON.parse(savedLiquidFv) : 0);
+        setLiquidFutureValue(getLiquidFutureValueTotal());
 
         // Cashflow Data
-        const savedCashflow = localStorage.getItem('finance-data');
-        const cashflow = savedCashflow ? JSON.parse(savedCashflow) : {};
+        const cashflow = getFinanceData();
         const totalRentalIncome = (cashflow.rentalProperty1 || 0) + (cashflow.rentalProperty2 || 0) + (cashflow.rentalProperty3 || 0);
         const totalAnnualIncome = (cashflow.postTaxSalaryIncome || 0) + (cashflow.businessIncome || 0) + totalRentalIncome + (cashflow.fdInterest || 0) + (cashflow.bondIncome || 0) + (cashflow.dividendIncome || 0);
         const totalAnnualOutflows = ((cashflow.monthlyHouseholdExpense || 0) + (cashflow.monthlyPpf || 0) + (cashflow.monthlyUlip || 0) + (cashflow.monthlyInsurance || 0) + (cashflow.monthlyRds || 0) + (cashflow.monthlyLoanEMIs || 0) + (cashflow.monthlyDonation || 0) + (cashflow.monthlyEntertainment || 0) + (cashflow.monthlyTravel || 0) + (cashflow.monthlyOthers || 0)) * 12;
         setCashflowData({ totalAnnualIncome, totalAnnualOutflows });
 
         // Net Worth Data
-        const savedNetWorth = localStorage.getItem('netWorthData');
-        const netWorth = savedNetWorth ? JSON.parse(savedNetWorth) : {};
+        const netWorth = getNetWorthData();
         const totalIlliquidAssets = (netWorth.homeValue || 0) + (netWorth.otherRealEstate || 0) + (netWorth.jewellery || 0) + (netWorth.sovereignGoldBonds || 0) + (netWorth.ulipsSurrenderValue || 0) + (netWorth.epfPpfVpf || 0);
         const totalLiquidAssets = (netWorth.fixedDeposits || 0) + (netWorth.debtFunds || 0) + (netWorth.domesticStocks || 0) + (netWorth.domesticMutualFunds || 0) + (netWorth.internationalFunds || 0) + (netWorth.smallCases || 0) + (netWorth.savingsBalance || 0) + (netWorth.preciousMetals || 0) + (netWorth.cryptocurrency || 0) + (netWorth.reits || 0);
         const totalAssets = totalIlliquidAssets + totalLiquidAssets;
@@ -36,13 +41,11 @@ const Dashboard: React.FC = () => {
         setNetWorthData({ totalAssets, totalLiabilities });
 
         // Future Value Data
-        const savedFvSummary = localStorage.getItem('futureValueSummary');
-        const fvSummary = savedFvSummary ? JSON.parse(savedFvSummary) : { totalFutureValue: 0, averageROI: 0, ageAtGoal: 0, duration: 0 };
+        const fvSummary = getFutureValueSummaryData();
         setFutureValueData(fvSummary);
 
         // Goals Data
-        const savedGoals = localStorage.getItem('goalsData');
-        const goals = savedGoals ? JSON.parse(savedGoals) : [];
+        const goals = getGoalsData();
         const totalGoalsFv = goals.reduce((sum: number, goal: any) => sum + (goal.targetFutureValue || 0), 0);
         const totalSip = goals.reduce((sum: number, goal: any) => sum + (goal.sipRequired || 0), 0);
         setGoalsData({ totalGoalsFutureValue: totalGoalsFv, totalSipRequired: totalSip });

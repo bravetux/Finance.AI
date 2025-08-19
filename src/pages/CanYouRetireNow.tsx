@@ -3,67 +3,18 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } => "@/components/ui/label";
+import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { CheckCircle, XCircle, Wallet, LineChart } from "lucide-react";
-
-// Helper to get total liquid assets from Net Worth data
-const getLiquidAssets = () => {
-  try {
-    const savedData = localStorage.getItem('netWorthData');
-    if (!savedData) return 0;
-    const data = JSON.parse(savedData);
-    return (data.fixedDeposits || 0) + (data.debtFunds || 0) + (data.domesticStocks || 0) + 
-           (data.domesticMutualFunds || 0) + (data.internationalFunds || 0) + (data.smallCases || 0) + 
-           (data.savingsBalance || 0) + (data.preciousMetals || 0) + (data.cryptocurrency || 0) + (data.reits || 0);
-  } catch {
-    return 0;
-  }
-};
-
-// Helper to get annual expenses from Cashflow data
-const getAnnualExpenses = () => {
-  try {
-    const savedData = localStorage.getItem('finance-data');
-    if (!savedData) return 0;
-    const data = JSON.parse(savedData);
-    return ((data.monthlyHouseholdExpense || 0) +
-            (data.monthlyPpf || 0) +
-            (data.monthlyUlip || 0) +
-            (data.monthlyInsurance || 0) +
-            (data.monthlyRds || 0) +
-            (data.monthlyLoanEMIs || 0) +
-            (data.monthlyDonation || 0) +
-            (data.monthlyEntertainment || 0) +
-            (data.monthlyTravel || 0) +
-            (data.monthlyOthers || 0)) * 12;
-  } catch {
-    return 0;
-  }
-};
-
-// Helper to get projected corpus from ProjectedCashflow data
-const getProjectedCorpus = () => {
-  try {
-    const savedData = localStorage.getItem('projectedAccumulatedCorpus');
-    return savedData ? JSON.parse(savedData) : 0;
-  } catch {
-    return 0;
-  }
-};
-
-// Helper to get total future value from FutureValueCalculator data
-const getTotalFutureValue = () => {
-  try {
-    const savedData = localStorage.getItem('futureValueSummary');
-    if (!savedData) return 0;
-    const data = JSON.parse(savedData);
-    return data.totalFutureValue || 0;
-  } catch {
-    return 0;
-  }
-};
+import {
+  getLiquidAssetsFromNetWorth,
+  getAnnualExpensesFromFinance,
+  getProjectedAccumulatedCorpus,
+  getFutureValueSummaryData,
+  getRetirementCorpusMode,
+  setRetirementCorpusMode,
+} from "@/utils/localStorageUtils";
 
 interface RetirementInputs {
   currentAge: number;
@@ -78,14 +29,7 @@ const CanYouRetireNow: React.FC = () => {
   const [projectedCorpus, setProjectedCorpus] = useState(0);
   const [totalFutureValueFromFutureValuePage, setTotalFutureValueFromFutureValuePage] = useState(0);
   const [annualExpenses, setAnnualExpenses] = useState(0);
-  const [corpusMode, setCorpusMode] = useState<'now' | 'future'>(() => {
-    try {
-      const savedMode = localStorage.getItem('retirementCorpusMode');
-      return savedMode === 'future' ? 'future' : 'now';
-    } catch {
-      return 'now';
-    }
-  });
+  const [corpusMode, setCorpusMode] = useState<'now' | 'future'>(getRetirementCorpusMode());
 
   const [inputs, setInputs] = useState<RetirementInputs>(() => {
     const defaultState: RetirementInputs = {
@@ -100,14 +44,11 @@ const CanYouRetireNow: React.FC = () => {
 
   useEffect(() => {
     const updateData = () => {
-      setLiquidAssets(getLiquidAssets());
-      setAnnualExpenses(getAnnualExpenses());
-      setProjectedCorpus(getProjectedCorpus());
-      setTotalFutureValueFromFutureValuePage(getTotalFutureValue());
-      const savedMode = localStorage.getItem('retirementCorpusMode');
-      if (savedMode !== null) {
-        setCorpusMode(savedMode === 'future' ? 'future' : 'now');
-      }
+      setLiquidAssets(getLiquidAssetsFromNetWorth());
+      setAnnualExpenses(getAnnualExpensesFromFinance());
+      setProjectedCorpus(getProjectedAccumulatedCorpus());
+      setTotalFutureValueFromFutureValuePage(getFutureValueSummaryData().totalFutureValue);
+      setCorpusMode(getRetirementCorpusMode());
     };
     updateData();
     window.addEventListener('storage', updateData);
@@ -170,7 +111,7 @@ const CanYouRetireNow: React.FC = () => {
             annualExpenses: annualExpenses,
             currentAge: inputs.currentAge,
         }));
-        localStorage.setItem('retirementCorpusMode', corpusMode);
+        setRetirementCorpusMode(corpusMode);
     } catch (error) {
         console.error("Failed to save data for post-retirement page:", error);
     }
