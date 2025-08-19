@@ -4,39 +4,39 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wallet, Calculator, Target, Flame, BarChart2, FileText } from 'lucide-react';
+import { Wallet, Calculator, Flame, Bot, ShieldCheck, Landmark } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 const features = [
   {
     icon: <Wallet className="h-8 w-8 text-primary" />,
-    title: 'Comprehensive Net Worth',
-    description: 'Track all your assets and liabilities in one place, from real estate to crypto.',
+    title: 'Holistic Net Worth Tracking',
+    description: 'Track everything from real estate and stocks to precious metals and crypto.',
   },
   {
     icon: <Calculator className="h-8 w-8 text-primary" />,
-    title: 'Detailed Cashflow Planning',
-    description: 'Analyze your income and expenses to identify savings opportunities.',
+    title: 'In-Depth Cashflow Analysis',
+    description: 'Plan your budget, project future savings, and find areas to cut costs.',
   },
   {
-    icon: <Target className="h-8 w-8 text-primary" />,
-    title: 'Goal-Oriented Savings',
-    description: 'Set financial goals and calculate the SIP required to achieve them.',
+    icon: <Landmark className="h-8 w-8 text-primary" />,
+    title: 'Full Retirement Suite',
+    description: 'From FIRE calculations to post-retirement withdrawal strategies, plan every step.',
   },
   {
-    icon: <Flame className="h-8 w-8 text-primary" />,
-    title: 'FIRE & Retirement',
-    description: 'Plan for Financial Independence and a comfortable retirement with powerful calculators.',
+    icon: <ShieldCheck className="h-8 w-8 text-primary" />,
+    title: 'Essential Life Planning',
+    description: 'Manage insurance, track loans, and secure your family’s future with our FIDOK module.',
   },
   {
-    icon: <BarChart2 className="h-8 w-8 text-primary" />,
-    title: 'Investment Tracking',
-    description: 'Monitor your equity, mutual funds, and other investments with detailed breakdowns.',
+    icon: <Calculator className="h-8 w-8 text-primary" />,
+    title: 'Powerful Financial Calculators',
+    description: 'A complete set of tools for SIP, SWP, PPF, EPF, Goals, and car affordability.',
   },
   {
-    icon: <FileText className="h-8 w-8 text-primary" />,
-    title: 'Data Export & AI',
-    description: 'Export all your data for backup and use our AI assistant for financial insights.',
+    icon: <Bot className="h-8 w-8 text-primary" />,
+    title: 'AI Insights & Data Control',
+    description: 'Chat with an AI about your finances and maintain full privacy with local data export/import.',
   },
 ];
 
