@@ -83,11 +83,11 @@ const CanYouRetireNow: React.FC = () => {
 
   const { yearsCorpusWillLast, canRetire, shortfall } = useMemo(() => {
     if (totalStartingCorpus <= 0 || annualExpenses <= 0 || totalAllocation !== 100) {
-      return { yearsCorpusWillLast: 0, canRetire: false, shortfall: annualExpenses * 25 };
+      return { yearsCorpusWillLast: 0, canRetire: false, shortfall: annualExpenses > 0 ? annualExpenses * 25 : 0 };
     }
 
     let currentFund = totalStartingCorpus;
-    let currentWithdrawal = totalStartingCorpus * 0.04; // Use 4% of the corpus as the initial withdrawal
+    let currentWithdrawal = annualExpenses;
     let years = 0;
     const maxYears = sharedData.lifeExpectancy - sharedData.currentAge;
 
@@ -95,7 +95,7 @@ const CanYouRetireNow: React.FC = () => {
       currentFund -= currentWithdrawal;
       if (currentFund <= 0) break;
       currentFund *= (1 + weightedAvgReturn / 100);
-      currentWithdrawal *= (1 + sharedData.inflation / 100); // Inflate the withdrawal amount each year
+      currentWithdrawal *= (1 + sharedData.inflation / 100);
       years++;
     }
 
@@ -105,7 +105,7 @@ const CanYouRetireNow: React.FC = () => {
     return {
       yearsCorpusWillLast: years,
       canRetire: canRetireStatus,
-      shortfall: canRetireStatus ? 0 : Math.max(0, retirementCorpusNeeded - totalStartingCorpus),
+      shortfall: Math.max(0, retirementCorpusNeeded - totalStartingCorpus),
     };
   }, [totalStartingCorpus, annualExpenses, sharedData, weightedAvgReturn, totalAllocation]);
 
@@ -213,13 +213,17 @@ const CanYouRetireNow: React.FC = () => {
             Verdict: {canRetire ? "Yes, you can likely retire now." : "No, not yet."}
           </CardTitle>
           <CardDescription>
-            The verdict is based on the standard 4% withdrawal rule. It simulates whether your 'Total Starting Corpus' can sustain an initial withdrawal of 4% (adjusted for inflation annually) until your 'Life Expectancy'.
+            The verdict is based on whether your 'Total Starting Corpus' can sustain your 'Current Annual Expenses' (adjusted for inflation) until your 'Life Expectancy'.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-2 text-lg">
           <p>Your net corpus of <strong>{formatCurrency(totalStartingCorpus)}</strong> will last for approximately <strong>{yearsCorpusWillLast} years</strong> (until age {sharedData.currentAge + yearsCorpusWillLast}).</p>
           {!canRetire && (
-            <p>You have a shortfall of approximately <strong>{formatCurrency(shortfall)}</strong> to reach a standard retirement corpus.</p>
+            shortfall > 0 ? (
+              <p>You have a shortfall of approximately <strong>{formatCurrency(shortfall)}</strong> to reach a standard retirement corpus (25x annual expenses).</p>
+            ) : (
+              <p className="text-orange-600 font-semibold">While you meet the 25x expenses rule, your current investment strategy (returns vs. inflation) is not projected to sustain your withdrawals for your entire retirement.</p>
+            )
           )}
         </CardContent>
         <CardFooter className="flex flex-col items-start space-y-4 pt-4 border-t">
