@@ -43,6 +43,7 @@ import PPFCalculator from "./pages/PPFCalculator";
 import EPFCalculator from "./pages/EPFCalculator";
 import GoalCalculator from "./pages/GoalCalculator";
 import CarAffordableCalculator from "./pages/CarAffordableCalculator";
+import Features from "./pages/Features";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Landing />} />
+            <Route path="/features" element={<Features />} />
             <Route path="/dashboard" element={<DashboardLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="cashflow" element={<Cashflow />} />

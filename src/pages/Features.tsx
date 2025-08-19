@@ -41,10 +41,9 @@ const features = [
   },
 ];
 
-const Landing: React.FC = () => {
+const Features: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-      {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center">
           <div className="mr-4 flex items-center">
@@ -54,7 +53,7 @@ const Landing: React.FC = () => {
             </Link>
           </div>
           <nav className="hidden md:flex flex-1 items-center justify-end space-x-4">
-            <Link to="/features" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+            <Link to="/features" className="text-sm font-medium text-primary">
               Features
             </Link>
             <a href="https://tax-compute.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
@@ -74,7 +73,7 @@ const Landing: React.FC = () => {
               </SheetTrigger>
               <SheetContent side="right">
                 <div className="flex flex-col gap-4 p-4">
-                  <Link to="/features" className="text-lg font-medium">Features</Link>
+                  <Link to="/features" className="text-lg font-medium text-primary">Features</Link>
                   <a href="https://tax-compute.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-lg font-medium">Tax Planning</a>
                   <hr/>
                   <div className="flex justify-between items-center">
@@ -91,22 +90,10 @@ const Landing: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="container flex flex-col items-center justify-center py-12 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tighter">
-            Take Control of Your Financial Future
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-            An all-in-one, open-source financial planner to track your net worth, manage cashflow, set goals, and plan for retirement. All your data stays on your device.
-          </p>
-        </section>
-
-        {/* Features Section */}
-        <section className="container pb-16">
+        <section className="container py-12">
           <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
-            <h2 className="text-3xl font-bold leading-[1.1] md:text-4xl">Features</h2>
+            <h1 className="text-4xl font-bold leading-[1.1] md:text-5xl">Features</h1>
             <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
               Everything you need to manage your personal finances, all in one place.
             </p>
@@ -129,7 +116,6 @@ const Landing: React.FC = () => {
         </section>
       </main>
 
-      {/* Footer */}
       <footer className="py-6 md:px-8 md:py-0">
         <div className="container flex flex-col items-center justify-center gap-4 md:h-24 md:flex-row">
           <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
@@ -159,4 +145,4 @@ const Landing: React.FC = () => {
   );
 };
 
-export default Landing;
+export default Features;
