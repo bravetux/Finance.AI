@@ -339,8 +339,8 @@ const RetirementDashboard: React.FC = () => {
               </p>
             </div>
             <div className="space-y-2 border-t pt-4">
-              <div className="flex justify-between"><span className="text-muted-foreground">Future Annual Expenses:</span><span className="font-bold">₹{futureAnnualExpenses.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Future Monthly Expenses:</span><span className="font-bold">₹{(futureAnnualExpenses / 12).toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">{corpusMode === 'now' ? 'Current Annual Expenses:' : 'Future Annual Expenses:'}</span><span className="font-bold">₹{futureAnnualExpenses.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">{corpusMode === 'now' ? 'Current Monthly Expenses:' : 'Future Monthly Expenses:'}</span><span className="font-bold">₹{(futureAnnualExpenses / 12).toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Corpus will last for:</span><span className="font-bold text-blue-600">{corpusSustainability >= (retirementData.lifeExpectancy - retirementData.retirementAge) ? `${retirementData.lifeExpectancy - retirementData.retirementAge}+ Years` : `${corpusSustainability.toFixed(0)} Years`}</span></div>
             </div>
             <div className="border-t pt-4 space-y-2">
