@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { CheckCircle, XCircle, Wallet, LineChart } from "lucide-react";
+import { CheckCircle, XCircle } from "lucide-react";
 import {
   getLiquidAssetsFromNetWorth,
   getAnnualExpensesFromFinance,
@@ -14,12 +14,11 @@ import {
   getLiquidFutureValueTotal,
   getRetirementCorpusMode,
   setRetirementCorpusMode,
+  getRetirementData,
 } from "@/utils/localStorageUtils";
+import AllocationPieChart from "@/components/AllocationPieChart";
 
-interface RetirementInputs {
-  currentAge: number;
-  lifeExpectancy: number;
-  inflation: number;
+interface SimulationInputs {
   allocations: { equity: number; fds: number; bonds: number; cash: number; };
   returns: { equity: number; fds: number; bonds: number; cash: number; };
 }
@@ -31,15 +30,13 @@ const CanYouRetireNow: React.FC = () => {
   const [annualExpenses, setAnnualExpenses] = useState(0);
   const [corpusMode, setCorpusMode] = useState<'now' | 'future'>(getRetirementCorpusMode());
 
-  const [inputs, setInputs] = useState<RetirementInputs>(() => {
-    const defaultState: RetirementInputs = {
-      currentAge: 30,
-      lifeExpectancy: 85,
-      inflation: 6,
+  const [sharedData, setSharedData] = useState({ currentAge: 30, lifeExpectancy: 85, inflation: 6 });
+  const [simulationInputs, setSimulationInputs] = useState<SimulationInputs>(() => {
+    // These settings are local to this page's simulation
+    return {
       allocations: { equity: 30, fds: 40, bonds: 25, cash: 5 },
       returns: { equity: 12, fds: 7, bonds: 8, cash: 2.5 },
     };
-    return defaultState;
   });
 
   useEffect(() => {
@@ -49,32 +46,39 @@ const CanYouRetireNow: React.FC = () => {
       setProjectedCorpus(getProjectedAccumulatedCorpus());
       setLiquidFutureValue(getLiquidFutureValueTotal());
       setCorpusMode(getRetirementCorpusMode());
+      
+      const retirementData = getRetirementData();
+      setSharedData({
+        currentAge: retirementData.currentAge,
+        lifeExpectancy: retirementData.lifeExpectancy,
+        inflation: retirementData.inflation,
+      });
     };
     updateData();
     window.addEventListener('storage', updateData);
     return () => window.removeEventListener('storage', updateData);
   }, []);
 
-  const handleInputChange = (field: keyof RetirementInputs, value: any) => {
-    setInputs((prev) => ({ ...prev, [field]: value }));
+  const handleSimulationInputChange = (field: keyof SimulationInputs, value: any) => {
+    setSimulationInputs((prev) => ({ ...prev, [field]: value }));
   };
 
   const totalStartingCorpus = useMemo(() => {
     if (corpusMode === 'now') {
       return liquidAssets;
-    } else { // corpusMode === 'future'
+    } else {
       return liquidFutureValue + projectedCorpus;
     }
   }, [liquidAssets, liquidFutureValue, projectedCorpus, corpusMode]);
 
-  const totalAllocation = useMemo(() => Object.values(inputs.allocations).reduce((sum, val) => sum + val, 0), [inputs.allocations]);
+  const totalAllocation = useMemo(() => Object.values(simulationInputs.allocations).reduce((sum, val) => sum + val, 0), [simulationInputs.allocations]);
   
   const weightedAvgReturn = useMemo(() => {
     if (totalAllocation !== 100) return 0;
-    return Object.keys(inputs.allocations).reduce((acc, key) => 
-      acc + (inputs.allocations[key as keyof typeof inputs.allocations] / 100) * inputs.returns[key as keyof typeof inputs.returns], 0
+    return Object.keys(simulationInputs.allocations).reduce((acc, key) => 
+      acc + (simulationInputs.allocations[key as keyof typeof simulationInputs.allocations] / 100) * simulationInputs.returns[key as keyof typeof simulationInputs.returns], 0
     );
-  }, [inputs.allocations, inputs.returns, totalAllocation]);
+  }, [simulationInputs.allocations, simulationInputs.returns, totalAllocation]);
 
   const { yearsCorpusWillLast, canRetire, shortfall } = useMemo(() => {
     if (totalStartingCorpus <= 0 || annualExpenses <= 0 || totalAllocation !== 100) {
@@ -84,13 +88,13 @@ const CanYouRetireNow: React.FC = () => {
     let currentFund = totalStartingCorpus;
     let currentWithdrawal = annualExpenses;
     let years = 0;
-    const maxYears = inputs.lifeExpectancy - inputs.currentAge;
+    const maxYears = sharedData.lifeExpectancy - sharedData.currentAge;
 
     while (currentFund > 0 && years < maxYears) {
       currentFund -= currentWithdrawal;
       if (currentFund <= 0) break;
       currentFund *= (1 + weightedAvgReturn / 100);
-      currentWithdrawal *= (1 + inputs.inflation / 100);
+      currentWithdrawal *= (1 + sharedData.inflation / 100);
       years++;
     }
 
@@ -102,20 +106,20 @@ const CanYouRetireNow: React.FC = () => {
       canRetire: canRetireStatus,
       shortfall: canRetireStatus ? 0 : Math.max(0, retirementCorpusNeeded - totalStartingCorpus),
     };
-  }, [totalStartingCorpus, annualExpenses, inputs, weightedAvgReturn, totalAllocation]);
+  }, [totalStartingCorpus, annualExpenses, sharedData, weightedAvgReturn, totalAllocation]);
 
   useEffect(() => {
     try {
         localStorage.setItem('canRetireNowData', JSON.stringify({
             corpus: totalStartingCorpus,
             annualExpenses: annualExpenses,
-            currentAge: inputs.currentAge,
+            currentAge: sharedData.currentAge,
         }));
         setRetirementCorpusMode(corpusMode);
     } catch (error) {
         console.error("Failed to save data for post-retirement page:", error);
     }
-  }, [totalStartingCorpus, annualExpenses, inputs.currentAge, corpusMode]);
+  }, [totalStartingCorpus, annualExpenses, sharedData.currentAge, corpusMode]);
 
   const formatCurrency = (value: number) => `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 
@@ -179,11 +183,11 @@ const CanYouRetireNow: React.FC = () => {
             Verdict: {canRetire ? "Yes, you can likely retire now." : "No, not yet."}
           </CardTitle>
           <CardDescription>
-            The verdict is based on whether your 'Total Starting Corpus' is projected to last until your 'Life Expectancy' (age {inputs.lifeExpectancy}) given your 'Current Annual Expenses', 'Inflation', and 'Expected Returns'. It uses a standard financial independence rule (25x annual expenses) to determine the required corpus.
+            The verdict is based on whether your 'Total Starting Corpus' is projected to last until your 'Life Expectancy' (age {sharedData.lifeExpectancy}) given your 'Current Annual Expenses', 'Inflation', and 'Expected Returns'. It uses a standard financial independence rule (25x annual expenses) to determine the required corpus.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-2 text-lg">
-          <p>Your net corpus of <strong>{formatCurrency(totalStartingCorpus)}</strong> will last for approximately <strong>{yearsCorpusWillLast} years</strong> (until age {inputs.currentAge + yearsCorpusWillLast}).</p>
+          <p>Your net corpus of <strong>{formatCurrency(totalStartingCorpus)}</strong> will last for approximately <strong>{yearsCorpusWillLast} years</strong> (until age {sharedData.currentAge + yearsCorpusWillLast}).</p>
           {!canRetire && (
             <p>You have a shortfall of approximately <strong>{formatCurrency(shortfall)}</strong> to reach a standard retirement corpus.</p>
           )}
@@ -193,21 +197,53 @@ const CanYouRetireNow: React.FC = () => {
       <Card>
         <CardHeader>
           <CardTitle>Retirement Simulation Inputs</CardTitle>
-          <CardDescription>Adjust these values to match your expectations.</CardDescription>
+          <CardDescription>Adjust these values to match your expectations. Core assumptions are managed on the Retirement Dashboard.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div><Label htmlFor="currentAge">Current Age</Label><Input id="currentAge" type="number" value={inputs.currentAge} onChange={(e) => handleInputChange("currentAge", Number(e.target.value))} /></div>
-            <div><Label htmlFor="lifeExpectancy">Life Expectancy</Label><Input id="lifeExpectancy" type="number" value={inputs.lifeExpectancy} onChange={(e) => handleInputChange("lifeExpectancy", Number(e.target.value))} /></div>
+            <div><Label htmlFor="currentAge">Current Age</Label><Input id="currentAge" type="number" value={sharedData.currentAge} disabled /></div>
+            <div><Label htmlFor="lifeExpectancy">Life Expectancy</Label><Input id="lifeExpectancy" type="number" value={sharedData.lifeExpectancy} disabled /></div>
             <div className="md:col-span-2">
               <Label>Expected Annual Inflation</Label>
-              <Slider value={[inputs.inflation]} onValueChange={(val) => handleInputChange("inflation", val[0])} min={4} max={10} step={0.5} />
-              <div className="text-center font-medium">{inputs.inflation.toFixed(1)}%</div>
+              <Input value={`${sharedData.inflation.toFixed(1)}%`} disabled />
             </div>
           </div>
           <div className="border-t pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex justify-between md:col-span-2"><span className="text-muted-foreground">Current Annual Expenses for Retirement:</span><span className="font-bold">{formatCurrency(annualExpenses)}</span></div>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+            <CardTitle>Post-Retirement Investment Strategy</CardTitle>
+            <CardDescription>Define how your corpus will be allocated and the expected returns for the simulation.</CardDescription>
+            <p className={`text-sm pt-2 ${totalAllocation !== 100 ? 'text-red-500 font-bold' : 'text-muted-foreground'}`}>Total Allocation: {totalAllocation}% {totalAllocation !== 100 && "(Must be 100%)"}</p>
+        </CardHeader>
+        <CardContent className="grid gap-8 md:grid-cols-2">
+            <div className="flex items-center justify-center">
+              <AllocationPieChart data={simulationInputs.allocations} />
+            </div>
+            <div className="space-y-6">
+              {Object.keys(simulationInputs.allocations).map((key) => {
+                const category = key as keyof SimulationInputs["allocations"];
+                return (
+                  <div key={category} className="grid grid-cols-2 gap-4 items-end">
+                    <div className="space-y-2">
+                      <Label className="capitalize text-md">{category}</Label>
+                      <Slider value={[simulationInputs.allocations[category]]} onValueChange={(val) => handleSimulationInputChange("allocations", { ...simulationInputs.allocations, [category]: val[0] })} min={0} max={100} step={5} />
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">{simulationInputs.allocations[category]}%</span>
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor={`return-${category}`} className="text-xs">Return (%)</Label>
+                      <Input id={`return-${category}`} type="number" value={simulationInputs.returns[category]} onChange={(e) => handleSimulationInputChange("returns", { ...simulationInputs.returns, [category]: Number(e.target.value) })} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
         </CardContent>
       </Card>
     </div>
