@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -29,6 +29,7 @@ const CanYouRetireNow: React.FC = () => {
   const [liquidFutureValue, setLiquidFutureValue] = useState(0);
   const [annualExpenses, setAnnualExpenses] = useState(0);
   const [corpusMode, setCorpusMode] = useState<'now' | 'future'>(getRetirementCorpusMode());
+  const [withdrawalRate, setWithdrawalRate] = useState(4);
 
   const [sharedData, setSharedData] = useState({ currentAge: 30, lifeExpectancy: 85, inflation: 6 });
   const [simulationInputs, setSimulationInputs] = useState<SimulationInputs>(() => {
@@ -107,6 +108,14 @@ const CanYouRetireNow: React.FC = () => {
       shortfall: canRetireStatus ? 0 : Math.max(0, retirementCorpusNeeded - totalStartingCorpus),
     };
   }, [totalStartingCorpus, annualExpenses, sharedData, weightedAvgReturn, totalAllocation]);
+
+  const annualWithdrawal = useMemo(() => {
+    return totalStartingCorpus * (withdrawalRate / 100);
+  }, [totalStartingCorpus, withdrawalRate]);
+
+  const monthlyWithdrawal = useMemo(() => {
+    return annualWithdrawal / 12;
+  }, [annualWithdrawal]);
 
   useEffect(() => {
     try {
@@ -192,6 +201,32 @@ const CanYouRetireNow: React.FC = () => {
             <p>You have a shortfall of approximately <strong>{formatCurrency(shortfall)}</strong> to reach a standard retirement corpus.</p>
           )}
         </CardContent>
+        <CardFooter className="flex flex-col items-start space-y-4 pt-4 border-t">
+          <div className="w-full">
+            <Label htmlFor="withdrawal-slider" className="font-semibold">
+              Withdrawal Rate Simulation: {withdrawalRate.toFixed(1)}%
+            </Label>
+            <Slider
+              id="withdrawal-slider"
+              value={[withdrawalRate]}
+              onValueChange={(val) => setWithdrawalRate(val[0])}
+              min={4}
+              max={10}
+              step={0.5}
+              className="mt-2"
+            />
+          </div>
+          <div className="w-full space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Annual Withdrawal:</span>
+              <span className="font-bold">{formatCurrency(annualWithdrawal)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Monthly Withdrawal:</span>
+              <span className="font-bold">{formatCurrency(monthlyWithdrawal)}</span>
+            </div>
+          </div>
+        </CardFooter>
       </Card>
 
       <Card>
