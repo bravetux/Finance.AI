@@ -18,6 +18,12 @@ const SIPCalculator: React.FC = () => {
   const [lumpsumReturnRate, setLumpsumReturnRate] = useState(12);
   const [lumpsumTimePeriod, setLumpsumTimePeriod] = useState(10);
 
+  // State for Lumpsum + SIP Calculator
+  const [comboLumpsum, setComboLumpsum] = useState(500000);
+  const [comboMonthlyInvestment, setComboMonthlyInvestment] = useState(10000);
+  const [comboReturnRate, setComboReturnRate] = useState(12);
+  const [comboTimePeriod, setComboTimePeriod] = useState(10);
+
   const sipCalculations = useMemo(() => {
     const P = monthlyInvestment;
     const i = sipReturnRate / 12 / 100;
@@ -47,6 +53,27 @@ const SIPCalculator: React.FC = () => {
     return { investedAmount, estimatedReturns, totalValue };
   }, [lumpsumInvestment, lumpsumReturnRate, lumpsumTimePeriod]);
 
+  const comboCalculations = useMemo(() => {
+    const L = comboLumpsum;
+    const S = comboMonthlyInvestment;
+    const i = comboReturnRate / 12 / 100;
+    const n = comboTimePeriod * 12;
+
+    if (n <= 0) {
+      const invested = L + S * n;
+      return { investedAmount: invested, estimatedReturns: 0, totalValue: invested };
+    }
+
+    const fvLumpsum = L * Math.pow(1 + i, n);
+    const fvSip = i === 0 ? S * n : S * (((Math.pow(1 + i, n) - 1) / i) * (1 + i));
+    
+    const totalValue = fvLumpsum + fvSip;
+    const investedAmount = L + (S * n);
+    const estimatedReturns = totalValue - investedAmount;
+
+    return { investedAmount, estimatedReturns, totalValue };
+  }, [comboLumpsum, comboMonthlyInvestment, comboReturnRate, comboTimePeriod]);
+
   const sipChartData = [
     { name: "Invested amount", value: sipCalculations.investedAmount },
     { name: "Est. returns", value: sipCalculations.estimatedReturns },
@@ -55,6 +82,11 @@ const SIPCalculator: React.FC = () => {
   const lumpsumChartData = [
     { name: "Invested amount", value: lumpsumCalculations.investedAmount },
     { name: "Est. returns", value: lumpsumCalculations.estimatedReturns },
+  ];
+
+  const comboChartData = [
+    { name: "Invested amount", value: comboCalculations.investedAmount },
+    { name: "Est. returns", value: comboCalculations.estimatedReturns },
   ];
 
   const COLORS = ["#E0E7FF", "#4F46E5"];
@@ -73,9 +105,10 @@ const SIPCalculator: React.FC = () => {
       <Card>
         <CardContent className="pt-6">
           <Tabs defaultValue="sip">
-            <TabsList className="grid w-full grid-cols-2 md:w-1/3">
+            <TabsList className="grid w-full grid-cols-3 md:w-1/2">
               <TabsTrigger value="sip">SIP</TabsTrigger>
               <TabsTrigger value="lumpsum">Lumpsum</TabsTrigger>
+              <TabsTrigger value="combo">Lumpsum + SIP</TabsTrigger>
             </TabsList>
             
             {/* SIP Calculator Content */}
@@ -165,6 +198,61 @@ const SIPCalculator: React.FC = () => {
                     <div className="flex justify-between"><span className="text-muted-foreground">Invested amount</span><span className="font-medium">{formatCurrency(lumpsumCalculations.investedAmount)}</span></div>
                     <div className="flex justify-between"><span className="text-muted-foreground">Est. returns</span><span className="font-medium">{formatCurrency(lumpsumCalculations.estimatedReturns)}</span></div>
                     <div className="flex justify-between border-t pt-2 mt-2"><span className="font-bold">Total value</span><span className="font-bold text-xl">{formatCurrency(lumpsumCalculations.totalValue)}</span></div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Lumpsum + SIP Calculator Content */}
+            <TabsContent value="combo">
+              <div className="grid md:grid-cols-2 gap-8 mt-6">
+                <div className="space-y-8">
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="font-medium">Initial Lumpsum</label>
+                      <span className="text-lg font-bold text-primary bg-primary/10 px-3 py-1 rounded-md">
+                        {formatCurrency(comboLumpsum)}
+                      </span>
+                    </div>
+                    <Slider value={[comboLumpsum]} onValueChange={(val) => setComboLumpsum(val[0])} min={0} max={5000000} step={10000} />
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="font-medium">Monthly Investment (SIP)</label>
+                      <span className="text-lg font-bold text-primary bg-primary/10 px-3 py-1 rounded-md">
+                        {formatCurrency(comboMonthlyInvestment)}
+                      </span>
+                    </div>
+                    <Slider value={[comboMonthlyInvestment]} onValueChange={(val) => setComboMonthlyInvestment(val[0])} min={0} max={500000} step={500} />
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="font-medium">Expected return rate (p.a)</label>
+                      <span className="text-lg font-bold text-primary bg-primary/10 px-3 py-1 rounded-md">{comboReturnRate}%</span>
+                    </div>
+                    <Slider value={[comboReturnRate]} onValueChange={(val) => setComboReturnRate(val[0])} min={1} max={30} step={0.5} />
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="font-medium">Time period</label>
+                      <span className="text-lg font-bold text-primary bg-primary/10 px-3 py-1 rounded-md">{comboTimePeriod} Yr</span>
+                    </div>
+                    <Slider value={[comboTimePeriod]} onValueChange={(val) => setComboTimePeriod(val[0])} min={1} max={40} step={1} />
+                  </div>
+                </div>
+                <div className="flex flex-col items-center">
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie data={comboChartData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} fill="#8884d8" paddingAngle={5} dataKey="value">
+                        {comboChartData.map((entry, index) => (<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />))}
+                      </Pie>
+                      <Legend iconType="circle" />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="w-full max-w-sm mt-6 space-y-2 text-lg">
+                    <div className="flex justify-between"><span className="text-muted-foreground">Invested amount</span><span className="font-medium">{formatCurrency(comboCalculations.investedAmount)}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Est. returns</span><span className="font-medium">{formatCurrency(comboCalculations.estimatedReturns)}</span></div>
+                    <div className="flex justify-between border-t pt-2 mt-2"><span className="font-bold">Total value</span><span className="font-bold text-xl">{formatCurrency(comboCalculations.totalValue)}</span></div>
                   </div>
                 </div>
               </div>
