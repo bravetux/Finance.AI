@@ -345,6 +345,7 @@ const RetirementDashboard: React.FC = () => {
             </div>
             <div className="border-t pt-4 space-y-2">
               <div className="flex justify-between"><span className="text-muted-foreground">Annual Returns (Non-Equity):</span><span className="font-bold">₹{annualReturnsAfterRetirement.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span></div>
+              <p className="text-xs text-muted-foreground text-right -mt-2">Includes returns from FDs, Bonds, and Cash.</p>
               {annualReturnsAfterRetirement > 0 && (
                 <div className="text-center pt-2 flex items-center justify-center gap-2">
                   {annualReturnsAfterRetirement > futureAnnualExpenses ? (
