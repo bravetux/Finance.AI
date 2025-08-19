@@ -20,6 +20,12 @@ const PPFCalculator: React.FC = () => {
   const [lumpsumTimePeriod, setLumpsumTimePeriod] = useState(15);
   const [lumpsumInterestRate, setLumpsumInterestRate] = useState(7.1);
 
+  // State for Lumpsum + Yearly Calculator
+  const [comboLumpsum, setComboLumpsum] = useState(500000);
+  const [comboYearlyInvestment, setComboYearlyInvestment] = useState(50000);
+  const [comboTimePeriod, setComboTimePeriod] = useState(15);
+  const [comboInterestRate, setComboInterestRate] = useState(7.1);
+
   const yearlyCalculations = useMemo(() => {
     const P = yearlyInvestment;
     const i = yearlyInterestRate / 100;
@@ -50,6 +56,27 @@ const PPFCalculator: React.FC = () => {
     return { investedAmount, totalInterest, maturityValue };
   }, [lumpsumInvestment, lumpsumTimePeriod, lumpsumInterestRate]);
 
+  const comboCalculations = useMemo(() => {
+    const P_lumpsum = comboLumpsum;
+    const P_yearly = comboYearlyInvestment;
+    const i = comboInterestRate / 100;
+    const n = comboTimePeriod;
+
+    if (n <= 0) {
+      const invested = P_lumpsum + P_yearly * n;
+      return { investedAmount: invested, totalInterest: 0, maturityValue: invested };
+    }
+
+    const fvLumpsum = P_lumpsum * Math.pow(1 + i, n);
+    const fvYearly = P_yearly * ((Math.pow(1 + i, n) - 1) / i);
+
+    const maturityValue = fvLumpsum + fvYearly;
+    const investedAmount = P_lumpsum + (P_yearly * n);
+    const totalInterest = maturityValue - investedAmount;
+
+    return { investedAmount, totalInterest, maturityValue };
+  }, [comboLumpsum, comboYearlyInvestment, comboTimePeriod, comboInterestRate]);
+
   const yearlyChartData = [
     { name: "Total investment", value: yearlyCalculations.investedAmount },
     { name: "Total interest", value: yearlyCalculations.totalInterest },
@@ -58,6 +85,11 @@ const PPFCalculator: React.FC = () => {
   const lumpsumChartData = [
     { name: "Invested amount", value: lumpsumCalculations.investedAmount },
     { name: "Total interest", value: lumpsumCalculations.totalInterest },
+  ];
+
+  const comboChartData = [
+    { name: "Total investment", value: comboCalculations.investedAmount },
+    { name: "Total interest", value: comboCalculations.totalInterest },
   ];
 
   const COLORS = ["#C7D2FE", "#4F46E5"];
@@ -76,15 +108,15 @@ const PPFCalculator: React.FC = () => {
       <Card>
         <CardContent className="pt-6">
           <Tabs defaultValue="yearly">
-            <TabsList className="grid w-full grid-cols-2 md:w-1/3">
+            <TabsList className="grid w-full grid-cols-3 md:w-1/2">
               <TabsTrigger value="yearly">Yearly Investment</TabsTrigger>
               <TabsTrigger value="lumpsum">Lumpsum</TabsTrigger>
+              <TabsTrigger value="combo">Lumpsum + Yearly</TabsTrigger>
             </TabsList>
 
             {/* Yearly Investment Calculator Content */}
             <TabsContent value="yearly">
               <div className="grid md:grid-cols-2 gap-8 mt-6">
-                {/* Left Side - Inputs & Summary */}
                 <div className="space-y-8 flex flex-col">
                   <div>
                     <div className="flex justify-between items-center mb-2">
@@ -93,13 +125,7 @@ const PPFCalculator: React.FC = () => {
                         {formatCurrency(yearlyInvestment)}
                       </span>
                     </div>
-                    <Slider
-                      value={[yearlyInvestment]}
-                      onValueChange={(val) => setYearlyInvestment(val[0])}
-                      min={500}
-                      max={150000}
-                      step={500}
-                    />
+                    <Slider value={[yearlyInvestment]} onValueChange={(val) => setYearlyInvestment(val[0])} min={500} max={150000} step={500} />
                   </div>
                   <div>
                     <div className="flex justify-between items-center mb-2">
@@ -108,61 +134,28 @@ const PPFCalculator: React.FC = () => {
                         {yearlyTimePeriod} Yr
                       </span>
                     </div>
-                    <Slider
-                      value={[yearlyTimePeriod]}
-                      onValueChange={(val) => setYearlyTimePeriod(val[0])}
-                      min={0}
-                      max={100}
-                      step={1}
-                    />
+                    <Slider value={[yearlyTimePeriod]} onValueChange={(val) => setYearlyTimePeriod(val[0])} min={0} max={100} step={1} />
                   </div>
                   <div>
                     <div className="flex justify-between items-center">
                       <label className="font-medium">Rate of interest</label>
                       <div className="relative w-24">
-                        <Input
-                          type="number"
-                          value={yearlyInterestRate}
-                          onChange={(e) => setYearlyInterestRate(Number(e.target.value))}
-                          className="pr-8 text-right font-bold"
-                        />
+                        <Input type="number" value={yearlyInterestRate} onChange={(e) => setYearlyInterestRate(Number(e.target.value))} className="pr-8 text-right font-bold" />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">%</span>
                       </div>
                     </div>
                   </div>
                   <div className="mt-auto space-y-2 text-lg border-t pt-6">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Invested amount</span>
-                      <span className="font-medium">{formatCurrency(yearlyCalculations.investedAmount)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Total interest</span>
-                      <span className="font-medium">{formatCurrency(yearlyCalculations.totalInterest)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-bold">Maturity value</span>
-                      <span className="font-bold text-xl">{formatCurrency(yearlyCalculations.maturityValue)}</span>
-                    </div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Invested amount</span><span className="font-medium">{formatCurrency(yearlyCalculations.investedAmount)}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Total interest</span><span className="font-medium">{formatCurrency(yearlyCalculations.totalInterest)}</span></div>
+                    <div className="flex justify-between"><span className="font-bold">Maturity value</span><span className="font-bold text-xl">{formatCurrency(yearlyCalculations.maturityValue)}</span></div>
                   </div>
                 </div>
-
-                {/* Right Side - Chart */}
                 <div className="flex flex-col items-center justify-between">
                   <ResponsiveContainer width="100%" height={250}>
                     <PieChart>
-                      <Pie
-                        data={yearlyChartData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={80}
-                        outerRadius={100}
-                        fill="#8884d8"
-                        paddingAngle={5}
-                        dataKey="value"
-                      >
-                        {yearlyChartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
+                      <Pie data={yearlyChartData} cx="50%" cy="50%" innerRadius={80} outerRadius={100} fill="#8884d8" paddingAngle={5} dataKey="value">
+                        {yearlyChartData.map((entry, index) => (<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />))}
                       </Pie>
                       <Legend iconType="circle" />
                     </PieChart>
@@ -179,9 +172,7 @@ const PPFCalculator: React.FC = () => {
                   <div>
                     <div className="flex justify-between items-center mb-2">
                       <label className="font-medium">Total investment</label>
-                      <span className="text-lg font-bold text-primary bg-primary/10 px-3 py-1 rounded-md">
-                        {formatCurrency(lumpsumInvestment)}
-                      </span>
+                      <span className="text-lg font-bold text-primary bg-primary/10 px-3 py-1 rounded-md">{formatCurrency(lumpsumInvestment)}</span>
                     </div>
                     <Slider value={[lumpsumInvestment]} onValueChange={(val) => setLumpsumInvestment(val[0])} min={10000} max={10000000} step={10000} />
                   </div>
@@ -196,12 +187,7 @@ const PPFCalculator: React.FC = () => {
                     <div className="flex justify-between items-center">
                       <label className="font-medium">Rate of interest</label>
                       <div className="relative w-24">
-                        <Input
-                          type="number"
-                          value={lumpsumInterestRate}
-                          onChange={(e) => setLumpsumInterestRate(Number(e.target.value))}
-                          className="pr-8 text-right font-bold"
-                        />
+                        <Input type="number" value={lumpsumInterestRate} onChange={(e) => setLumpsumInterestRate(Number(e.target.value))} className="pr-8 text-right font-bold" />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">%</span>
                       </div>
                     </div>
@@ -217,6 +203,59 @@ const PPFCalculator: React.FC = () => {
                     <PieChart>
                       <Pie data={lumpsumChartData} cx="50%" cy="50%" innerRadius={80} outerRadius={100} fill="#8884d8" paddingAngle={5} dataKey="value">
                         {lumpsumChartData.map((entry, index) => (<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />))}
+                      </Pie>
+                      <Legend iconType="circle" />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Lumpsum + Yearly Calculator Content */}
+            <TabsContent value="combo">
+              <div className="grid md:grid-cols-2 gap-8 mt-6">
+                <div className="space-y-8">
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="font-medium">Initial Lumpsum Investment</label>
+                      <span className="text-lg font-bold text-primary bg-primary/10 px-3 py-1 rounded-md">{formatCurrency(comboLumpsum)}</span>
+                    </div>
+                    <Slider value={[comboLumpsum]} onValueChange={(val) => setComboLumpsum(val[0])} min={0} max={5000000} step={10000} />
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="font-medium">Yearly Investment</label>
+                      <span className="text-lg font-bold text-primary bg-primary/10 px-3 py-1 rounded-md">{formatCurrency(comboYearlyInvestment)}</span>
+                    </div>
+                    <Slider value={[comboYearlyInvestment]} onValueChange={(val) => setComboYearlyInvestment(val[0])} min={0} max={150000} step={500} />
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="font-medium">Time period</label>
+                      <span className="text-lg font-bold text-primary bg-primary/10 px-3 py-1 rounded-md">{comboTimePeriod} Yr</span>
+                    </div>
+                    <Slider value={[comboTimePeriod]} onValueChange={(val) => setComboTimePeriod(val[0])} min={1} max={40} step={1} />
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-center">
+                      <label className="font-medium">Rate of interest</label>
+                      <div className="relative w-24">
+                        <Input type="number" value={comboInterestRate} onChange={(e) => setComboInterestRate(Number(e.target.value))} className="pr-8 text-right font-bold" />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">%</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-auto space-y-2 text-lg border-t pt-6">
+                    <div className="flex justify-between"><span className="text-muted-foreground">Invested amount</span><span className="font-medium">{formatCurrency(comboCalculations.investedAmount)}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Total interest</span><span className="font-medium">{formatCurrency(comboCalculations.totalInterest)}</span></div>
+                    <div className="flex justify-between"><span className="font-bold">Maturity value</span><span className="font-bold text-xl">{formatCurrency(comboCalculations.maturityValue)}</span></div>
+                  </div>
+                </div>
+                <div className="flex flex-col items-center">
+                  <ResponsiveContainer width="100%" height={250}>
+                    <PieChart>
+                      <Pie data={comboChartData} cx="50%" cy="50%" innerRadius={80} outerRadius={100} fill="#8884d8" paddingAngle={5} dataKey="value">
+                        {comboChartData.map((entry, index) => (<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />))}
                       </Pie>
                       <Legend iconType="circle" />
                     </PieChart>
