@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -227,7 +227,23 @@ const CarAffordableCalculator: React.FC = () => {
       </div>
 
       <Card><CardHeader><CardTitle>Ownership Summary (Over {inputs.lifespan} Years)</CardTitle></CardHeader><CardContent className="space-y-2">{renderInfoField("Total Buying Cost (with EMI interest):", formatCurrency(calculations.totalBuyingCostWithEMI))}{renderInfoField("Total Running Cost (Fuel):", formatCurrency(calculations.totalRunningCost))}{renderInfoField("Total Insurance + Maintenance:", formatCurrency(calculations.totalInsuranceMaintenanceCost))}{renderInfoField("Total Additional Costs (Parking, Tolls):", formatCurrency(calculations.totalAdditionalCosts))}<div className="flex justify-between items-center border-t pt-2 mt-2"><span className="text-lg font-bold">Total Cost of Ownership:</span><span className="text-xl font-bold">{formatCurrency(calculations.totalOwnershipCost)}</span></div></CardContent></Card>
-      <Card className={calculations.isAffordable ? "bg-green-50 dark:bg-green-900/30 border-green-500" : "bg-red-50 dark:bg-red-900/30 border-red-500"}><CardHeader><CardTitle>Verdict</CardTitle></CardHeader><CardContent className="text-center space-y-2"><p className="text-lg">Annual Cost of Owning a Car (EMI + Running Costs): <strong className="text-2xl">{formatCurrency(calculations.totalAnnualCost)}</strong></p><p className={`text-4xl font-bold ${calculations.isAffordable ? 'text-green-600' : 'text-red-600'}`}>{calculations.isAffordable ? "Affordable" : "Not Affordable"}</p><p className="text-sm text-muted-foreground">Based on the rule that total annual car expenses should not exceed 15% of your annual net income.</p></CardContent></Card>
+      
+      <Card className={calculations.isAffordable ? "bg-green-50 dark:bg-green-900/30 border-green-500" : "bg-red-50 dark:bg-red-900/30 border-red-500"}>
+        <CardHeader><CardTitle>Verdict</CardTitle></CardHeader>
+        <CardContent className="text-center space-y-2">
+          <p className="text-lg">Annual Cost of Owning a Car (EMI + Running Costs): <strong className="text-2xl">{formatCurrency(calculations.totalAnnualCost)}</strong></p>
+          <p className={`text-4xl font-bold ${calculations.isAffordable ? 'text-green-600' : 'text-red-600'}`}>{calculations.isAffordable ? "Affordable" : "Not Affordable"}</p>
+        </CardContent>
+        <CardFooter>
+          <div className="text-xs text-muted-foreground space-y-1 w-full">
+            <p><strong>How affordability is calculated:</strong></p>
+            <ul className="list-disc pl-4 text-left">
+              <li>A common financial guideline is that your total car expenses (EMI, fuel, insurance, maintenance) should not exceed 15-20% of your monthly take-home pay. This calculator uses the 15% rule for its verdict.</li>
+              <li>As your salary increases over time and your loan is paid off, the affordability percentage (Total Cost / Net Income) should decrease, as shown in the projection table below.</li>
+            </ul>
+          </div>
+        </CardFooter>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -244,11 +260,11 @@ const CarAffordableCalculator: React.FC = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Year</TableHead>
-                  <TableHead>Net Income</TableHead>
+                  <TableHead>Net Income (+{inputs.annualSalaryHike}% yearly)</TableHead>
                   <TableHead>Purchase Cost (EMIs)</TableHead>
-                  <TableHead>Running Cost</TableHead>
-                  <TableHead>Insurance + Maintenance</TableHead>
-                  <TableHead>Additional Cost</TableHead>
+                  <TableHead>Running Cost (+{inputs.costInflation}% yearly)</TableHead>
+                  <TableHead>Insurance + Maintenance (+{inputs.costInflation}% yearly)</TableHead>
+                  <TableHead>Additional Cost (+{inputs.costInflation}% yearly)</TableHead>
                   <TableHead>Total Cost</TableHead>
                   <TableHead>% of Net Income</TableHead>
                 </TableRow>
