@@ -35,6 +35,7 @@ import {
   Bitcoin,
   HeartHandshake,
   Sparkles,
+  Car,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -130,6 +131,7 @@ const navItems = [
       { name: "SWP Calculator", path: "/dashboard/swp-calculator", icon: Calculator, type: 'link' },
       { name: "PPF Calculator", path: "/dashboard/ppf-calculator", icon: Calculator, type: 'link' },
       { name: "EPF Calculator", path: "/dashboard/epf-calculator", icon: Calculator, type: 'link' },
+      { name: "Car Affordable Calculator", path: "/dashboard/car-affordable-calculator", icon: Car, type: 'link' },
     ]
   },
 ];

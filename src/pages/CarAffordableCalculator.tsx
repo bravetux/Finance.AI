@@ -1,0 +1,236 @@
+"use client";
+
+import React, { useState, useMemo, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Car, Upload, Download, Trash2 } from "lucide-react";
+import { saveAs } from "file-saver";
+import { showSuccess, showError } from "@/utils/toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
+interface CarInputs {
+  annualIncome: number;
+  incomeTax: number;
+  priceOfVehicle: number;
+  roadTax: number;
+  downpayment: number;
+  loanTenure: number;
+  interestRate: number;
+  monthlyDriving: number;
+  mileage: number;
+  fuelPrice: number;
+  lifespan: number;
+  insurancePremium: number;
+  maintenanceCost: number;
+  parkingExpenses: number;
+  tollExpenses: number;
+}
+
+const initialInputs: CarInputs = {
+  annualIncome: 1600000,
+  incomeTax: 0,
+  priceOfVehicle: 1500000,
+  roadTax: 100000,
+  downpayment: 320000,
+  loanTenure: 5,
+  interestRate: 9.5,
+  monthlyDriving: 300,
+  mileage: 14,
+  fuelPrice: 110,
+  lifespan: 15,
+  insurancePremium: 9000,
+  maintenanceCost: 10000,
+  parkingExpenses: 0,
+  tollExpenses: 3000,
+};
+
+const CarAffordableCalculator: React.FC = () => {
+  const [inputs, setInputs] = useState<CarInputs>(() => {
+    try {
+      const saved = localStorage.getItem('carAffordableCalculatorData');
+      return saved ? JSON.parse(saved) : initialInputs;
+    } catch {
+      return initialInputs;
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('carAffordableCalculatorData', JSON.stringify(inputs));
+  }, [inputs]);
+
+  const handleInputChange = (field: keyof CarInputs, value: string) => {
+    setInputs(prev => ({ ...prev, [field]: Number(value) || 0 }));
+  };
+
+  const calculations = useMemo(() => {
+    const { annualIncome, incomeTax, priceOfVehicle, roadTax, downpayment, loanTenure, interestRate, monthlyDriving, mileage, fuelPrice, lifespan, insurancePremium, maintenanceCost, parkingExpenses, tollExpenses } = inputs;
+
+    const annualNetIncome = annualIncome - incomeTax;
+    const onRoadPrice = priceOfVehicle + roadTax;
+    const loanAmount = Math.max(0, onRoadPrice - downpayment);
+    
+    const monthlyInterestRate = (interestRate / 100) / 12;
+    const loanTenureMonths = loanTenure * 12;
+    const emiAmount = loanAmount > 0 && monthlyInterestRate > 0 && loanTenureMonths > 0
+      ? (loanAmount * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, loanTenureMonths)) / (Math.pow(1 + monthlyInterestRate, loanTenureMonths) - 1)
+      : 0;
+
+    const fuelCostPerYear = (monthlyDriving * 12 / Math.max(1, mileage)) * fuelPrice;
+    const fuelCostOverLifespan = fuelCostPerYear * lifespan;
+
+    const totalInsuranceCost = insurancePremium * lifespan;
+    const totalMaintenanceCost = maintenanceCost * lifespan;
+    const totalParkingCost = parkingExpenses * lifespan;
+    const totalTollCost = tollExpenses * lifespan;
+
+    const totalBuyingCostWithEMI = (emiAmount * loanTenureMonths) + downpayment;
+    const totalRunningCost = fuelCostOverLifespan;
+    const totalInsuranceMaintenanceCost = totalInsuranceCost + totalMaintenanceCost;
+    const totalAdditionalCosts = totalParkingCost + totalTollCost;
+    const totalOwnershipCost = totalBuyingCostWithEMI + totalRunningCost + totalInsuranceMaintenanceCost + totalAdditionalCosts;
+
+    const annualOperatingCost = fuelCostPerYear + insurancePremium + maintenanceCost + parkingExpenses + tollExpenses;
+    const totalAnnualCost = annualOperatingCost + (emiAmount * 12);
+    
+    const isAffordable = annualNetIncome > 0 ? totalAnnualCost <= (annualNetIncome * 0.15) : false;
+
+    return {
+      annualNetIncome, onRoadPrice, loanAmount, emiAmount, fuelCostPerYear,
+      totalBuyingCostWithEMI, totalRunningCost, totalInsuranceMaintenanceCost,
+      totalAdditionalCosts, totalOwnershipCost, totalAnnualCost, isAffordable
+    };
+  }, [inputs]);
+
+  const formatCurrency = (value: number) => `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+
+  const exportData = () => {
+    const blob = new Blob([JSON.stringify(inputs, null, 2)], { type: 'application/json' });
+    saveAs(blob, 'car-calculator-data.json');
+    showSuccess('Car calculator data exported!');
+  };
+
+  const importData = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const content = e.target?.result as string;
+        const data = JSON.parse(content);
+        setInputs({ ...initialInputs, ...data });
+        showSuccess('Data imported successfully!');
+      } catch (err) {
+        showError('Failed to parse the file.');
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  };
+
+  const handleClearData = () => {
+    setInputs(initialInputs);
+    showSuccess('All fields have been reset.');
+  };
+
+  const renderInputField = (label: string, field: keyof CarInputs, value: number) => (
+    <div className="space-y-1">
+      <Label htmlFor={field}>{label}</Label>
+      <Input id={field} type="number" value={value} onChange={e => handleInputChange(field, e.target.value)} />
+    </div>
+  );
+
+  const renderInfoField = (label: string, value: string) => (
+    <div className="flex justify-between items-center">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-medium">{value}</span>
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold flex items-center gap-2"><Car className="h-8 w-8" />Car Affordability Calculator</h1>
+        <div className="flex gap-2">
+          <AlertDialog><AlertDialogTrigger asChild><Button variant="destructive"><Trash2 className="mr-2 h-4 w-4" /> Clear</Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>This will reset all fields to their default values.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={handleClearData}>Yes, clear</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+          <Button variant="outline" onClick={exportData}><Upload className="mr-2 h-4 w-4" /> Export</Button>
+          <Button variant="outline" asChild><Label htmlFor="import-file" className="cursor-pointer"><Download className="mr-2 h-4 w-4" /> Import<Input id="import-file" type="file" accept=".json" className="hidden" onChange={importData} /></Label></Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader><CardTitle>Basic Car & Loan Details</CardTitle></CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {renderInputField("Annual Income", "annualIncome", inputs.annualIncome)}
+            {renderInputField("Income Tax", "incomeTax", inputs.incomeTax)}
+            {renderInputField("Price of Vehicle (Ex-Showroom)", "priceOfVehicle", inputs.priceOfVehicle)}
+            {renderInputField("Road Tax + Others", "roadTax", inputs.roadTax)}
+            {renderInputField("Expected Downpayment", "downpayment", inputs.downpayment)}
+            {renderInputField("Loan Tenure (Years)", "loanTenure", inputs.loanTenure)}
+            {renderInputField("Interest Rate on Loan (%)", "interestRate", inputs.interestRate)}
+            <div className="md:col-span-2 space-y-2 border-t pt-4">
+              {renderInfoField("Annual Net Income:", formatCurrency(calculations.annualNetIncome))}
+              {renderInfoField("On-Road Price:", formatCurrency(calculations.onRoadPrice))}
+              {renderInfoField("Loan Amount:", formatCurrency(calculations.loanAmount))}
+              {renderInfoField("EMI Amount:", formatCurrency(calculations.emiAmount))}
+            </div>
+          </CardContent>
+        </Card>
+        <div className="space-y-6">
+          <Card>
+            <CardHeader><CardTitle>Running, Insurance & Maintenance</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {renderInputField("Monthly Driving (km)", "monthlyDriving", inputs.monthlyDriving)}
+              {renderInputField("Car Mileage (km/l)", "mileage", inputs.mileage)}
+              {renderInputField("Fuel Price (per litre)", "fuelPrice", inputs.fuelPrice)}
+              {renderInputField("Car Lifespan (Years)", "lifespan", inputs.lifespan)}
+              {renderInputField("Annual Insurance Premium", "insurancePremium", inputs.insurancePremium)}
+              {renderInputField("Annual Maintenance Cost", "maintenanceCost", inputs.maintenanceCost)}
+              {renderInputField("Annual Parking Expenses", "parkingExpenses", inputs.parkingExpenses)}
+              {renderInputField("Annual Toll Expenses", "tollExpenses", inputs.tollExpenses)}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      <Card>
+        <CardHeader><CardTitle>Ownership Summary (Over {inputs.lifespan} Years)</CardTitle></CardHeader>
+        <CardContent className="space-y-2">
+          {renderInfoField("Total Buying Cost (with EMI interest):", formatCurrency(calculations.totalBuyingCostWithEMI))}
+          {renderInfoField("Total Running Cost (Fuel):", formatCurrency(calculations.totalRunningCost))}
+          {renderInfoField("Total Insurance + Maintenance:", formatCurrency(calculations.totalInsuranceMaintenanceCost))}
+          {renderInfoField("Total Additional Costs (Parking, Tolls):", formatCurrency(calculations.totalAdditionalCosts))}
+          <div className="flex justify-between items-center border-t pt-2 mt-2">
+            <span className="text-lg font-bold">Total Cost of Ownership:</span>
+            <span className="text-xl font-bold">{formatCurrency(calculations.totalOwnershipCost)}</span>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className={calculations.isAffordable ? "bg-green-50 dark:bg-green-900/30 border-green-500" : "bg-red-50 dark:bg-red-900/30 border-red-500"}>
+        <CardHeader><CardTitle>Verdict</CardTitle></CardHeader>
+        <CardContent className="text-center space-y-2">
+          <p className="text-lg">Annual Cost of Owning a Car (EMI + Running Costs): <strong className="text-2xl">{formatCurrency(calculations.totalAnnualCost)}</strong></p>
+          <p className={`text-4xl font-bold ${calculations.isAffordable ? 'text-green-600' : 'text-red-600'}`}>
+            {calculations.isAffordable ? "Affordable" : "Not Affordable"}
+          </p>
+          <p className="text-sm text-muted-foreground">Based on the rule that total annual car expenses should not exceed 15% of your annual net income.</p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default CarAffordableCalculator;
