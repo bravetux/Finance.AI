@@ -231,7 +231,7 @@ const CanYouRetireNow: React.FC = () => {
               id="withdrawal-slider"
               value={[withdrawalRate]}
               onValueChange={(val) => setWithdrawalRate(val[0])}
-              min={4}
+              min={1}
               max={10}
               step={0.5}
               className="mt-2"
