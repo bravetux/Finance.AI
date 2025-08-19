@@ -19,6 +19,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface CarInputs {
   annualIncome: number;
@@ -36,6 +37,8 @@ interface CarInputs {
   maintenanceCost: number;
   parkingExpenses: number;
   tollExpenses: number;
+  annualSalaryHike: number;
+  costInflation: number;
 }
 
 const initialInputs: CarInputs = {
@@ -54,13 +57,15 @@ const initialInputs: CarInputs = {
   maintenanceCost: 10000,
   parkingExpenses: 0,
   tollExpenses: 3000,
+  annualSalaryHike: 4,
+  costInflation: 6,
 };
 
 const CarAffordableCalculator: React.FC = () => {
   const [inputs, setInputs] = useState<CarInputs>(() => {
     try {
       const saved = localStorage.getItem('carAffordableCalculatorData');
-      return saved ? JSON.parse(saved) : initialInputs;
+      return saved ? { ...initialInputs, ...JSON.parse(saved) } : initialInputs;
     } catch {
       return initialInputs;
     }
@@ -106,7 +111,6 @@ const CarAffordableCalculator: React.FC = () => {
     
     const isAffordable = annualNetIncome > 0 ? totalAnnualCost <= (annualNetIncome * 0.15) : false;
 
-    // Monthly calculations for cards
     const fuelCostPerMonth = (monthlyDriving / Math.max(1, mileage)) * fuelPrice;
     const insuranceCostPerMonth = insurancePremium / 12;
     const additionalCostPerMonth = (maintenanceCost + parkingExpenses + tollExpenses) / 12;
@@ -119,6 +123,40 @@ const CarAffordableCalculator: React.FC = () => {
       fuelCostPerMonth, insuranceCostPerMonth, additionalCostPerMonth, monthlyTotalExpenses
     };
   }, [inputs]);
+
+  const projectionCalculations = useMemo(() => {
+    const { lifespan, loanTenure, annualSalaryHike, costInflation } = inputs;
+    const { annualNetIncome, emiAmount, fuelCostPerYear } = calculations;
+    
+    const projections = [];
+    let currentNetIncome = annualNetIncome;
+    let currentRunningCost = fuelCostPerYear;
+    let currentInsuranceMaintenance = inputs.insurancePremium + inputs.maintenanceCost;
+    let currentAdditionalCost = inputs.parkingExpenses + inputs.tollExpenses;
+
+    for (let year = 1; year <= lifespan; year++) {
+      const annualEmi = year <= loanTenure ? emiAmount * 12 : 0;
+      const totalCost = annualEmi + currentRunningCost + currentInsuranceMaintenance + currentAdditionalCost;
+      const percentOfNetIncome = currentNetIncome > 0 ? (totalCost / currentNetIncome) * 100 : 0;
+
+      projections.push({
+        year,
+        netIncome: currentNetIncome,
+        purchaseCost: annualEmi,
+        runningCost: currentRunningCost,
+        insuranceMaintenance: currentInsuranceMaintenance,
+        additionalCost: currentAdditionalCost,
+        totalCost,
+        percentOfNetIncome,
+      });
+
+      currentNetIncome *= (1 + annualSalaryHike / 100);
+      currentRunningCost *= (1 + costInflation / 100);
+      currentInsuranceMaintenance *= (1 + costInflation / 100);
+      currentAdditionalCost *= (1 + costInflation / 100);
+    }
+    return projections;
+  }, [inputs, calculations]);
 
   const formatCurrency = (value: number) => `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 
@@ -177,104 +215,72 @@ const CarAffordableCalculator: React.FC = () => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Fuel Cost Per Month</CardTitle>
-            <Fuel className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(calculations.fuelCostPerMonth)}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Insurance Cost Per Month</CardTitle>
-            <Shield className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(calculations.insuranceCostPerMonth)}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Additional Cost Per Month</CardTitle>
-            <Wrench className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(calculations.additionalCostPerMonth)}</div>
-            <p className="text-xs text-muted-foreground">Maintenance, Parking, Tolls</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Monthly Total Expenses</CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(calculations.monthlyTotalExpenses)}</div>
-            <p className="text-xs text-muted-foreground">EMI + All Monthly Costs</p>
-          </CardContent>
-        </Card>
+        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Fuel Cost Per Month</CardTitle><Fuel className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{formatCurrency(calculations.fuelCostPerMonth)}</div></CardContent></Card>
+        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Insurance Cost Per Month</CardTitle><Shield className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{formatCurrency(calculations.insuranceCostPerMonth)}</div></CardContent></Card>
+        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Additional Cost Per Month</CardTitle><Wrench className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{formatCurrency(calculations.additionalCostPerMonth)}</div><p className="text-xs text-muted-foreground">Maintenance, Parking, Tolls</p></CardContent></Card>
+        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Monthly Total Expenses</CardTitle><Wallet className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{formatCurrency(calculations.monthlyTotalExpenses)}</div><p className="text-xs text-muted-foreground">EMI + All Monthly Costs</p></CardContent></Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader><CardTitle>Basic Car & Loan Details</CardTitle></CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {renderInputField("Annual Income", "annualIncome", inputs.annualIncome)}
-            {renderInputField("Income Tax", "incomeTax", inputs.incomeTax)}
-            {renderInputField("Price of Vehicle (Ex-Showroom)", "priceOfVehicle", inputs.priceOfVehicle)}
-            {renderInputField("Road Tax + Others", "roadTax", inputs.roadTax)}
-            {renderInputField("Expected Downpayment", "downpayment", inputs.downpayment)}
-            {renderInputField("Loan Tenure (Years)", "loanTenure", inputs.loanTenure)}
-            {renderInputField("Interest Rate on Loan (%)", "interestRate", inputs.interestRate)}
-            <div className="md:col-span-2 space-y-2 border-t pt-4">
-              {renderInfoField("Annual Net Income:", formatCurrency(calculations.annualNetIncome))}
-              {renderInfoField("On-Road Price:", formatCurrency(calculations.onRoadPrice))}
-              {renderInfoField("Loan Amount:", formatCurrency(calculations.loanAmount))}
-              {renderInfoField("EMI Amount:", formatCurrency(calculations.emiAmount))}
-            </div>
-          </CardContent>
-        </Card>
-        <div className="space-y-6">
-          <Card>
-            <CardHeader><CardTitle>Running, Insurance & Maintenance</CardTitle></CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {renderInputField("Monthly Driving (km)", "monthlyDriving", inputs.monthlyDriving)}
-              {renderInputField("Car Mileage (km/l)", "mileage", inputs.mileage)}
-              {renderInputField("Fuel Price (per litre)", "fuelPrice", inputs.fuelPrice)}
-              {renderInputField("Car Lifespan (Years)", "lifespan", inputs.lifespan)}
-              {renderInputField("Annual Insurance Premium", "insurancePremium", inputs.insurancePremium)}
-              {renderInputField("Annual Maintenance Cost", "maintenanceCost", inputs.maintenanceCost)}
-              {renderInputField("Annual Parking Expenses", "parkingExpenses", inputs.parkingExpenses)}
-              {renderInputField("Annual Toll Expenses", "tollExpenses", inputs.tollExpenses)}
-            </CardContent>
-          </Card>
-        </div>
+        <Card><CardHeader><CardTitle>Basic Car & Loan Details</CardTitle></CardHeader><CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">{renderInputField("Annual Income", "annualIncome", inputs.annualIncome)}{renderInputField("Income Tax", "incomeTax", inputs.incomeTax)}{renderInputField("Price of Vehicle (Ex-Showroom)", "priceOfVehicle", inputs.priceOfVehicle)}{renderInputField("Road Tax + Others", "roadTax", inputs.roadTax)}{renderInputField("Expected Downpayment", "downpayment", inputs.downpayment)}{renderInputField("Loan Tenure (Years)", "loanTenure", inputs.loanTenure)}{renderInputField("Interest Rate on Loan (%)", "interestRate", inputs.interestRate)}<div className="md:col-span-2 space-y-2 border-t pt-4">{renderInfoField("Annual Net Income:", formatCurrency(calculations.annualNetIncome))}{renderInfoField("On-Road Price:", formatCurrency(calculations.onRoadPrice))}{renderInfoField("Loan Amount:", formatCurrency(calculations.loanAmount))}{renderInfoField("EMI Amount:", formatCurrency(calculations.emiAmount))}</div></CardContent></Card>
+        <div className="space-y-6"><Card><CardHeader><CardTitle>Running, Insurance & Maintenance</CardTitle></CardHeader><CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">{renderInputField("Monthly Driving (km)", "monthlyDriving", inputs.monthlyDriving)}{renderInputField("Car Mileage (km/l)", "mileage", inputs.mileage)}{renderInputField("Fuel Price (per litre)", "fuelPrice", inputs.fuelPrice)}{renderInputField("Car Lifespan (Years)", "lifespan", inputs.lifespan)}{renderInputField("Annual Insurance Premium", "insurancePremium", inputs.insurancePremium)}{renderInputField("Annual Maintenance Cost", "maintenanceCost", inputs.maintenanceCost)}{renderInputField("Annual Parking Expenses", "parkingExpenses", inputs.parkingExpenses)}{renderInputField("Annual Toll Expenses", "tollExpenses", inputs.tollExpenses)}</CardContent></Card></div>
       </div>
 
-      <Card>
-        <CardHeader><CardTitle>Ownership Summary (Over {inputs.lifespan} Years)</CardTitle></CardHeader>
-        <CardContent className="space-y-2">
-          {renderInfoField("Total Buying Cost (with EMI interest):", formatCurrency(calculations.totalBuyingCostWithEMI))}
-          {renderInfoField("Total Running Cost (Fuel):", formatCurrency(calculations.totalRunningCost))}
-          {renderInfoField("Total Insurance + Maintenance:", formatCurrency(calculations.totalInsuranceMaintenanceCost))}
-          {renderInfoField("Total Additional Costs (Parking, Tolls):", formatCurrency(calculations.totalAdditionalCosts))}
-          <div className="flex justify-between items-center border-t pt-2 mt-2">
-            <span className="text-lg font-bold">Total Cost of Ownership:</span>
-            <span className="text-xl font-bold">{formatCurrency(calculations.totalOwnershipCost)}</span>
-          </div>
-        </CardContent>
-      </Card>
+      <Card><CardHeader><CardTitle>Ownership Summary (Over {inputs.lifespan} Years)</CardTitle></CardHeader><CardContent className="space-y-2">{renderInfoField("Total Buying Cost (with EMI interest):", formatCurrency(calculations.totalBuyingCostWithEMI))}{renderInfoField("Total Running Cost (Fuel):", formatCurrency(calculations.totalRunningCost))}{renderInfoField("Total Insurance + Maintenance:", formatCurrency(calculations.totalInsuranceMaintenanceCost))}{renderInfoField("Total Additional Costs (Parking, Tolls):", formatCurrency(calculations.totalAdditionalCosts))}<div className="flex justify-between items-center border-t pt-2 mt-2"><span className="text-lg font-bold">Total Cost of Ownership:</span><span className="text-xl font-bold">{formatCurrency(calculations.totalOwnershipCost)}</span></div></CardContent></Card>
+      <Card className={calculations.isAffordable ? "bg-green-50 dark:bg-green-900/30 border-green-500" : "bg-red-50 dark:bg-red-900/30 border-red-500"}><CardHeader><CardTitle>Verdict</CardTitle></CardHeader><CardContent className="text-center space-y-2"><p className="text-lg">Annual Cost of Owning a Car (EMI + Running Costs): <strong className="text-2xl">{formatCurrency(calculations.totalAnnualCost)}</strong></p><p className={`text-4xl font-bold ${calculations.isAffordable ? 'text-green-600' : 'text-red-600'}`}>{calculations.isAffordable ? "Affordable" : "Not Affordable"}</p><p className="text-sm text-muted-foreground">Based on the rule that total annual car expenses should not exceed 15% of your annual net income.</p></CardContent></Card>
 
-      <Card className={calculations.isAffordable ? "bg-green-50 dark:bg-green-900/30 border-green-500" : "bg-red-50 dark:bg-red-900/30 border-red-500"}>
-        <CardHeader><CardTitle>Verdict</CardTitle></CardHeader>
-        <CardContent className="text-center space-y-2">
-          <p className="text-lg">Annual Cost of Owning a Car (EMI + Running Costs): <strong className="text-2xl">{formatCurrency(calculations.totalAnnualCost)}</strong></p>
-          <p className={`text-4xl font-bold ${calculations.isAffordable ? 'text-green-600' : 'text-red-600'}`}>
-            {calculations.isAffordable ? "Affordable" : "Not Affordable"}
-          </p>
-          <p className="text-sm text-muted-foreground">Based on the rule that total annual car expenses should not exceed 15% of your annual net income.</p>
+      <Card>
+        <CardHeader>
+          <CardTitle>Ownership Cost Projection (With Salary Hike & Inflation)</CardTitle>
+          <CardDescription>This table projects your car ownership costs over its entire lifespan, factoring in inflation and your salary growth.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            {renderInputField("Annual Salary Hike (%)", "annualSalaryHike", inputs.annualSalaryHike)}
+            {renderInputField("Annual Cost Inflation (%)", "costInflation", inputs.costInflation)}
+          </div>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Year</TableHead>
+                  <TableHead>Net Income</TableHead>
+                  <TableHead>Purchase Cost (EMIs)</TableHead>
+                  <TableHead>Running Cost</TableHead>
+                  <TableHead>Insurance + Maintenance</TableHead>
+                  <TableHead>Additional Cost</TableHead>
+                  <TableHead>Total Cost</TableHead>
+                  <TableHead>% of Net Income</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {projectionCalculations.map(p => (
+                  <TableRow key={p.year}>
+                    <TableCell>{p.year}</TableCell>
+                    <TableCell>{formatCurrency(p.netIncome)}</TableCell>
+                    <TableCell>{formatCurrency(p.purchaseCost)}</TableCell>
+                    <TableCell>{formatCurrency(p.runningCost)}</TableCell>
+                    <TableCell>{formatCurrency(p.insuranceMaintenance)}</TableCell>
+                    <TableCell>{formatCurrency(p.additionalCost)}</TableCell>
+                    <TableCell>{formatCurrency(p.totalCost)}</TableCell>
+                    <TableCell>{p.percentOfNetIncome.toFixed(2)}%</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+              <TableFooter>
+                <TableRow className="font-bold bg-muted/50">
+                  <TableCell>Total</TableCell>
+                  <TableCell></TableCell>
+                  <TableCell>{formatCurrency(projectionCalculations.reduce((s, p) => s + p.purchaseCost, 0))}</TableCell>
+                  <TableCell>{formatCurrency(projectionCalculations.reduce((s, p) => s + p.runningCost, 0))}</TableCell>
+                  <TableCell>{formatCurrency(projectionCalculations.reduce((s, p) => s + p.insuranceMaintenance, 0))}</TableCell>
+                  <TableCell>{formatCurrency(projectionCalculations.reduce((s, p) => s + p.additionalCost, 0))}</TableCell>
+                  <TableCell>{formatCurrency(projectionCalculations.reduce((s, p) => s + p.totalCost, 0))}</TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+              </TableFooter>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>
